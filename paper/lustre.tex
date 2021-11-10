@@ -1,1 +1,11 @@
-Write lustre
+We explained the asynchronous AGREE semantics by modifying and supplementing the orignal AGREE contracts. However, these changes could be done behind the scene during AGREE translation. Once user indicates the asynchronous semantics is desired to prove the property, the translator could adopt the translation so that the resulting Lustre model reflects the desired semantics. In AGREE, a variant of Lustre \cite{GAO2008111} was adopted. It extends Lustre to support the analysis of globally asynchronous, locally synchronous architectures. It introduced an expression called \emph{condact}. \emph{Condact} expressions are used to clock nodes, i.e. \emph{Condact (clock, node\_name(), initial\_output)}. A clocked node updates the local and output signals when the clock is true, otherwise it keeps the previous value of the local and output signals. This matches the synchronous timing semantics of threads. In AGREE backend, each thread is translated to a node \emph{Thread\_node}. We use the \emph{Complete} event as the clock. The \emph{condact} expression looks like \emph{condact(Complete, Thread\_node(in, out,…), true)}. The final translation is \emph{assert(condact(Complete, Thread\_node(in, out,…), true));}. 
+
+In AGREE backend translation, a thread is translated as a node with constraints on thread input and output values. All thread inputs and outputs are mapped to the inputs of a node. The \emph{condact} expression does not constrain the values of the inputs of the corresponding node. Thus, we need to use additional assertions to ensure that the output of a thread updates value only when \emph{Complete} is true, otherwise keeps its previous value. That is, \emph{assert (not complete) => (Output = (0 -> pre(Output)));}
+
+%Condact (clock, node_name(), initial_output)
+%It computes node local variables and outputs when the clock is true, and holds the previous values when false.
+%Propose: use condact to model AADL threads
+%Lustre code: assert(condact(Complete, Thread_node(in, out,…), true));
+%It matches AGREE semantics
+%Contracts only hold @Complete
+%Local variables are updated only once per cycle (@Complete)
