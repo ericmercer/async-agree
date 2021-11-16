@@ -1,1 +1,24 @@
-Write introduction \cite{8625938}.
+%Write introduction \cite{8625938}.
+
+% Brief overview of AADL
+The Architecture Analysis and Design Language (AADL) was developed to capture the important design concepts in distributed real-time embedded systems~\cite{FeilerModelBasedEngineering2012}. 
+%AADL is therefore well-suited for modeling avionics system architectures, and provides an excellent mechanism for capturing the important details of the system design. 
+AADL captures both the hardware and software architecture in a hierarchical format,  
+%It provides hardware component models including processors, buses, memories, and I/O devices, and software component models including threads, processes, and subprograms. 
+%Interfaces for these components and data flows between components can also be defined. 
+%The language offers a high degree of flexibility in terms of architecture and component detail. 
+offering a high degree of flexibility and supporting incremental development, in which an architecture is refined to increasing levels of detail.
+%This supports incremental development, where the architecture is refined to increasing levels of detail and where components can be refined with additional details over time. 
+%AADL models can be built and managed using the Eclipse-based Open Source AADL Development Environment (OSATE) \cite{osate}. OSATE includes a number of tools for checking model characteristics, such as schedulability and data flows.  
+%
+% Need for compositional analysis - scalability, consistent with and supports development process, proof follows architecture
+In AADL, an architectural model includes component interfaces, connections, and execution characteristics, but not component implementations. It describes the interactions between components and their arrangement in the system, but the components themselves are ``black boxes.'' The implementations are described separately using model-based specification languages or traditional programming languages, which may be included by reference in the architecture model.  
+%This separation of implementation and architecture is an important factor in achieving scalability for the analysis tools that we have developed.
+
+In previous work, we developed AGREE~\cite{8625938}, a language and tool for compositional verification of AADL models.  The behavior of a model is described by \textit{contracts} specified for each component.  A contract contains a set of \textit{assumptions} about the component's inputs and a set of \textit{guarantees} about the outputs.  The guarantees of a component must be true provided the component's assumptions are true.  The goal of an AGREE analysis is to prove that a component's contract is entailed by the contracts of its subcomponents.  Contracts of a leaf-level component must be verified to hold by its implementation.  
+%
+AGREE was originally developed to reason about systems that execute synchronously. These systems have straightforward translations to \emph{Lustre}, a synchronous dataflow language interpreted by the model checkers used by AGREE. However, many systems that are modeled in AADL do not behave synchronously. Ideally one can implement a communication protocol between components, such as Physically Asynchronous Logically Synchronous (PALS)~\cite{pals}, that allows the abstraction of synchronous communication to be sound. However, for many systems this is not the case.
+
+In this paper, we extend the AGREE framework to enable verification of asynchronous system architectures. We introduce virtual scheduling events, which tie AADL timing and scheduling semantics to AGREE contracts. This enhancement enables AGREE to better preserve the full AADL semantics and take the software execution schedule into account in the analysis.  Furthermore, it enables formal verification of a new class of embedded system architectures. 
+
+We describe the problem of asynchronous system verification, and illustrate using a simple example in Section~\ref{example}.  We then provide a formal definition of AGREE, including our proposed asynchronous semantics, in Section~\ref{async}, followed by a description of the Lustre backend model in Section~\ref{lustre}.  We demonstrate usage of asynchronous AGREE in a case study in Section~\ref{case-study}, in which we compare the formal verification of a system architecture using both synchronous and asynchronous approaches.  Related work is presented in Section~\ref{rw}.  We discuss our conclusions in Section~\ref{conclusion}.  
