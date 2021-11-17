@@ -23,16 +23,36 @@ $$e(c)_i \Rightarrow p_i, \forall i\in N, \forall p \in P $$
 %We denote the initial value of a signal as $x_0$. For an event port $p$, $e(p_0) = false$. The output write action is also non-blocking. In other words, a thread will not halt its execution due to waiting for an previous output data to be \emph{consumed}. It overwrites.
 
 %{\bf schedule.}
-A schedule of a set of threads defines the \emph{dispatch} and \emph{complete} signals of each thread. We assume schedules are static, periodic, and valid. A schedule is called valid if in each period or \emph{cycle}, there is no other scheduling event between the \emph{dispatch} and \emph{complete} of the same thread, and the \emph{dispatch} event occurs before the \emph{complete} event.
+A schedule of a set of threads defines the \emph{dispatch} and \emph{complete} signals of each thread. We assume schedules are static, periodic, and valid. A schedule is called valid if in each period or \emph{cycle}, there is no other scheduling event between the \emph{dispatch} and \emph{complete} of the same thread, and the \emph{dispatch} event occurs before the matching \emph{complete} event. 
 
 %{\bf model of time.}
-All signals by definition are associated with the same logic clock, indicated by its index. The \emph{tick} models the basic time unit where the system is analyzed. This could be the basic time unit used in a schedule, or the greatest common divisor. For example, given a schedule with a period of 10 ms, starting with thread A 4 ms, idle 2 ms, thread B 2 ms, idle 2 ms, then a schedule could be $\sigma = \{d(A)=(1,0,0,0,0)^*, c(A) = (0,0,1,0,0)^*, d(B) = (0,0,0,1,0)^*, c(B) = (0,0,0,0,1)^*\}$, where each \emph{tick} models 2 ms. The model of a schedule can be simplified to potentially improve the formal verification performance. The thread execution time can be modelled as just one tick. The idle time can be abstracted out. For the same example above, a simplified schedule could be  $\sigma' = \{d(A)=(1,0,0)^*, c(A) = (0,1,0)^*, d(B) = (0,1,0)^*, c(B) = (0,0,1)^*\}$. As long as the execution order is preserved, it is straightforward to show the proof/disproof is equavilent to a model directly mapping each base time unit to a tick.
+All signals by definition are associated with the same logic clock, indicated by its index. The \emph{tick} models the basic time unit where the system is analyzed. This could be the basic time unit used in a schedule, or the greatest common divisor. For example, given a schedule with a period of 10 ms, starting with thread A 4 ms, idle 2 ms, thread B 2 ms, idle 2 ms, then a model of the schedule could be $\sigma = \{d(A)=(1,0,0,0,0)^*, c(A) = (0,0,1,0,0)^*, d(B) = (0,0,0,1,0)^*, c(B) = (0,0,0,0,1)^*\}$, where each \emph{tick} models 2 ms. We introduce a circular counter to model a schedule in AGREE. The counter updates at each tick. The maximum count models the period of the schedule. 
+%		-- Counter starts with init + incr, reset to init
+\begin{verbatim}
+		node Counter (init: int, incr: int, reset: bool)	
+		returns (count: int);
+		let
+			count = if reset then init
+					else init-> (pre(count) + incr);
+		tel;
+		
+ eq Frame : int = CASEAsyncAgree::Counter(1, 1, prev(Frame = 5, false));
 
-\begin{theorem}
-Given an AADL model with two models of schedule $\sigma$ and $\sigma'$ ...
-\end{theorem}
+ assume "SEL4 domain schedule" :
+				Thread_A_Dispatch = (Frame = 1) and
+				Thread_A_Complete = (Frame = 3) and					
+				Thread_B_Dispatch = (Frame = 4) and	
+				Thread_B_Complete = (Frame = 5);	
+\end{verbatim}		
 
-{\bf Proof sketch.} It is possible to show that any counter-example found in the proof of the system property of model with schedule $\sigma$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\sigma'$,  and vice versa.
+The internal input ports of a thread are connected to the output ports of another thread. The data arrival rate is controlled by the scheduler. However, for the external input ports of a thread, the data arrival could be irregular. We assume the external input data rate is considered in the schedule, so that all external input data is processed by the thread. Since AADL assiciate each input port with a buffer or queue, we could simply the timing model by assuming the external input data arrival event is coincidental with thread \emph{dispatch} event. That is, for the external input event data ports $I_x$ of thread $A$, 
+$$ e(i) \Rightarrow d(A), \forall i \in I_x $$
+	
+%\begin{theorem}
+%Given an AADL model with two models of schedule $\sigma$ and $\sigma'$ ...
+%\end{theorem}
+
+%{\bf Proof sketch.} 
 
 %{\bf model of execution delay.}
 %The thread exeution delay is not directly modelled. Instead, the time slot allocated to a thread in a schedule is modelled by the \emph{distance} between the thread \emph{dispatch} and \emph{complete}. If we assume there is no pre-emption, this modells  the worst case execution time or deadline.
@@ -42,14 +62,14 @@ Given an AADL model with two models of schedule $\sigma$ and $\sigma'$ ...
 
 %{\bf AGREE contracts.}
 
-Our approach to modelling the AADL asynchronous MoC in AGREE is to keep the existing AADL model structure intact and add new AGREE contracts and modify existing contracts. The added contracts model the asynchronous communication between AADL ports. The modification of the exisiting contracts reflcts the interpretation of the contracts (system properties) under the asychronous AGREE MoC. 
+Our approach to modelling the AADL asynchronous MoC in AGREE is to keep the existing AADL model structure intact and add new AGREE contracts and augument existing contracts. The added contracts model the asynchronous communication between AADL ports. The modification of the exisiting contracts reflcts the interpretation of the contracts under the asychronous AGREE MoC. 
 
 
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=80mm]{aadl_events.jpg}
-\caption{An AADL Model with AGREE Contracts\label{motivation}}
-\end{figure}
+%\begin{figure}[ht!]
+%\centering
+%\includegraphics[width=80mm]{aadl_events.jpg}
+%\caption{An AADL Model with AGREE Contracts\label{motivation}}
+%\end{figure}
 
 %In asynchronous AGREE, the \emph{Execution\_Time} property is modelled by the time interval between the \emph{Dispatch} event and the \emph{Complete} event.
 %The assumptions hold at the \emph{Dispatch} event \[Dispatch => Assumption\] , and the guarantees hold at the \emph{Complete} event, i.e. \[Complete => Guarantee\] 

@@ -1,1 +1,11 @@
-Write introduction \cite{8625938}.
+write introduction.
+
+%{\bf AADL.}
+Architectue Analysis and Design Language (AADL) has been widely used for the modelling and analysis of complex cyber-physical systems. For our domain of interest, AADL provides an appropriate level of abstraction to perform formal analysis without the implemention details.
+
+%{\bf AGREE.}
+Assume-Guarantee REasoning Environment (AGREE)\cite{8625938} is a language and a tool for compositional verification of AADL models. The behavior of a model is described by contracts specified for each component. A \emph{contract} contains a set of \emph{assumptions} about the component's inputs and a set of \emph{guarantees} about the component's outputs. The verification goal is to prove that a system top-level contract holds, provided its component's contracts hold.
+%
+An important limitation in the current AGREE tool suite is that it can only deal with \emph{synchronous} systems. This means the components of a system computes and communicates \emph{instanenously}. And there is no notion of component execution order. The work described in this paper specifically addresses the limitation. It incorporates a pre-defined schedule and ties the asynchronous AADL execution semantics with AGREE contracts, without changing the underlying analysis framework.
+
+
