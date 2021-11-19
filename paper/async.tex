@@ -3,22 +3,22 @@
 
 We define a signal $x$ as a sequence of values $(x_1, x_2, ...)$ of a certain data type. That is, $x = N \mapsto T$, where $x_i$ is of type $T$ for all $i \in N$. The data type can be either a primitive data type (e.g. real, bool, int, and enumeration types) or a composite data type (e.g. record types). Assume the data type of signal $x$ and $y$ is $T_x$ and $T_y$, respectively, $x = y$ means that $T_x=T_y$ and $x_i = y_i$ for all $i \in N$. 
 
-We model the ports of an AADL thread as signals. In particular, an event port is modelled as a sequence of Boolean values. The value \emph{true} or \emph{false} indicates an event is \emph{present} or \emph{absent} at the port, respectively. An event data port is modelled as a pair of signals, one representing the data stream, and the other representing the associated event stream. To simplify the notation, we use the port name $p$ to denote its associated \emph{data signal}, and $e(p)$ to denote its associated \emph{event signal}. The ports of a thread are divided into two finite disctinct sets: input ports ($I$) and output ports ($O$). Correspondingly, the associated signals are divided int to input signals and output signals. We model the \emph{state} of a thread with a finite set $S$ of signals. %The next state function is $T: S x I \mapsto S'$. The output function is $T: S x I \mapsto S$. Then, a thread is %A thread is modelled as a collection of input signals and output signals. A thread could be aossciated with /emph{local} states, which are not accessible outside the scope of the thread. They are modelled as signals, noted as set S . 
-An AADL \emph{connection} between an input port $i$ and an output port $o$ establishes the equality of their associated signals. For data ports, this means $i = o$. For event data prots, this means $i = o$ and $e(i) = e(o)$. %For simplicity, we define $e(p) = false^*$ if $p$ is a data port.
+We model the ports of an AADL thread as signals. In particular, an event port is modelled as a sequence of Boolean values. The value \emph{true} or \emph{false} indicates an event is \emph{present} or \emph{absent} at the port, respectively. An event data port is modelled as a pair of signals, one representing the data stream, and the other representing the associated event stream. To simplify the notation, we use the port name $p$ to denote its associated \emph{data signal}, and $event(p)$ to denote its associated \emph{event signal}. The ports of a thread are divided into two finite disctinct sets: input ports ($I$) and output ports ($O$). Correspondingly, the associated signals are divided int to input signals and output signals. We model the \emph{state} of a thread with a finite set $S$ of signals. %The next state function is $T: S x I \mapsto S'$. The output function is $T: S x I \mapsto S$. Then, a thread is %A thread is modelled as a collection of input signals and output signals. A thread could be aossciated with /emph{local} states, which are not accessible outside the scope of the thread. They are modelled as signals, noted as set S . 
+An AADL \emph{connection} between an input port $i$ and an output port $o$ establishes the equality of their associated signals. For data ports, this means $i = o$. For event data prots, this means $i = o$ and $event(i) = event(o)$. %For simplicity, we define $e(p) = false^*$ if $p$ is a data port.
 
 %{\bf virtual events.}
 We introduce two virtual input event ports: \emph{dispatch} ($d$) and \emph{complete} ($c$) for each thread.  The \emph{Dispatch} and \emph{Complete} event models, respectively, the start and end of the time slot that a scheduler allocated to a thread to run. 
 %{\bf thread execution.}
 When its \emph{dispatch} event $d$ is present, a thread samples the input values and starts execution. This is the time when the associated AGREE \emph{assumptions} $A$ should hold. That is,
-$$e(d)_i \Rightarrow a_i, \forall i\in N, \forall a \in A $$
+$$event(d)_i \Rightarrow a_i, \forall i\in N, \forall a \in A $$
 %For an input event data port, its value is considered only when its event is present at \emph{dispatch}. The input read action is non-blocking. In other words, a thread will not halt its execution due to waiting for an input data or event.
 %We assume a thread always completes its execution within the time slot. In other words, there is no pre-emption. 
 When its \emph{complete} event $c$ is present, a thread updates its ouput signal $o$ value, otherwise it holds its previous value. That is, 
-$$\lnot e(c)_i \Rightarrow ((o_i = o_{i-1}) \land (e(o)_i = e(o)_{i-1}), \forall i \in N, \forall o \in O$$
+$$\lnot event(c)_i \Rightarrow ((o_i = o_{i-1}) \land (event(o)_i = event(o)_{i-1}), \forall i \in N, \forall o \in O$$
 A thread updates its the state signal $s$ similarly. That is,
-$$\lnot e(c)_i \Rightarrow ((s_i = s_{i-1}) \land (e(s)_i = e(s)_{i-1}), \forall i \in N, \forall s \in S$$
+$$\lnot event(c)_i \Rightarrow ((s_i = s_{i-1}) \land (event(s)_i = event(s)_{i-1}), \forall i \in N, \forall s \in S$$
 This is the time where the associated AGREE \emph{gurarantees} $P$ should hold. That is,
-$$e(c)_i \Rightarrow p_i, \forall i\in N, \forall p \in P $$
+$$event(c)_i \Rightarrow p_i, \forall i\in N, \forall p \in P $$
 
 %We denote the initial value of a signal as $x_0$. For an event port $p$, $e(p_0) = false$. The output write action is also non-blocking. In other words, a thread will not halt its execution due to waiting for an previous output data to be \emph{consumed}. It overwrites.
 
@@ -38,21 +38,25 @@ All signals by definition are associated with the same logic clock, indicated by
 		
  eq Frame : int = CASEAsyncAgree::Counter(1, 1, prev(Frame = 5, false));
 
- assume "SEL4 domain schedule" :
+ assume "seL4 domain schedule" :
 				Thread_A_Dispatch = (Frame = 1) and
 				Thread_A_Complete = (Frame = 3) and					
 				Thread_B_Dispatch = (Frame = 4) and	
 				Thread_B_Complete = (Frame = 5);	
 \end{verbatim}		
 
+The model of a schedule can be simplified to potentially improve the formal verification performance. The thread execution time can be modelled as just one tick. The idle time can be abstracted out. For the same example above, a simplified schedule could be  $\sigma' = \{d(A)=(1,0,0)^*, c(A) = (0,1,0)^*, d(B) = (0,1,0)^*, c(B) = (0,0,1)^*\}$. As long as the execution order is preserved, the proof/disproof is equavilent to a model directly mapping each base time unit to a tick. 
+	
+\begin{theorem}
+Given an AADL model with two \emph{equavilent} schedules $\sigma$ and $\sigma'$, a property of the model holds under schedule $\sigma$ if and only if it hold under schedule $\sigma'$.
+\end{theorem}
+
+{\bf Proof sketch.} 
+It is possible to show that any counter-example found in the proof of the system property of model with schedule $\sigma$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\sigma'$,  and vice versa. 
+
 The internal input ports of a thread are connected to the output ports of another thread. The data arrival rate is controlled by the scheduler. However, for the external input ports of a thread, the data arrival could be irregular. We assume the external input data rate is considered in the schedule, so that all external input data is processed by the thread. Since AADL assiciate each input port with a buffer or queue, we could simply the timing model by assuming the external input data arrival event is coincidental with thread \emph{dispatch} event. That is, for the external input event data ports $I_x$ of thread $A$, 
 $$ e(i) \Rightarrow d(A), \forall i \in I_x $$
-	
-%\begin{theorem}
-%Given an AADL model with two models of schedule $\sigma$ and $\sigma'$ ...
-%\end{theorem}
 
-%{\bf Proof sketch.} 
 
 %{\bf model of execution delay.}
 %The thread exeution delay is not directly modelled. Instead, the time slot allocated to a thread in a schedule is modelled by the \emph{distance} between the thread \emph{dispatch} and \emph{complete}. If we assume there is no pre-emption, this modells  the worst case execution time or deadline.
