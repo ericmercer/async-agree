@@ -1,5 +1,7 @@
 %Write introduction \cite{8625938}.
 
+Formal verification of cyber-physical system has become a daunting task due to the \emph{state explosion problem} \cite{Clarke2012}. We tackle the challenge from two angles. First, we use a compositional verfication technique to replace the reasoning on the global state space with localized reasoning of each component separately. And the system-level property is verified based on the proofs of the components. Second, we assume the components executes in a static, pre-defined sequential order. We do not consider all possible execution orders. In other words, we assume that non-determinism is exclusively due to the inputs. This is because in many applications, the actual implementation ususally executes sequentially, due to the sharing of a computational resource (e.g. processor). And often, in particular for safety-critical applications, the execution order is fully determined at compile-time. 
+
 % Brief overview of AADL
 The Architecture Analysis and Design Language (AADL) was developed to capture the important design concepts in distributed real-time embedded systems~\cite{FeilerModelBasedEngineering2012}. 
 %AADL is therefore well-suited for modeling avionics system architectures, and provides an excellent mechanism for capturing the important details of the system design. 
