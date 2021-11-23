@@ -2,6 +2,7 @@
 %A system consists of a set of threads, a schedule, and a set of AGREE contracts.
 {\bf signal.}
 A signal $x$ is a sequence of values $(x_1, x_2, ...)$ of a certain data type. That is, $x = N \mapsto T$, where $x_i$ is of type $T$ for all $i \in N$. The data type can be either a primitive data type (e.g. real, bool, int, and enumeration types) or a composite data type (e.g. record types). Assume the data type of signal $x$ and $y$ is $T_x$ and $T_y$, respectively, $x = y$ means that $T_x=T_y$ and $x_i = y_i$ for all $i \in N$. 
+
 {\bf thread.}
 We model the ports of an AADL thread as signals. In particular, an event port is modelled as a sequence of Boolean values. The value \emph{true} or \emph{false} indicates an event is \emph{present} or \emph{absent} at the port, respectively. An event data port is modelled as a pair of signals, one representing the data stream, and the other representing the associated event stream. To simplify the notation, we use the port name $p$ to denote its associated \emph{data signal}, and $event(p)$ to denote its associated \emph{event signal}. The ports of a thread are divided into two finite disctinct sets: input ports ($I$) and output ports ($O$). Correspondingly, the associated signals are divided int to input signals and output signals. We model the \emph{state} of a thread with a finite set $S$ of signals. %The next state function is $T: S x I \mapsto S'$. The output function is $T: S x I \mapsto S$. Then, a thread is %A thread is modelled as a collection of input signals and output signals. A thread could be aossciated with /emph{local} states, which are not accessible outside the scope of the thread. They are modelled as signals, noted as set S . 
 
@@ -50,21 +51,24 @@ All signals by definition are associated with the same logic clock, indicated by
 				Thread_B_Complete = (Frame = 5);	
 \end{verbatim}		
 
-The model of a schedule can be simplified to potentially improve the formal verification performance. The thread execution time can be modelled as just one tick. The idle time can be abstracted out. For the same example above, a simplified schedule could be  $\sigma' = \{d(A)=(1,0,0)^*, c(A) = (0,1,0)^*, d(B) = (0,1,0)^*, c(B) = (0,0,1)^*\}$. As long as the execution order is preserved, the proof/disproof is equavilent to a model directly mapping each base time unit to a tick. 
+The model of a schedule can be simplified to potentially improve the formal verification performance. The thread execution time can be modelled as just one tick. The idle time or communication delay can be abstracted out. For the same example above, a simplified schedule could be  $\sigma' = \{d(A)=(1,0,0)^*, c(A) = (0,1,0)^*, d(B) = (0,1,0)^*, c(B) = (0,0,1)^*\}$. The intuition is that as long as the execution order is preserved, the verfication problem of such a model is equavilent to that of a model directly mapping each base time unit to a tick. 
 	
 \begin{theorem}
 Given an AADL model with two \emph{equavilent} schedules $\sigma$ and $\sigma'$, a property of the model holds under schedule $\sigma$ if and only if it hold under schedule $\sigma'$.
 \end{theorem}
 
 {\bf Proof sketch.} 
-It is possible to show that any counter-example found in the proof of the system property of model with schedule $\sigma$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\sigma'$,  and vice versa. 
+It is possible to show that any counter-example found in the proof of the system property of model with schedule $\sigma$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\sigma'$,  and vice versa.  
 
 {\bf external input.} 
 Input could arrive at any time instant at an external input port of a thread. However, the thread is activated periodically. To address the asynchrony, we assume that there is a FIFO qeue that stores the input. And the external input arrival rate is properly considered in the schedule, so that all external input data is processed by the thread without causing the buffer overflow. This allows us to simply the timing model by assuming the external input data arrival is coincidental with thread \emph{dispatch} event. That is, for the external input event data ports $I_x$ of thread $A$, 
 $$ event(i) \Rightarrow d(A), \forall i \in I_x $$
 
 {\bf execution semantics.}
-The 
+The AGREE assumptions of each component are like \emph{assertions} on the input signals. If any of the assumption is violated, the system is deemed as containing no valid behavior. On the other hand, the AGREE guarantees of each component are like \emph{constraints} on the output signals. Together they define a valid mapping from input signals to output signals. That is,  the output update is defined by a transition relationship, 
+$$ O = \{O | p(I, O, S) = 1, \forall p \in P\} $$ 
+%The timing of the output signal is similar to the notion of \emph{when} and \emph{current} operators defined in Lustre \cite{lustre}. 
+
 
 %{\bf model of execution delay.}
 %The thread exeution delay is not directly modelled. Instead, the time slot allocated to a thread in a schedule is modelled by the \emph{distance} between the thread \emph{dispatch} and \emph{complete}. If we assume there is no pre-emption, this modells  the worst case execution time or deadline.
