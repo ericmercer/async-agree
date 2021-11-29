@@ -1,7 +1,3 @@
-Figure \ref{useCaseExample} shows a use example from the UAV AADL model developed in the DARPA CASE project. The UAV software has 13 threads, scheduled in a period of 95 ticks. The schedule model is based on the \emph{seL4} domain schedule used in the implementation. Four system-level security properties were proved in less than 2 minutes.
+TODO: add the simple example that was used in a previous publication.
 
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=120mm]{useCaseExample.jpg}
-\caption{A Use Example\label{useCaseExample}}
-\end{figure}
+For the DARPA CASE project, we modelled a UAV system architecture. The UAV software contains 13 AADL threads, including UxAS, waypoint plan manager, UART, radio, and various security components like attestations, monitors, and filters. The period of each thread is 500 ms. Based on the seL4 domain schedule used in the implementation, we created a model of the schedule with a cycle of 95 ticks. Every 2 ms is mapped to one tick. And all idle time between threads are abstracted out. Four system-level security properties were proved in less than 2 minutes on a PC with 2.6 GHz CPU and 32 GB RAM.
