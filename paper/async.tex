@@ -29,15 +29,45 @@ We model the AADL ports as signals. In particular, an event port is modelled as 
 An event data port is modelled as a pair of data signal and event signal. We use the port name $p$ to denote its associated data signal, and $event(p)$ to denote its associated event signal. 
 
 {\bf component.}
-A component is a six-tuple $(S, s_0, I, O, \delta, \lambda)$, where $S$ is a finite non-empty set of states, $s_0 \in S$ is the initial state, $I$ is a set of input signals valuations; and $O$ is a set of output signals valuations, $\delta$ is the state transfer function of the form $\delta: (I, S) \mapsto S$, and $\lambda$ is the output function of the form $\lambda: (I,S) \mapsto O$. Let $s: N \mapsto S$, we have $ s(n+1) = \delta (s(n), I(n))$ and $ O(n) = \delta (s(n), I(n))$, where $I(n) = \{x_1(n), x_2(n), ... x_N(n)\}$, for all $n \in N$. 
- 
+A component is a eight-tuple $(S, s_0, I, O, \delta, A, P, clock)$, where 
+\begin{itemize}
+    	\item $S$ is a finite non-empty set of states;
+    	\item $s_0 \in S$ is the initial state;
+    	\item $I$ is a set of input signals valuations;
+    	\item $O$ is a set of output signals valuations;
+    	\item $\delta$ is the state transfer function of the form $\delta: I \times S \mapsto S$;
+    	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I \times S \mapsto B$;
+    	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I \times O \times S \mapsto B$;
+	\item $clock$ is a Boolean signal $clock(n+1) \Rightarrow \lnot clock(n+2) \land  \lnot clock(n), \forall i \in N$ .
+\end{itemize}
+
+%$\lambda$ is the output relation of the form $\lambda: (I,S) \mapsto O$. 
+Let $s: N \mapsto S$, we have $ s(n+1) = \delta (s(n), I(n))$ 
+%and $ O(n) = \delta (s(n), I(n))$, 
+where $I(n) = \{x_1(n), x_2(n), ... x_N(n)\}$, for all $n \in N$. 
+  
 %The ports of a thread are divided into two finite disctinct sets: input ports ($I$) and output ports ($O$). Correspondingly, the associated signals are divided int to input signals and output signals. We model the \emph{state} of a thread with a finite set $S$ of signals. %The next state function is $T: S x I \mapsto S'$. The output function is $T: S x I \mapsto S$. Then, a thread is %A thread is modelled as a collection of input signals and output signals. A thread could be aossciated with /emph{local} states, which are not accessible outside the scope of the thread. They are modelled as signals, noted as set S . 
 
 {\bf component execution.}
-A component is associated with two Boolean signals (events) \emph{dispatch} ($d$) and \emph{complete} ($c$). A component is \emph{dispatched} at time $i$, if and only if $d(i) = true$. A component is \emph{complete} at time $i$, if and only if $c(i) = true$. %A component can be in either \emph{active} or \emph{sleep} mode. 
-At \emph{dispatch} a component evaluates the inputs. At \emph{complete}, it updates its output and transitions to its \emph{next state}. After \emph{complete}, it holds its state and output till next \emph{complete}. That is,
-$$\lnot c(i) \Rightarrow (y(i) = y(i-1), \forall i \in N, \forall y \in Y$$
-$$\lnot c(i) \Rightarrow (s(i) = s(i-1), \forall i \in N, \forall s \in S$$
+
+%A component is associated with two Boolean signals (events) \emph{dispatch} ($d$) and \emph{complete} ($c$). A component is \emph{dispatched} at time $i$, if and only if $d(i) = true$. A component is \emph{complete} at time $i$, if and only if $c(i) = true$. %A component can be in either \emph{active} or \emph{sleep} mode. 
+%At \emph{dispatch} a component evaluates the inputs. At \emph{complete}, it updates its output and transitions to its \emph{next state}. After \emph{complete}, it holds its state and output till next \emph{complete}. That is,
+
+An valuation of an assumption $a$ at time $n$ is $a(n) =  a(I(n), s(n))$. 
+An valuation of a gurarantee $p$ at time $n$ is $p(n) =  p(I(n), O(n), s(n))$. 
+
+At \emph{clock}, the \emph{assumptions} $A$ should hold. That is,
+$$d(i) \Rightarrow a_i, \forall i\in N, \forall a \in A $$
+If it is violated, the component is inconsistent.
+
+At \emph{clock}, the \emph{gurarantees} $P$ should hold. That is,
+$$clock(n) \Rightarrow p(n), \forall n\in N, \forall p \in P $$
+
+A compoent holds its state and output between \emph{clock}. That is,
+$$\lnot clock(n) \Rightarrow y(n+1) = y(n), \forall n \in N, \forall y \in Y$$
+$$\lnot clock(n) \Rightarrow s(n+1) = s(n), \forall n \in N, \forall s \in S$$
+
+
 
 %The \emph{dispatch} and \emph{complete} models, respectively, the start and end of the time slot that a component to run. 
 %When its \emph{dispatch} event $d$ is present, a thread samples the input values and starts execution. This is the time when the associated AGREE \emph{assumptions} $A$ should hold. That is,
@@ -45,6 +75,7 @@ $$\lnot c(i) \Rightarrow (s(i) = s(i-1), \forall i \in N, \forall s \in S$$
 
 {\bf connection.}
 A \emph{connection} from an output port $y \in Y$ of one component $C$ to an input port $x' \in X'$ of another component $C'$ implies the corresponding signals $x' = y$.
+Define intial input
 
 %An AADL \emph{connection} between an input port $i$ of one thread and an output port $o$ of another thread enforces the equality of their associated signals. For data ports, this means $i = o$. For event data prots, this means $i = o$ and $event(i) = event(o)$. %For simplicity, we define $e(p) = false^*$ if $p$ is a data port.
 
