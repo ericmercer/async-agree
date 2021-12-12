@@ -1,6 +1,8 @@
 {\bf Conclusion.}
 Based on the AGREE framework, we presented an approach to compositional verification of scheduled components. The proposed model of computation differs from the synchronous semantics used in current AGREE. We introduced virtual scheduling events to tie AADL timing and execution semantics with AGREE contracts. The effectiveness of our apporach is demostrated in the case studies.
 
+In the proposed model, the queue (associated with an AADL event port or event data port) size is limited to one. This limiation is driven by our domain of interest. In our applications, the direct interactions (e.g. queueing or buffering) with the physical environment are usually handlled outside the system under consideration. Inisde the system, event ports and event data ports are used to model sporadic execution of periodic components. Some applications are multi-rate systems, but the comonents communicate with shared memory, which are naturally modelled as data ports with sampling semantics. We believe extending the modelling framework to allow larger queue size is an interesting direction, particularly for multi-rate dataflow-based applications. 
+
 {\bf Discussion.}
 
 {\bf Future Work.}

@@ -1,35 +1,57 @@
-Here, we define the proposed model of computation. We start with a brief, informal description. Then, we will provide formal definitions and discuss their connections to AADL syntax and semantics.
 
-A system consists of components, connections between components, and a schedule.
-Every component is associated with two Boolean variables \emph{dispatch} and \emph{complete}.
-The schedule defines the time of dispatch, and the time of completion of each component within a scheduling cycle.
-A component is activated when it is dispatched.
-Component activation ends when it is completed.
-A valid schedule is one where component activations do not overlap.
+First, we describe the rational behind our semantics interpretation of an AADL model in AGREE with a schedule. Then, we will present the formal definitions and discuss their connection to AADL semantics.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=80mm]{pre.jpg}
+\caption{A Simple Integrator AADL Model in AGREE\label{integratorFig}}
+\end{figure}
+
+We use an example to explain our rationals. Consider an AADL thread with AGREE contracts shown in Figure \ref{integratorFig}. Let us assume a scheduler assigns a time slot to the thread. There are a few questions that need to be clarified before we understand the semantics. 
+First, when shall the contracts hold? In a synchronous model, the contract shall hold at every \emph{tick}. However, in a scheduled execution, it is reasonable to assume the contract may not hold when the component is not \emph{active}. But once it is active, shall it hold throughout the whole execution or just at certain instants? 
+Second, how shall $Input$ referred in the contract be interpreted? One interpretation is that it refers to the input value at the time when the contract is evaluated, which may vary during the execution. Another interpretation is that it refers to the input value when the component starts its execution. In other words, there is a notion of \emph{sample and hold}. Any input value change after the execution will not impact the current execution. This interpretation is consistent with the notion of \emph{frozen} input in AADL.
+Third, how the \emph{pre} operator shall be interpreted? In a synchronous model, it refers to the previous \emph{tick}. However, in a scheduled execution, it seems reasonable to interpret \emph{pre} as the last value when the component was active. The interpretation makes sense if the contract is evaluated only once during the current execution. If the contract is evaluated multiple times, a more sensible interpretation is that at the first evaluation, it refers to the last value from the previous activation. And at all the following evaluations, it refers to the last updated value in the current execution. This interpretation is adopted in the \emph{activation condition} in SCADE \cite{scade} or \emph{clock} in SIGNAL \cite{signal}.
+
+%This interpretation means that the number of evaluation during the execution could have an impact on the final output value. This is illustrated in the integrator example. To match the software behavior, the evaluation interval has to equal the integration step size used in the implementation. 
+
+%In AGREE, the contracts represent requirements and we want to comply with AADL semantics. This has some implictions.  In AADL, inputs are frozen at dispatch time by default. Thus, we interpret the input referred in a contract as the input value at dispatch time. And assumptions on input or its history hold at dispatch time. 
+%
+%We assume dispatch occurs at the beginning of the time slot and complete occurs at the end. For now, we assume there is no preemption. We will discuss how preemption is handled in Section 4. Note that we use complete to refer to the end of a time slot. It does not necessarily mean the actual execution ends exactly at the end of the time slot. We interpret it as the upperbound of worst case execution time plus some margin. In other words, this is time for sure the computation is complete and the final output data is available. Note that in acutual implementation the output value may vary during the execution. We interpret guarantees as requrirements on the final output. 
+
+In AGREE, the contracts are intended to model requirements \cite{AGREE2}. Assumptions and guarantees correspond to preconditions and postconditions, respectively. Given the AADL \emph{input-compute-output} model, it is reasonable to interpret that the assumptions shall hold at the start of the execution when the inputs are read in. And the guarantees shall be satisfied at the end of the execution when the outputs are written out. In other words, in AGREE, the contracts are not intended to model the timing behavior within an execution. This is different from the real-time behavior models used to model AADL semantics, like real-time Maude \cite{maude}, timed automata \cite{behaviorannex}, and timed Petri net \cite{tpn}. They model the component timing behavior throughout the whole execution. Note that since each contract is evaluated only once in each activation. The $pre$ operator is always interpreted as the last value from the previous activation.
+
+Note that this does not mean AGREE contracts cannot model timer (or integerator)-like requirements. In practice, a timer is usually implemented as a counter, whose limit (constant) is calculated based on the frequency of its execution. The counter is active periodically and increments by only one during each activation, independent of the execution time. 
+
+Thus, in our interpretation, the length of the execution time at each activation, which could vary from one activation to another, is abstracted out. We introudce two distinctive events \emph{dispatch} and \emph{complete} for each component to model the start and end of its each execution, respectively. Similarly, for a system (consists of components), they model the start and end of a scheduling cycle.
+
+%A system consists of components, connections between components, contracts, and a schedule.
+%The schedule defines a total order of dispatch and complete events of each component within a scheduling cycle.
+%A valid schedule is one where component activations do not overlap.
 %Once a component is activated, it runs to complete. There is no preemption.
-A component reads input at dispatch time. %Reading is non-blocking. It reads the most recent input data value or an initial value. 
-And the input is \emph{frozen} during the component activation.
-A component writes output at completion time. %Writing is non-blocking. It overwrites the previous data value. 
-And the output holds its data value between its completions.
+%A component reads input at dispatch time. %Reading is non-blocking. It reads the most recent input data value or an initial value. 
+%And the input is \emph{frozen} during the component activation.
+%A component writes output at completion time. %Writing is non-blocking. It overwrites the previous data value. 
+%And the output holds its data value between its completions.
 %The connections represent an asynchrnous communication channel with a buffer of size one.
-The connections between components are unidirectional. It represents communication through shared variable with one writer and possible multiple readers. 
-A component checks its input assumptions at dispatch time. %If the assumption is violated, then the system is consided \emph{inconsistent}.
-A component ensures its guarantees at completion time. 
-
-{\bf signal.}
+%The connections between components are unidirectional. %It represents communication through shared variable with one writer and possible multiple readers. 
+%A component satisfies its assumptions at dispatch time. %If the assumption is violated, then the system is consided \emph{inconsistent}.
+%A component satisfies its guarantees at completion time. 
+%And the output holds its data value between its completions.
+{\bf Signal.}
 A signal $x$ is a function of the form $x: N \mapsto T_x$, where $N$ is the set of natural numbers including zero, and $T_x$ is the data type of $x(i)$ for all $i \in N$.
 $x(i)$, an assignment of a vlaue in $T_x$ to $x$, is called a \emph{valuation} of signal $x$. A signal represents a possibly infinite sequence of values.
-The data type can be either a primitive data type (e.g. real, bool, int, and enumeration types) or a composite data type (e.g. record types). 
+%The data type can be either a primitive data type (e.g. real, bool, int, and enumeration types) or a composite data type (e.g. record types). 
 %Assume the data type of signal $x$ and $y$ is $T_x$ and $T_y$, respectively, $x = y$ means that $T_x=T_y$ and $x_i = y_i$ for all $i \in N$. 
 
-{\bf port.}
-Input ports $X = \{x_1, x_2, ... x_M\}$, where $x_i$ is the \emph{i}-th input port, and $M$ is the total number of input ports. Each port $x \in X$ is uniquely associated with a signal. We may use input port or input signal interchangablely. To simplify the notation, we use the port ID $x$ to denote the associated \emph{signal}. Outputs are defined similarly. 
+{\bf Port.}
+Input ports $X = \{x_1, x_2, ..., x_M\}$, where $x_i$ is the \emph{i}-th input port, and $M\in N$ is the total number of input ports. Each port $x \in X$ is associated with a signal. We may use input port or input signal interchangablely. To simplify the notation, we use the port ID $x$ to denote the associated \emph{signal}. Outputs are defined similarly: $Y = \{y_1, y_2, ..., y_K\}$, where $K\in N$ is the total number of output ports.  
+A \emph{valuation} of input ports is the valuation of all input signals. That is, $I(n) = \{x_1(n), x_2(n), ... x_N(n)\}$, where $n \in N$. Similarly, a \emph{valuation} of output ports $O(n) = \{y_1(n), y_2(n), ... y_N(n)\}$, where $n \in N$. 
 
-We model the AADL ports as signals. In particular, an event port is modelled as a sequence of Boolean values. %The value \emph{true} or \emph{false} indicates an event is \emph{present} or \emph{absent} at the port, respectively. 
-An event data port is modelled as a pair of data signal and event signal. We use the port name $p$ to denote its associated data signal, and $event(p)$ to denote its associated event signal. 
+We model the AADL ports as signals. In particular, an event port is modelled as a Boolean signal. The value \emph{1} or \emph{0} indicates the event is \emph{present} or \emph{absent} at the port, respectively. 
+An event data port is modelled as a pair of data signal and event signal.  %An event data port is modelled as a pair of data signal $p$ and event signal $event(p)$.  
 
-{\bf component.}
-A component is a eight-tuple $(S, s_0, I, O, \delta, A, P, clock)$, where 
+{\bf Component.}
+A component $c$ is a nine-tuple $(S, s_0, I, O, \delta, A, P, dispatch, complete)$, where: 
 \begin{itemize}
     	\item $S$ is a finite non-empty set of states;
     	\item $s_0 \in S$ is the initial state;
@@ -38,44 +60,66 @@ A component is a eight-tuple $(S, s_0, I, O, \delta, A, P, clock)$, where
     	\item $\delta$ is the state transfer function of the form $\delta: I \times S \mapsto S$;
     	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I \times S \mapsto B$;
     	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I \times O \times S \mapsto B$;
-	\item $clock$ is a Boolean signal $clock(n+1) \Rightarrow \lnot clock(n+2) \land  \lnot clock(n), \forall i \in N$ .
+    	\item $dispatch$ is a Boolean signal;
+	\item $complete$ is a Boolean signal.
+%	\item $clock$ is a Boolean signal $clock(n) \Rightarrow \lnot clock(n+1) \land  \lnot clock(n-1), \forall i \in N$ .
 \end{itemize}
 
-%$\lambda$ is the output relation of the form $\lambda: (I,S) \mapsto O$. 
-Let $s: N \mapsto S$, we have $ s(n+1) = \delta (s(n), I(n))$ 
-%and $ O(n) = \delta (s(n), I(n))$, 
-where $I(n) = \{x_1(n), x_2(n), ... x_N(n)\}$, for all $n \in N$. 
+Let $s$ be a \emph{valuation} of $S$. That is, $s: N \mapsto S$. We have $ s(n+1) = \delta (s(n), I(n))$.
+
+Note that the guarantees represent a general relation, not a function. This allows users to models the non-derterminism introduced by design decision or implementation choice.
   
 %The ports of a thread are divided into two finite disctinct sets: input ports ($I$) and output ports ($O$). Correspondingly, the associated signals are divided int to input signals and output signals. We model the \emph{state} of a thread with a finite set $S$ of signals. %The next state function is $T: S x I \mapsto S'$. The output function is $T: S x I \mapsto S$. Then, a thread is %A thread is modelled as a collection of input signals and output signals. A thread could be aossciated with /emph{local} states, which are not accessible outside the scope of the thread. They are modelled as signals, noted as set S . 
 
-{\bf component execution.}
+%{\bf component execution.}
 
 %A component is associated with two Boolean signals (events) \emph{dispatch} ($d$) and \emph{complete} ($c$). A component is \emph{dispatched} at time $i$, if and only if $d(i) = true$. A component is \emph{complete} at time $i$, if and only if $c(i) = true$. %A component can be in either \emph{active} or \emph{sleep} mode. 
 %At \emph{dispatch} a component evaluates the inputs. At \emph{complete}, it updates its output and transitions to its \emph{next state}. After \emph{complete}, it holds its state and output till next \emph{complete}. That is,
 
-An valuation of an assumption $a$ at time $n$ is $a(n) =  a(I(n), s(n))$. 
-An valuation of a gurarantee $p$ at time $n$ is $p(n) =  p(I(n), O(n), s(n))$. 
+%A \emph{valuation} of an assumption $a$ is defined as $a(n) =  a(I(n), s(n))$.
+%A \emph{valuation} of a gurarantee $p$ is defined as $p(n) =  p(I(n), O(n), s(n))$.
 
-At \emph{clock}, the \emph{assumptions} $A$ should hold. That is,
-$$d(i) \Rightarrow a_i, \forall i\in N, \forall a \in A $$
-If it is violated, the component is inconsistent.
+At \emph{dispatch}, the \emph{assumptions} $A$ should hold. That is,
 
-At \emph{clock}, the \emph{gurarantees} $P$ should hold. That is,
-$$clock(n) \Rightarrow p(n), \forall n\in N, \forall p \in P $$
+\begin{equation} 
+\label{eqn:assumption}
+dispatch(n) \Rightarrow a(I(n), s(n)), \forall i\in N, \forall a \in A
+\end{equation}
 
-A compoent holds its state and output between \emph{clock}. That is,
-$$\lnot clock(n) \Rightarrow y(n+1) = y(n), \forall n \in N, \forall y \in Y$$
-$$\lnot clock(n) \Rightarrow s(n+1) = s(n), \forall n \in N, \forall s \in S$$
+At \emph{complete}, the \emph{gurarantees} $P$ should hold. That is,
 
+\begin{equation} 
+\label{eqn:guarantee}
+complete(n) \Rightarrow p(I(n), O(n), s(n)), \forall n\in N, \forall p \in P
+\end{equation}
 
+A compoent holds its state and output between \emph{complete}. That is,
+
+\begin{equation} 
+\label{eqn:outputhold}
+\lnot complete(n) \Rightarrow y(n) = y(n-1), \forall n \in N, \forall y \in Y
+\end{equation}
+
+\begin{equation} 
+\label{eqn:statehold}
+\lnot complete(n) \Rightarrow s(n) = s(n-1), \forall n \in N, \forall s \in S
+\end{equation}
 
 %The \emph{dispatch} and \emph{complete} models, respectively, the start and end of the time slot that a component to run. 
 %When its \emph{dispatch} event $d$ is present, a thread samples the input values and starts execution. This is the time when the associated AGREE \emph{assumptions} $A$ should hold. That is,
 %$$event(d)_i \Rightarrow a_i, \forall i\in N, \forall a \in A $$
 
-{\bf connection.}
+{\bf Trace.}
+A trace $\sigma$ of a component $c(S, s_0, I, O, \delta, A, P, dispatch, complete)$ is a function of the form $\sigma: N \mapsto \Sigma$, where
+%a sequence of valuations $(\omega_1, \omega_2, ...)$, 
+$\sigma(n) = ((I(n), O(n), s(n), dispatch(n), complete(n))$, for all $n\in N$, that satifies Equation \ref{eqn:assumption}, \ref{eqn:guarantee}, \ref{eqn:outputhold}, \ref{eqn:statehold}.
+%function of the form $x: N \mapsto I\times O\times S\times dipatch \times complete$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{\bf Connection.}
+A connection $e = \{(y, x) | y\in Y of C, x'\in X' of C', C \neq C'\}$
 A \emph{connection} from an output port $y \in Y$ of one component $C$ to an input port $x' \in X'$ of another component $C'$ implies the corresponding signals $x' = y$.
-Define intial input
+%Define intial input
 
 %An AADL \emph{connection} between an input port $i$ of one thread and an output port $o$ of another thread enforces the equality of their associated signals. For data ports, this means $i = o$. For event data prots, this means $i = o$ and $event(i) = event(o)$. %For simplicity, we define $e(p) = false^*$ if $p$ is a data port.
 
@@ -85,19 +129,30 @@ Define intial input
 %When its \emph{dispatch} event $d$ is present, a thread samples the input values and starts execution. 
 
 %When its \emph{complete} event $c$ is present, a thread updates its ouput signal $o$ value, otherwise it holds its previous value. That is, 
-The output hold combined with the definition of \emph{connection} models the asynchronous communication. It could be viewed as a shared variable, which has one writer and possibly multiple readers. Since under our MoC, at most one component is active at a time, there is no ambiguity on the order of read and write actions. It also could be viewed as a buffer (or queue) of size one. It overwrites when overflow occurs. Note that, unlike synchronous dataflow models, the data (\emph{token}) is not disgarded after \emph{consumption}. That is, reading is non-destroying. This ensures that in case of \emph{upsampling}, the consumer samples the same input value repeatedly. 
-
-{\bf AGREE contracts.}
-A component is associated with a set of AGREE \emph{assumptions} $A$ and \emph{gurarantees} $P$, where $a \in A$ is a Boolan function $(I, S) \mapsto B$, $p \in P$ is a Boolan function $(I, O, S) \mapsto B$. The evaluation of assumption $a$ at time $i$ is denoted as $a_i$. The evaluation of gurarantee $p$ at time $i$ is denoted as $p_i$. 
-	
-At \emph{dispatch}, the \emph{assumptions} $A$ should hold. That is,
-$$d(i) \Rightarrow a_i, \forall i\in N, \forall a \in A $$
-
-At \emph{complete}, the \emph{gurarantees} $P$ should hold. That is,
-$$c(i) \Rightarrow p_i, \forall i\in N, \forall p \in P $$
-%Here we assume a thread always completes its execution within the assigned time slot. Thus, there is no pre-emption. 
+The \emph{connection} definition together with the output hold defines our asynchronous communication. Each communication could be viewed as a shared variable, which has one writer and possibly multiple readers. Since under our MoC, at most one component is active at a time, there is no ambiguity on the order of read and write. It may also be viewed as a buffer (or queue) of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs.  
 
 %We denote the initial value of a signal as $x_0$. For an event port $p$, $e(p_0) = false$. The output write action is also non-blocking. In other words, a thread will not halt its execution due to waiting for an previous output data to be \emph{consumed}. It overwrites.
+
+%The trace of the simple downsampling system is shown in Table \ref{tab:table1}.
+%\begin{table}[h!]
+%\begin{center}
+%\caption{A Simple Downsampling System Trace}
+%\label{tab:table2}
+%\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c| } 
+%\hline
+%k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+%\hline
+%a(k) & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+%\hline
+%b(k) & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+%\hline
+%c(k) & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+%\hline
+%d(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+%\hline
+%\end{tabular}
+%\end{center}
+%\end{table}}
 
 Figure \ref{wpmAGREE} shows an exmaple of how the proposed MoC could be modelled in the AGREE annex.
 
@@ -107,13 +162,52 @@ Figure \ref{wpmAGREE} shows an exmaple of how the proposed MoC could be modelled
 \caption{An AGREE Model Example\label{wpmAGREE}}
 \end{figure}
 
-{\bf schedule.}
-Given a finite set of components $C = \{c_1, c_2,... C_N\}$, where $c_i$ is the \emph{i}-th component, a schedule is a set of triple $(c_i, dispatch, complete)$.
-A schedule $\sigma$ defines when a component out of a set of components $P$ is activated. That is,  
-$$\sigma = \{(p, d, c), \forall p \in P  \}$$ 
-We assume schedules are static, periodic, and valid. A schedule is called valid if in each period or \emph{cycle}, there is no other scheduling event between any pair of \emph{dispatch} and \emph{complete} of the same component, and the \emph{dispatch} event occurs before the matching \emph{complete} event. 
+{\bf Schedule.}
+Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $T \mapsto C\times \{Dispatch, Complete\}$ satisfying:
+\begin{itemize}
+	\item there exists $i\in T$, $c\in C$ such that $\phi(i) = (c, Dispatch)$ if and only if there exists $j\in T$, such that $j > i, \phi(j) =  (c, Complete)$.
+	\item if there exists $i, j\in T$, $c\in C$ such that $i \neq j, \phi(i) = (c, Dispatch), \phi(j) = (c, Dispatch)$, then there exists $k\in T$, such that $j >k> i, \phi(j) =  (c, Complete)$.
+\end{itemize}
+The first conditions says that in a schedule \emph{Dispatch} and \emph{Complete} of a component must appear in pairs, and in each pair \emph{Dispatch} is  ``before'' \emph{Complete}. The second condition says that  \emph{Dispatch} and \emph{Complete} of a component must appear alternately. 
 
-In a schedule model, one has to choose the mapping from a \emph{tick} to physical time. A tick could be the basic time unit, or a common divisor. For example, given a schedule with a period of 10 ms, starting with component A 4 ms, idle 2 ms, component B 2 ms, idle 2 ms, then a model of the schedule could be $\sigma = \{d(A)=(1,0,0,0,0)^*, c(A) = (0,0,1,0,0)^*, d(B) = (0,0,0,1,0)^*, c(B) = (0,0,0,0,1)^*\}$, where each \emph{tick} models 2 ms. 
+Then the \emph{dispatch} and \emph{complete} signal of a component $c$ can be defined as:
+  
+\begin{equation*}
+    dispatch(i+kT) =
+    \begin{cases}
+      1, & \text{if}\ \phi(i) = (c, Dispatch) \\
+      0, & \text{otherwise}
+    \end{cases}
+\end{equation*}
+
+\begin{equation*}
+    complete(i+kT) =
+    \begin{cases}
+      1, & \text{if}\ \phi(i) = (c, Complete) \\
+      0, & \text{otherwise}
+    \end{cases}
+\end{equation*}
+
+where $i,k\in N$.
+A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is executed at least once.
+A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant there is a either \emph{dispatch} or \emph{complete} event.
+
+{\bf System.}
+A system is components + connections + schedule. TODO
+
+{\bf AGREE.}
+Give a system and a set of system \emph{assumptions} and \emph{guarantees}, TODO
+
+Note that if all the inputs of a component are connected to the outputs of other components, the inputs value will not change while the component is active. This is because the other components hold their outputs while inactive. It implies assumptions could be checked at \emph{complete}, instead of \emph{dispatch}. Thus, we do not necessarily need \emph{dispatch} event for verification purposes. Actually, in the backend implementation, assumptions at checked at \emph{complete}. We keep \emph{dispatch} event mainly for usability reasons. The (\emph{dispatch, complete}) pair helps users to understand a counterexample and mentally construct the system trace. This is particularly useful when the schedule is preemptive .
+
+{\bf Model of real-time schedule.}
+In practice, a schedule often comes in form of real-time schedule, a sequence of time slots associated wtih a component. The real-time schedule could come from an AADL scheduling tool like Cheddar \cite{Cheddar}, or from a scheduler provided by the RTOS/Microkernel verdor, like seL4\cite{seL4}. To model the schedule in AGREE, the component execution time has to be considered. One example is shown in Figure \ref{RTschedule}.
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=120mm]{RTschedule.jpg}
+\caption{A Model of Real-Time Schedule in AGREE\label{RTschedule}}
+\end{figure}
+In the example, there are two components $A$ and $B$. Given the same real-time schedule, due to the different execution time $C_A$ of $A$, different AGREE schedules are created. In Figure\ref{RTschedule}(b), since the first time slot assigned for $A$ is less than its execution time, the end of the first time slot is interpreted as \emph{preemption}, instead of \emph{complete}.
 
 We introduce a circular counter to model a schedule in AGREE. The counter updates at each tick. The maximum count models the period of the schedule. An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in Figure \ref{schedule}.
 \begin{figure}[ht!]
@@ -121,6 +215,7 @@ We introduce a circular counter to model a schedule in AGREE. The counter update
 \includegraphics[width=100mm]{schedule.jpg}
 \caption{A Model of Schedule in AGREE\label{schedule}}
 \end{figure}
+
 
 %An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in code~\ref{schedule_model}
 
@@ -145,21 +240,36 @@ We introduce a circular counter to model a schedule in AGREE. The counter update
 %	D_complete = (tick = 10);			
 %\end{lstlisting}	
 
-%The model of a schedule can be simplified to potentially improve the formal verification performance. The thread execution time can be modelled as just one tick. The idle time or communication delay can be abstracted out. For the same example above, a simplified schedule could be  $\sigma' = \{d(A)=(1,0,0)^*, c(A) = (0,1,0)^*, d(B) = (0,1,0)^*, c(B) = (0,0,1)^*\}$. The intuition is that as long as the execution order is preserved, the verfication problem of such a model is equavilent to that of a model directly mapping each base time unit to a tick. 
+%The model of a schedule can be simplified to potentially improve the formal verification performance. The thread execution time can be modelled as just one tick. The idle time or communication delay can be abstracted out. For the same example above, a simplified schedule could be  $\phi' = \{d(A)=(1,0,0)^*, c(A) = (0,1,0)^*, d(B) = (0,1,0)^*, c(B) = (0,0,1)^*\}$. The intuition is that as long as the execution order is preserved, the verfication problem of such a model is equavilent to that of a model directly mapping each base time unit to a tick. 
 %	
 %\begin{theorem}
-%Given an AADL model with two \emph{equavilent} schedules $\sigma$ and $\sigma'$, a property of the model holds under schedule $\sigma$ if and only if it hold under schedule $\sigma'$.
+%Given an AADL model with two \emph{equavilent} schedules $\phi$ and $\phi'$, a property of the model holds under schedule $\phi$ if and only if it hold under schedule $\phi'$.
 %\end{theorem}
 %
 %{\bf Proof sketch.} 
-%It is possible to show that any counter-example found in the proof of the system property of model with schedule $\sigma$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\sigma'$,  and vice versa.  
+%It is possible to show that any counter-example found in the proof of the system property of model with schedule $\phi$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\phi'$,  and vice versa.  
 
 {\bf external input.} 
 Input could arrive at any time instant at an external input port of a thread. However, the thread is activated periodically. To address the asynchrony, we assume that there is a FIFO qeue that stores the input. And the external input arrival rate is properly considered in the schedule, so that all external input data is processed by the thread without causing the buffer overflow. This allows us to simply the timing model by assuming the external input data arrival is coincidental with thread \emph{dispatch} event. That is, for the external input event data ports $I_x$ of thread $A$, 
 $$ event(i) \Rightarrow d(A), \forall i \in I_x $$
 
-{\bf AGREE.}
-In the assume-gurantee reasoning, the AGREE assumptions of a component work as \emph{assertions}. If an assumption is violated, the system is deemed \emph{inconsistent}. On the other hand, the AGREE guarantees of a component work as \emph{constraints}, which any counterexample has to satisfy.
+%{\bf AGREE.}
+%In the assume-gurantee reasoning, the AGREE assumptions of a component work as \emph{assertions}. If an assumption is violated, the system is deemed \emph{inconsistent}. On the other hand, the AGREE guarantees of a component work as \emph{constraints}, which any counterexample has to satisfy.
+
+
+%\documentclass{article}
+%\usepackage{multirow}
+%\begin{document}
+%\begin{center}
+%\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c| } 
+%\hline
+%k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+%\hline
+%& Active & - & A & B & A & C & D & A & B & A & C & D \\ 
+%\hline
+%\end{tabular}
+%\end{center}
+%\end{document}
 
 %As suggested by previous examples, the schedule or execution order has an impact on the system behavior. This differs from other dataflow models, such as Synchronous Dataflow \cite{sdf}, or other variants of Kahn Process Networks \cite{kpn}. It is known 
 
@@ -201,3 +311,40 @@ In the assume-gurantee reasoning, the AGREE assumptions of a component work as \
 % 
 %% Schedule
 %In asynchronous AGREE, a schedule defines the sequential execution order of threads. It is specified by the user. It often come from the actual software execution schedule on the target platform (e.g. seL4 domain schedule). Currently AADL does not define a standard format to specify a schedule. We used AGREE \emph{assumption} on each thread's \emph{Dispatch} and \emph{Complete} event to represent a schedule. For example, \emph{assume "schedule" :			ThreadA\_Dispatch = (Frame = 60) and ThreadA\_Complete = (Frame = 70) and ...}
+
+The trace of the simple downsampling system is shown in Table \ref{tab:table1}.
+\begin{table}[h!]
+\begin{center}
+\caption{A Simple Downsampling System Trace}
+\label{tab:table1}
+\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
+\hline
+            k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10  & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 \\
+\hline
+dispatchA  & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0  \\ 
+\hline
+completeA & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0  \\ 
+\hline
+dispatchB & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0  \\ 
+\hline
+completeB & 0 & 0 & 0 &0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\ 
+\hline
+dispatchC & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\ 
+\hline
+completeC & 0 & 0 & 0 & 1  & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
+\hline
+dispatchD & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\ 
+\hline
+completeD & 0 & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\ 
+\hline
+a(k) & 0 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 4 & 4 & 4 & 4 & 4 \\
+\hline
+b(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 4 & 4 & 4 \\
+\hline
+c(k) & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 3 & 3 & 3 & 3 & 3 & 3 & 3 \\
+\hline
+d(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
