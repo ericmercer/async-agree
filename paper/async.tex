@@ -83,7 +83,7 @@ At \emph{dispatch}, the \emph{assumptions} $A$ should hold. That is,
 
 \begin{equation} 
 \label{eqn:assumption}
-dispatch(n) \Rightarrow a(I(n), s(n)), \forall i\in N, \forall a \in A
+dispatch(n) \Rightarrow a(I(n), s(n)), \forall n\in N, \forall a \in A
 \end{equation}
 
 At \emph{complete}, the \emph{gurarantees} $P$ should hold. That is,
@@ -111,27 +111,19 @@ A compoent holds its state and output between \emph{complete}. That is,
 
 {\bf Trace.}
 A trace $\sigma$ of a component $c(S, s_0, I, O, \delta, A, P, dispatch, complete)$ is a function of the form $\sigma: N \mapsto \Sigma$, where
-%a sequence of valuations $(\omega_1, \omega_2, ...)$, 
-$\sigma(n) = ((I(n), O(n), s(n), dispatch(n), complete(n))$, for all $n\in N$, that satifies Equation \ref{eqn:assumption}, \ref{eqn:guarantee}, \ref{eqn:outputhold}, \ref{eqn:statehold}.
-%function of the form $x: N \mapsto I\times O\times S\times dipatch \times complete$
+$\sigma(n) = ((I(n), O(n), s(n), dispatch(n), complete(n))$, for all $n\in N$, that satifies Equation \ref{eqn:assumption}, \ref{eqn:guarantee}, \ref{eqn:outputhold}, \ref{eqn:statehold}. %We denote the set of all traces of a component as $\Sigma$.
+A trace is a possibly infinite sequence of component valuations that satify the contract constraints and the output and state hold rules. 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 {\bf Connection.}
-A connection $e = \{(y, x) | y\in Y of C, x'\in X' of C', C \neq C'\}$
-A \emph{connection} from an output port $y \in Y$ of one component $C$ to an input port $x' \in X'$ of another component $C'$ implies the corresponding signals $x' = y$.
-%Define intial input
+Suppose component $c$ has output ports $Y$ and component $c', c' \neq c$ has input ports $X$. A connection $e$ is a Boolean function: $Y \times X' \mapsto B$. In AGREE, we have
+\begin{equation} 
+\label{eqn:connection}
+e(y, x') \Rightarrow y = x', \forall y \in Y, \forall x \in X'
+\end{equation} 
 
-%An AADL \emph{connection} between an input port $i$ of one thread and an output port $o$ of another thread enforces the equality of their associated signals. For data ports, this means $i = o$. For event data prots, this means $i = o$ and $event(i) = event(o)$. %For simplicity, we define $e(p) = false^*$ if $p$ is a data port.
+A \emph{connection} from an output port of one component to an input port of another component implies the corresponding signals are equal. For an AADL event data prot, this means the data signals and event signals are equal, respectively. 
 
-%{\bf virtual events.}
-%We introduce two virtual input event ports: \emph{dispatch} ($d$) and \emph{complete} ($c$) for each thread.  The \emph{dispatch} and \emph{complete} event models, respectively, the start and end of the time slot that a scheduler allocated to a thread to run. 
-%{\bf thread execution.}
-%When its \emph{dispatch} event $d$ is present, a thread samples the input values and starts execution. 
-
-%When its \emph{complete} event $c$ is present, a thread updates its ouput signal $o$ value, otherwise it holds its previous value. That is, 
-The \emph{connection} definition together with the output hold defines our asynchronous communication. Each communication could be viewed as a shared variable, which has one writer and possibly multiple readers. Since under our MoC, at most one component is active at a time, there is no ambiguity on the order of read and write. It may also be viewed as a buffer (or queue) of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs.  
-
-%We denote the initial value of a signal as $x_0$. For an event port $p$, $e(p_0) = false$. The output write action is also non-blocking. In other words, a thread will not halt its execution due to waiting for an previous output data to be \emph{consumed}. It overwrites.
+The \emph{connection} definition together with the output hold defines an asynchronous communication. Each communication could be viewed as a shared variable, which has one writer and possibly multiple readers. Since in the proposed MoC, at most one component is active at a time, there is no ambiguity on the order of read and write. It may also be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
 
 %The trace of the simple downsampling system is shown in Table \ref{tab:table1}.
 %\begin{table}[h!]
@@ -154,11 +146,11 @@ The \emph{connection} definition together with the output hold defines our async
 %\end{center}
 %\end{table}}
 
-Figure \ref{wpmAGREE} shows an exmaple of how the proposed MoC could be modelled in the AGREE annex.
+Figure \ref{wpmAGREE} shows an exmaple of direct modelling the component semantics in the AADL AGREE annex. This is mostly done by augumenting the contracts defined in synchronous AGREE, and adding additional contracts to enforce the output hold rule.
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=120mm]{wpmAGREE.jpg}
+\includegraphics[width=130mm]{wpmAGREE.jpg}
 \caption{An AGREE Model Example\label{wpmAGREE}}
 \end{figure}
 
@@ -168,48 +160,88 @@ Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{lengt
 	\item there exists $i\in T$, $c\in C$ such that $\phi(i) = (c, Dispatch)$ if and only if there exists $j\in T$, such that $j > i, \phi(j) =  (c, Complete)$.
 	\item if there exists $i, j\in T$, $c\in C$ such that $i \neq j, \phi(i) = (c, Dispatch), \phi(j) = (c, Dispatch)$, then there exists $k\in T$, such that $j >k> i, \phi(j) =  (c, Complete)$.
 \end{itemize}
-The first conditions says that in a schedule \emph{Dispatch} and \emph{Complete} of a component must appear in pairs, and in each pair \emph{Dispatch} is  ``before'' \emph{Complete}. The second condition says that  \emph{Dispatch} and \emph{Complete} of a component must appear alternately. 
+The first condition requires that in a schedule \emph{Dispatch} and \emph{Complete} of a component must appear in pairs, and in each pair \emph{Dispatch} appears ``before'' \emph{Complete}. The second condition states that \emph{Dispatch} and \emph{Complete} of a component must appear alternately in a schedule. 
 
-Then the \emph{dispatch} and \emph{complete} signal of a component $c$ can be defined as:
+Then given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ can be defined as:
   
-\begin{equation*}
+\begin{equation}
+\label{eqn:dispatch}
     dispatch(i+kT) =
     \begin{cases}
       1, & \text{if}\ \phi(i) = (c, Dispatch) \\
       0, & \text{otherwise}
     \end{cases}
-\end{equation*}
+\end{equation}
 
-\begin{equation*}
+\begin{equation}
+\label{eqn:complete}
     complete(i+kT) =
     \begin{cases}
       1, & \text{if}\ \phi(i) = (c, Complete) \\
       0, & \text{otherwise}
     \end{cases}
-\end{equation*}
+\end{equation}
 
 where $i,k\in N$.
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is executed at least once.
-A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant there is a either \emph{dispatch} or \emph{complete} event.
+A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each ``tick'' there is a \emph{dispatch} or \emph{complete} event. Note in a synchronous model, a tick represents a global clock that triggers all components to update. While in the proposed model, ticks are used to represent the total order of events. 
 
 {\bf System.}
-A system is components + connections + schedule. TODO
+A \emph{system} is a triple $(C, E, \phi)$, where:
+\begin{itemize}
+    	\item $C$ is a finite non-empty set of components;
+    	\item $E$ is a set of connections;
+    	\item $\phi$ is a schedule.
+\end{itemize}
+A \emph{trace} of a system is a trace of it components that satisfies the connection Equation \ref{eqn:connection} for all $e in E$, and the schedule Equation \ref{eqn:dispatch} and Equation \ref{eqn:complete}.
+An \emph{observal trace} of a system is a trace of the system that only has the input and output trajectory.
 
-{\bf AGREE.}
-Give a system and a set of system \emph{assumptions} and \emph{guarantees}, TODO
+{\bf Assume-Guarantee Reasoning.}
+Given a system and a set of system \emph{assumptions} $A_s$ and a \emph{guarantee} $p_s$, a \emph{trace} of the contract is a sequence of inputs and outputs valuations that satisfies:
+
+\begin{equation} 
+\label{eqn:sys_assumption}
+dispatch_s(n) \Rightarrow a_s(n), \forall n\in N, \forall a_s \in A_s
+\end{equation}
+
+\begin{equation} 
+\label{eqn:sys_assumption}
+complete_s(n) \Rightarrow p_s(n), \forall n\in N
+\end{equation}
+
+where:
+\begin{equation}
+\label{eqn:sys_dispatch}
+    dispatch_s(n) =
+    \begin{cases}
+      1, & \text{if}\ n = kT, k=0,1,... \\
+      0, & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+\begin{equation}
+\label{eqn:sys_complete}
+    complete_s(n) =
+    \begin{cases}
+      1, & \text{if}\ n = kT-1, k=1,2,... \\
+      0, & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+Verifying a system satisfies its contract $(A_s, p_s)$ is to check whether the set of traces of the contract is a subset of the oberservable traces of the system. TODO
 
 Note that if all the inputs of a component are connected to the outputs of other components, the inputs value will not change while the component is active. This is because the other components hold their outputs while inactive. It implies assumptions could be checked at \emph{complete}, instead of \emph{dispatch}. Thus, we do not necessarily need \emph{dispatch} event for verification purposes. Actually, in the backend implementation, assumptions at checked at \emph{complete}. We keep \emph{dispatch} event mainly for usability reasons. The (\emph{dispatch, complete}) pair helps users to understand a counterexample and mentally construct the system trace. This is particularly useful when the schedule is preemptive .
 
-{\bf Model of real-time schedule.}
-In practice, a schedule often comes in form of real-time schedule, a sequence of time slots associated wtih a component. The real-time schedule could come from an AADL scheduling tool like Cheddar \cite{Cheddar}, or from a scheduler provided by the RTOS/Microkernel verdor, like seL4\cite{seL4}. To model the schedule in AGREE, the component execution time has to be considered. One example is shown in Figure \ref{RTschedule}.
+{\bf Model of Real-Time Schedule.}
+In practice, a schedule often comes in form of real-time schedule, a sequence of time slots associated wtih components. The real-time schedule could come from an AADL scheduling tool like Cheddar \cite{Cheddar}, or from a scheduler provided by the RTOS/Microkernel verdor, like seL4\cite{seL4}. To properly model the schedule in AGREE, the component execution time has to be considered. One example is shown in Figure \ref{RTschedule}, where there are two components $A$ and $B$. 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=120mm]{RTschedule.jpg}
+\includegraphics[width=130mm]{RTschedule.jpg}
 \caption{A Model of Real-Time Schedule in AGREE\label{RTschedule}}
 \end{figure}
-In the example, there are two components $A$ and $B$. Given the same real-time schedule, due to the different execution time $C_A$ of $A$, different AGREE schedules are created. In Figure\ref{RTschedule}(b), since the first time slot assigned for $A$ is less than its execution time, the end of the first time slot is interpreted as \emph{preemption}, instead of \emph{complete}.
+Given the same real-time schedule, due to the different execution time $C_A$ of $A$, different AGREE schedules are created. In Figure\ref{RTschedule}(b), since the first time slot assigned for $A$ is less than its execution time, the end of the first time slot is interpreted as \emph{preemption}, instead of \emph{complete}.
 
-We introduce a circular counter to model a schedule in AGREE. The counter updates at each tick. The maximum count models the period of the schedule. An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in Figure \ref{schedule}.
+We introduce a circular counter to model a schedule in AGREE. The maximum count models the period of the schedule. An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in Figure \ref{schedule}.
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=100mm]{schedule.jpg}
@@ -249,13 +281,8 @@ We introduce a circular counter to model a schedule in AGREE. The counter update
 %{\bf Proof sketch.} 
 %It is possible to show that any counter-example found in the proof of the system property of model with schedule $\phi$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\phi'$,  and vice versa.  
 
-{\bf external input.} 
-Input could arrive at any time instant at an external input port of a thread. However, the thread is activated periodically. To address the asynchrony, we assume that there is a FIFO qeue that stores the input. And the external input arrival rate is properly considered in the schedule, so that all external input data is processed by the thread without causing the buffer overflow. This allows us to simply the timing model by assuming the external input data arrival is coincidental with thread \emph{dispatch} event. That is, for the external input event data ports $I_x$ of thread $A$, 
-$$ event(i) \Rightarrow d(A), \forall i \in I_x $$
-
-%{\bf AGREE.}
-%In the assume-gurantee reasoning, the AGREE assumptions of a component work as \emph{assertions}. If an assumption is violated, the system is deemed \emph{inconsistent}. On the other hand, the AGREE guarantees of a component work as \emph{constraints}, which any counterexample has to satisfy.
-
+{\bf External Input.} 
+System inputs from the environment could arrive at any instant. To avoid missing events, we assume that there is a FIFO qeue that stores the input. TODO %This allows us to simply the timing model by assuming the external input data arrival is coincidental with thread \emph{dispatch} event. That is, for the external input event data ports $I_x$ of thread $A$, $$ event(i) \Rightarrow d(A), \forall i \in I_x $$
 
 %\documentclass{article}
 %\usepackage{multirow}
