@@ -123,8 +123,6 @@ e(y, x') \Rightarrow y = x', \forall y \in Y, \forall x \in X'
 
 A \emph{connection} from an output port of one component to an input port of another component implies the corresponding signals are equal. For an AADL event data prot, this means the data signals and event signals are equal, respectively. 
 
-The \emph{connection} definition together with the output hold defines an asynchronous communication. Each communication could be viewed as a shared variable, which has one writer and possibly multiple readers. Since in the proposed MoC, at most one component is active at a time, there is no ambiguity on the order of read and write. It may also be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
-
 %The trace of the simple downsampling system is shown in Table \ref{tab:table1}.
 %\begin{table}[h!]
 %\begin{center}
@@ -186,6 +184,8 @@ where $i,k\in N$.
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is executed at least once.
 A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each ``tick'' there is a \emph{dispatch} or \emph{complete} event. Note in a synchronous model, a tick represents a global clock that triggers all components to update. While in the proposed model, ticks are used to represent the total order of events. 
 
+With the output hold, the \emph{connection} definition, and the scheudling semantics, we essentially define an asynchronous communication with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is active at a time, there is no ambiguity on the order of read and write. The comminucation may be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
+
 {\bf System.}
 A \emph{system} is a triple $(C, E, \phi)$, where:
 \begin{itemize}
@@ -195,6 +195,43 @@ A \emph{system} is a triple $(C, E, \phi)$, where:
 \end{itemize}
 A \emph{trace} of a system is a trace of it components that satisfies the connection Equation \ref{eqn:connection} for all $e in E$, and the schedule Equation \ref{eqn:dispatch} and Equation \ref{eqn:complete}.
 An \emph{observal trace} of a system is a trace of the system that only has the input and output trajectory.
+A trace of the simple downsampling system is partially shown in Table \ref{tab:table1}.
+
+\begin{table}[h!]
+\begin{center}
+\caption{A Simple Downsampling System Trace}
+\label{tab:table1}
+\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
+\hline
+            k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10  & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 \\
+\hline
+dispatchA  & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0  \\ 
+\hline
+completeA & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0  \\ 
+\hline
+dispatchB & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0  \\ 
+\hline
+completeB & 0 & 0 & 0 &0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\ 
+\hline
+dispatchC & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\ 
+\hline
+completeC & 0 & 0 & 0 & 1  & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
+\hline
+dispatchD & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\ 
+\hline
+completeD & 0 & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\ 
+\hline
+a(k) & 0 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 4 & 4 & 4 & 4 & 4 \\
+\hline
+b(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 4 & 4 & 4 \\
+\hline
+c(k) & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 3 & 3 & 3 & 3 & 3 & 3 & 3 \\
+\hline
+d(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 {\bf Assume-Guarantee Reasoning.}
 Given a system and a set of system \emph{assumptions} $A_s$ and a \emph{guarantee} $p_s$, a \emph{trace} of the contract is a sequence of inputs and outputs valuations that satisfies:
@@ -229,6 +266,15 @@ where:
 \end{equation}
 
 Verifying a system satisfies its contract $(A_s, p_s)$ is to check whether the set of traces of the contract is a subset of the oberservable traces of the system. TODO
+
+{\bf Hierarchical Composition.}
+The proposed semantics supports hierarchical composition. This is possible if the structural proximity of the models is coincidental with the temporal proximity of their time slots in a schedule. We illustrate this using the example shown in Figure \ref{pic:hierarchy}. A system $G$ consists of components $A$ and $B$. Suppose given the lower-level schedule $(ABA)$, we prove the contracts of $G$. Then, at the structural higher-level, $G$ could be viewed as a component. And since component $A$ and $B$ are also scheduled to execute one after another, $G$'s time slot is the concatenation of the time slots of its components. Thus its \emph{dispatch} and \emph{complete} events is the start and end of the combined time slot, respectively.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=100mm]{Hierarchy.jpg}
+\caption{An Example of Hierarchical Composition in AGREE\label{pic:hierarchy}}
+\end{figure}
 
 Note that if all the inputs of a component are connected to the outputs of other components, the inputs value will not change while the component is active. This is because the other components hold their outputs while inactive. It implies assumptions could be checked at \emph{complete}, instead of \emph{dispatch}. Thus, we do not necessarily need \emph{dispatch} event for verification purposes. Actually, in the backend implementation, assumptions at checked at \emph{complete}. We keep \emph{dispatch} event mainly for usability reasons. The (\emph{dispatch, complete}) pair helps users to understand a counterexample and mentally construct the system trace. This is particularly useful when the schedule is preemptive .
 
@@ -282,7 +328,7 @@ We introduce a circular counter to model a schedule in AGREE. The maximum count 
 %It is possible to show that any counter-example found in the proof of the system property of model with schedule $\phi$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\phi'$,  and vice versa.  
 
 {\bf External Input.} 
-System inputs from the environment could arrive at any instant. To avoid missing events, we assume that there is a FIFO qeue that stores the input. TODO %This allows us to simply the timing model by assuming the external input data arrival is coincidental with thread \emph{dispatch} event. That is, for the external input event data ports $I_x$ of thread $A$, $$ event(i) \Rightarrow d(A), \forall i \in I_x $$
+System inputs from the environment could arrive at any instant, while the system runs periodically. To avoid missing events, we assume that there is a buffer mechanism that stores all the input messages on a queue and periodically send it out to the system for processing. We assume the communication can be modelled as a shared variable, and the communication rate is the same as the system execution rate. 
 
 %\documentclass{article}
 %\usepackage{multirow}
@@ -339,39 +385,3 @@ System inputs from the environment could arrive at any instant. To avoid missing
 %% Schedule
 %In asynchronous AGREE, a schedule defines the sequential execution order of threads. It is specified by the user. It often come from the actual software execution schedule on the target platform (e.g. seL4 domain schedule). Currently AADL does not define a standard format to specify a schedule. We used AGREE \emph{assumption} on each thread's \emph{Dispatch} and \emph{Complete} event to represent a schedule. For example, \emph{assume "schedule" :			ThreadA\_Dispatch = (Frame = 60) and ThreadA\_Complete = (Frame = 70) and ...}
 
-The trace of the simple downsampling system is shown in Table \ref{tab:table1}.
-\begin{table}[h!]
-\begin{center}
-\caption{A Simple Downsampling System Trace}
-\label{tab:table1}
-\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
-\hline
-            k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10  & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 \\
-\hline
-dispatchA  & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0  \\ 
-\hline
-completeA & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0  \\ 
-\hline
-dispatchB & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0  \\ 
-\hline
-completeB & 0 & 0 & 0 &0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\ 
-\hline
-dispatchC & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\ 
-\hline
-completeC & 0 & 0 & 0 & 1  & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
-\hline
-dispatchD & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\ 
-\hline
-completeD & 0 & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\ 
-\hline
-a(k) & 0 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 4 & 4 & 4 & 4 & 4 \\
-\hline
-b(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 4 & 4 & 4 \\
-\hline
-c(k) & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 3 & 3 & 3 & 3 & 3 & 3 & 3 \\
-\hline
-d(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
