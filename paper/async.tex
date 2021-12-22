@@ -1,5 +1,5 @@
 
-First, we describe the rational behind our semantics interpretation of an AADL model in AGREE with a schedule. Then, we will present the formal definitions and discuss their connection to AADL semantics.
+First, we describe the rational behind our semantics interpretation of an AADL model in AGREE with a schedule. Then, we formally define the scheduling semantics of AGREE and discuss their connection to AADL semantics.
 
 \begin{figure}[ht!]
 \centering
@@ -7,10 +7,9 @@ First, we describe the rational behind our semantics interpretation of an AADL m
 \caption{A Simple Integrator AADL Model in AGREE\label{integratorFig}}
 \end{figure}
 
-We use an example to explain our rationals. Consider an AADL thread with AGREE contracts shown in Figure \ref{integratorFig}. Let us assume a scheduler assigns a time slot to the thread. There are a few questions that need to be clarified before we understand the semantics. 
-First, when shall the contracts hold? In a synchronous model, the contract shall hold at every \emph{tick}. However, in a scheduled execution, it is reasonable to assume the contract may not hold when the component is not \emph{active}. But once it is active, shall it hold throughout the whole execution or just at certain instants? 
-Second, how shall $Input$ referred in the contract be interpreted? One interpretation is that it refers to the input value at the time when the contract is evaluated, which may vary during the execution. Another interpretation is that it refers to the input value when the component starts its execution. In other words, there is a notion of \emph{sample and hold}. Any input value change after the execution will not impact the current execution. This interpretation is consistent with the notion of \emph{frozen} input in AADL.
-Third, how the \emph{pre} operator shall be interpreted? In a synchronous model, it refers to the previous \emph{tick}. However, in a scheduled execution, it seems reasonable to interpret \emph{pre} as the last value when the component was active. The interpretation makes sense if the contract is evaluated only once during the current execution. If the contract is evaluated multiple times, a more sensible interpretation is that at the first evaluation, it refers to the last value from the previous activation. And at all the following evaluations, it refers to the last updated value in the current execution. This interpretation is adopted in the \emph{activation condition} in SCADE \cite{scade} or \emph{clock} in SIGNAL \cite{signal}.
+We use an example to illustrate our rationals. Consider a simple model of integer integrator shown in Figure \ref{integratorFig}. Let us assume a time slot in a periodic schedule is allocated to the component.  
+%The first problem we face is how to interpret the contracts with the time slot. 
+The first question we have is when the contracts hold. In a synchronous model, contracts hold at every \emph{tick}. However, with scheduled execution, it is reasonable to assume the contract may not hold when the component is not \emph{active}. But once it is active, shall it hold throughout the whole execution or just at certain instants? Second, how shall $Input$ referred in the contract be interpreted? One interpretation is that it refers to the input value at the time when the contract is evaluated, which may vary during the execution. Another interpretation is that it refers to the input value when the component starts its execution. In other words, there is a notion of \emph{sample and hold}. Any input value change during the execution will not impact the current execution. This interpretation is consistent with the notion of \emph{frozen} input in AADL. Third, how the \emph{pre} operator shall be interpreted? In a synchronous model, it refers to the previous \emph{tick}. However, with scheduled execution, it seems reasonable to interpret \emph{pre} as previous activation (i.e. the last value when the component was active). The interpretation makes sense if the contract holds at only one instant during the execution. If the contract holds at multiple instants, a more sensible interpretation is that at the first instant, it refers to the previous activation. Then at each following instant, it refers to the last updated value in the current execution. This interpretation is adopted in the \emph{activation condition} in SCADE \cite{scade} or the \emph{clock} mechanism in SIGNAL \cite{signal}.
 
 %This interpretation means that the number of evaluation during the execution could have an impact on the final output value. This is illustrated in the integrator example. To match the software behavior, the evaluation interval has to equal the integration step size used in the implementation. 
 
@@ -18,7 +17,7 @@ Third, how the \emph{pre} operator shall be interpreted? In a synchronous model,
 %
 %We assume dispatch occurs at the beginning of the time slot and complete occurs at the end. For now, we assume there is no preemption. We will discuss how preemption is handled in Section 4. Note that we use complete to refer to the end of a time slot. It does not necessarily mean the actual execution ends exactly at the end of the time slot. We interpret it as the upperbound of worst case execution time plus some margin. In other words, this is time for sure the computation is complete and the final output data is available. Note that in acutual implementation the output value may vary during the execution. We interpret guarantees as requrirements on the final output. 
 
-In AGREE, the contracts are intended to model requirements \cite{AGREE2}. Assumptions and guarantees correspond to preconditions and postconditions, respectively. Given the AADL \emph{input-compute-output} model, it is reasonable to interpret that the assumptions shall hold at the start of the execution when the inputs are read in. And the guarantees shall be satisfied at the end of the execution when the outputs are written out. In other words, in AGREE, the contracts are not intended to model the timing behavior within an execution. This is different from the real-time behavior models used to model AADL semantics, like real-time Maude \cite{maude}, timed automata \cite{behaviorannex}, and timed Petri net \cite{tpn}. They model the component timing behavior throughout the whole execution. Note that since each contract is evaluated only once in each activation. The $pre$ operator is always interpreted as the last value from the previous activation.
+In AGREE, the contracts are intended to model requirements \cite{AGREE2}. Assumptions and guarantees correspond to preconditions and postconditions, respectively. Given the AADL \emph{input-compute-output} model, we interpret that the assumptions shall hold at the start of the execution when the inputs are read in. And the guarantees shall be satisfied at the end of the execution when the outputs are written out. In other words, the AGREE contracts are not intended to model the timing behavior within an execution. This is different from the real-time behavior models used to formalize AADL semantics, like real-time Maude \cite{maude}, timed automata \cite{behaviorannex}, and timed Petri net \cite{tpn}. They model the component timing behavior throughout the whole execution. Note that since each contract is evaluated exactly once in each activation, the $pre$ operator is interpreted as previous activation. We adopt the AADL frozen input semantics, so any reference to $Input$ refer to the same input value.
 
 Note that this does not mean AGREE contracts cannot model timer (or integerator)-like requirements. In practice, a timer is usually implemented as a counter, whose limit (constant) is calculated based on the frequency of its execution. The counter is active periodically and increments by only one during each activation, independent of the execution time. 
 
@@ -85,6 +84,14 @@ At \emph{dispatch}, the \emph{assumptions} $A$ should hold. That is,
 \label{eqn:assumption}
 dispatch(n) \Rightarrow a(I(n), s(n)), \forall n\in N, \forall a \in A
 \end{equation}
+
+Once \emph{dispatch}, input freeze till \emph{complete}. That is,
+
+\begin{equation} 
+\label{eqn:inputfreeze}
+x(n) = x(n-1), \forall n\in Act, \forall x \in X
+\end{equation}
+where $Act = \{k | k\in N, i<k\le j, dispatch(i)=1, complete(j) = 1, dispatch(k)=0, complete(k)=0\}$.
 
 At \emph{complete}, the \emph{gurarantees} $P$ should hold. That is,
 
@@ -184,7 +191,7 @@ where $i,k\in N$.
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is executed at least once.
 A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each ``tick'' there is a \emph{dispatch} or \emph{complete} event. Note in a synchronous model, a tick represents a global clock that triggers all components to update. While in the proposed model, ticks are used to represent the total order of events. 
 
-With the output hold, the \emph{connection} definition, and the scheudling semantics, we essentially define an asynchronous communication with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is active at a time, there is no ambiguity on the order of read and write. The comminucation may be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
+With the output hold, the \emph{connection} definition, and the scheduling semantics, we essentially define an asynchronous communication with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is active at a time, there is no ambiguity on the order of read and write. The comminucation may be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
 
 {\bf System.}
 A \emph{system} is a triple $(C, E, \phi)$, where:
@@ -268,7 +275,7 @@ where:
 Verifying a system satisfies its contract $(A_s, p_s)$ is to check whether the set of traces of the contract is a subset of the oberservable traces of the system. TODO
 
 {\bf Hierarchical Composition.}
-The proposed semantics supports hierarchical composition. This is possible if the structural proximity of the models is coincidental with the temporal proximity of their time slots in a schedule. We illustrate this using the example shown in Figure \ref{pic:hierarchy}. A system $G$ consists of components $A$ and $B$. Suppose given the lower-level schedule $(ABA)$, we prove the contracts of $G$. Then, at the structural higher-level, $G$ could be viewed as a component. And since component $A$ and $B$ are also scheduled to execute one after another, $G$'s time slot is the concatenation of the time slots of its components. Thus its \emph{dispatch} and \emph{complete} events is the start and end of the combined time slot, respectively.
+The proposed semantics supports hierarchical composition and Hierarchical Scheduling Framework (HSF) \cite{HSF}. This is possible if the structural proximity of the models is coincidental with the temporal proximity of their time slots in a schedule. We illustrate this using the example shown in Figure \ref{pic:hierarchy}. A system $G$ consists of components $A$ and $B$. Suppose given the lower-level schedule $(ABA)$, we prove the contracts of $G$. Then, at the structural higher-level, $G$ could be viewed as a component. And since component $A$ and $B$ are also scheduled to execute one after another, $G$'s time slot is the concatenation of the time slots of its components. Thus its \emph{dispatch} and \emph{complete} events is the start and end of the combined time slot, respectively.
 
 \begin{figure}[ht!]
 \centering
