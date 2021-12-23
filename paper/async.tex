@@ -22,6 +22,13 @@ In AGREE, the contracts are intended to model requirements \cite{AGREE2}. Assump
 Note that this does not mean AGREE contracts cannot model timer (or integerator)-like requirements. In practice, a timer is usually implemented as a counter, whose limit (constant) is calculated based on the frequency of its execution. The counter is active periodically and increments by only one during each activation, independent of the execution time. 
 
 Thus, in our interpretation, the length of the execution time at each activation, which could vary from one activation to another, is abstracted out. We introudce two distinctive events \emph{dispatch} and \emph{complete} for each component to model the start and end of its each execution, respectively. Similarly, for a system (consists of components), they model the start and end of a scheduling cycle.
+The two events shall appear in pairs and alternately. \emph{dispatch} shall appear \emph{before} \emph{complete}. We define \emph{well-orderedness} to capture the pattern.
+
+The AGREE reasoning framework uses past-time LTL [2], particularly LTL operator $G$ (globally), $H$ (historically), and $Z$ (previous). Given a component with an assume-gurantee pair ($A,P$) and an event pair (\emph{dispatch}, \emph{complete}), the meaning of the contract can be formally represented as a past-time LTL formula $G(H((dispatch \Rightarrow A)) \Rightarrow (complete \Rightarrow P))$. In synchronous AGREE, the two events \emph{collpase} into a single instant at each tick. Thus, we have $G(H(A) \Rightarrow P)$.
+
+We use \emph{state} to represent the history of both inputs and outputs streams. The state transition depends on both inputs and outputs. This is because AGREE \emph{Guarantee} contracts usually do not completely define the outputs based on the inputs and states. Instead, they impose contraints that all valid outputs shall satisfy.
+
+%In the formal definition, we use indices to represent the total order of scheduling events. TODO
 
 %A system consists of components, connections between components, contracts, and a schedule.
 %The schedule defines a total order of dispatch and complete events of each component within a scheduling cycle.
@@ -36,9 +43,10 @@ Thus, in our interpretation, the length of the execution time at each activation
 %A component satisfies its assumptions at dispatch time. %If the assumption is violated, then the system is consided \emph{inconsistent}.
 %A component satisfies its guarantees at completion time. 
 %And the output holds its data value between its completions.
+
 {\bf Signal.}
 A signal $x$ is a function of the form $x: N \mapsto T_x$, where $N$ is the set of natural numbers including zero, and $T_x$ is the data type of $x(i)$ for all $i \in N$.
-$x(i)$, an assignment of a vlaue in $T_x$ to $x$, is called a \emph{valuation} of signal $x$. A signal represents a possibly infinite sequence of values.
+$x(i)$, an assignment of a vlaue in $T_x$ to $x$, is called a \emph{valuation} of signal $x$. A signal represents a possibly infinite sequence of values. We may refer a Boolean signal as a \emph{event}.
 %The data type can be either a primitive data type (e.g. real, bool, int, and enumeration types) or a composite data type (e.g. record types). 
 %Assume the data type of signal $x$ and $y$ is $T_x$ and $T_y$, respectively, $x = y$ means that $T_x=T_y$ and $x_i = y_i$ for all $i \in N$. 
 
@@ -56,12 +64,19 @@ A component $c$ is a nine-tuple $(S, s_0, I, O, \delta, A, P, dispatch, complete
     	\item $s_0 \in S$ is the initial state;
     	\item $I$ is a set of input signals valuations;
     	\item $O$ is a set of output signals valuations;
-    	\item $\delta$ is the state transfer function of the form $\delta: I \times S \mapsto S$;
+    	\item $\delta$ is the state transfer function of the form $\delta: I \times O \times S \mapsto S$;
     	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I \times S \mapsto B$;
     	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I \times O \times S \mapsto B$;
-    	\item $dispatch$ is a Boolean signal;
-	\item $complete$ is a Boolean signal.
+    	\item $dispatch$ and $complete$ is a pair of \emph{well-ordered} events.
+%	\item $complete$ is a Boolean signal.
 %	\item $clock$ is a Boolean signal $clock(n) \Rightarrow \lnot clock(n+1) \land  \lnot clock(n-1), \forall i \in N$ .
+\end{itemize}
+
+Two events $dispatch$ and $complete$ are \emph{well-ordered} if 
+\begin{itemize}
+	\item there eixsts no $i\in N$ such that $dispatch(i) = 1$ and $complete(i) =  1$.
+	\item there exists $i\in N$ such that $dispatch(i) = 1$ if and only if there exists $j\in N$, such that $j > i, complete(j) =  1$.
+	\item if there exists $i, j\in N$ such that $i \neq j, dispatch(i) = 1, dispatch(j) = 1$, then there exists $k\in T$ such that $j >k> i, complete(j) = 1$.
 \end{itemize}
 
 Let $s$ be a \emph{valuation} of $S$. That is, $s: N \mapsto S$. We have $ s(n+1) = \delta (s(n), I(n))$.
