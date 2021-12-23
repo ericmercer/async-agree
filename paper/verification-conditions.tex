@@ -27,6 +27,8 @@ The behavior of a scheduled component is defined by three special propositions: 
   \dispatch(A) &=& \left[\left(\dispatch \wedge \assumes\right) \vee \left(\neg\dispatch \wedge \same{\inputs}\right)\right] \\
   \complete(A) &=& \left[\left(\complete \wedge \guarantees\right) \vee \left(\neg\complete \wedge \same{\outputs}\right)\right]
 \end{eqnarray*}
+The assumptions must hold at dispatch and the inputs may not change (I think this is too strong and is only needed a the system level). 
+The guarantees must hold at complete and the outputs must not change between completions.
 A scheduled component is correct if and only if
 \[
   \globally\left(
