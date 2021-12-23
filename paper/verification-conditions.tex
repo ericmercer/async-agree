@@ -1,0 +1,54 @@
+
+\newcommand{\globally}{\ensuremath{\mathbf{G}}}
+\newcommand{\historically}{\ensuremath{\mathbf{H}}}
+\newcommand{\assumes}{\ensuremath{A}}
+\newcommand{\guarantees}{\ensuremath{G}}
+\newcommand{\dispatch}{\ensuremath{\mathit{dispatch}}}
+\newcommand{\complete}{\ensuremath{\mathit{complete}}}
+\newcommand{\same}[1]{\ensuremath{\mathit{same}(#1)}}
+\newcommand{\inputs}{\ensuremath{I}}
+\newcommand{\outputs}{\ensuremath{O}}
+\newcommand{\system}{\ensuremath{S}}
+\newcommand{\components}{\ensuremath{C}}
+\newcommand{\schedule}{\ensuremath{\phi}}
+\newcommand{\valid}{\ensuremath{\mathit{valid}}}
+
+PLTL to reason about sequences of sets of propositions, $\pi$, where $\pi^i$ is the subsequence starting at the $i^\mathrm{th}$ instance.
+Globally, $\pi^i \models \globally(f) \iff \forall j \ge i, \pi^j \models f$.
+Historically, $\pi^i \models \historically(f) \iff \forall 0 \le j \le i, \pi^j \models f$.
+
+A component is described by a contract, $(\assumes, \guarantees)$, where $\assumes$ are the component assumptions and $\guarantees$ are the component guarantees when the assumptions hold.
+Contracts are written over propositions using the \emph{property specification language} (PSL).
+An implementation of a component is correct if and only if $\globally(\historically(\assumes) \implies \guarantees)$.
+Component implementations are assumed correct in the compositional reasoning AGREE framework.
+
+The behavior of a scheduled component is defined by three special propositions: $\dispatch$ denoting when assumptions must hold, $\complete$ denoting when guarantees must hold, $\same(inputs)$ and $\same(\outputs)$ denoting that the component outputs are unchanged from the previous instance. For convenience in presentation
+\begin{eqnarray*}
+  \dispatch(A) &=& \left[\left(\dispatch \wedge \assumes\right) \vee \left(\neg\dispatch \wedge \same{\inputs}\right)\right] \\
+  \complete(A) &=& \left[\left(\complete \wedge \guarantees\right) \vee \left(\neg\complete \wedge \same{\outputs}\right)\right]
+\end{eqnarray*}
+A scheduled component is correct if and only if
+\[
+  \globally\left(
+    \historically\left(\dispatch(\assumes)\right) \implies \complete(\guarantees) \right)
+\]
+A component is said to be \emph{scheduled} if and only if every $\dispatch$ is eventually closed with a $\complete$ and the $\dispatch$ eventually holds at some instance.
+A component is assumed correct in the compositional reasoning.
+
+A system is defined by its own contract, the contracts from each of its constituent components that implement it, and a scheduler, $\system = (\assumes, \guarantees, \components, \schedule)$ where $\components$ are the constituent component contracts and $\schedule$ defines the $\dispatch$ and $\complete$ sequences for each component.
+Components \emph{communicate} in the sense that their formulas may refer to the same variables.
+Two components are said to be \emph{temporarily independent} if and only if their schedules do not overlap.
+A schedule is said to be \emph{valid}, $\valid(\schedule)$ if and only if every component in the system is scheduled and is temporally independent of all other components with the exception of the system itself. A system is correct if and only if $\valid(\schedule) \implies$
+\[
+\begin{array}{ll}
+  & \forall (\assumes_i, \guarantees_i) \in \components, \\
+  & \ \ \ \ \globally(\historically(\dispatch(A) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \implies \dispatch(\assumes_i)) \\
+  \wedge & 
+  \globally(\historically(\dispatch(A) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \implies \complete(\guarantees)))
+\end{array}
+\]
+A correct system has assumptions string enough to meet assumptions on any component input, and the guarantees from the components are string enough to meet the guarantees on the system. These ensure the correctness of the following statement for the system composed of several components.
+\[
+  \globally\left(
+    \historically\left(\dispatch(\assumes)\right) \implies \complete(\guarantees) \right)
+\]
