@@ -45,105 +45,135 @@ We use \emph{state} to represent the history of both inputs and outputs streams.
 %And the output holds its data value between its completions.
 
 {\bf Signal.}
-A signal $x$ is a function of the form $x: N \mapsto T_x$, where $N$ is the set of natural numbers including zero, and $T_x$ is the data type of $x(i)$ for all $i \in N$.
-$x(i)$, an assignment of a vlaue in $T_x$ to $x$, is called a \emph{valuation} of signal $x$. A signal represents a possibly infinite sequence of values. We may refer a Boolean signal as a \emph{event}.
+A signal $x$ is a function $x: N \mapsto T_x$, where $N$ is the set of natural numbers including zero, and $T_x$ is the data type of $x(n)$ for all $n \in N$.
+$x(n)$, an assignment of a vlaue in $T_x$ to $x$, is called a \emph{valuation} of signal $x$. 
+A \emph{trace} of a signal $x$ is a possibly infinite sequence of valuations $(x(0), x(1), x(2),... )$. 
+The \emph{length} of a trace is the number of elements in the sequence. 
+The set of all traces of length $k$ of a signal $x$ is denoted as $x^k$. 
+The set of all possible traces of a signal $x$ is denoted as $x^{\omega}$. 
+%We may refer a Boolean signal as an \emph{event}.
 %The data type can be either a primitive data type (e.g. real, bool, int, and enumeration types) or a composite data type (e.g. record types). 
 %Assume the data type of signal $x$ and $y$ is $T_x$ and $T_y$, respectively, $x = y$ means that $T_x=T_y$ and $x_i = y_i$ for all $i \in N$. 
 
-{\bf Port.}
-Input ports $X = \{x_1, x_2, ..., x_M\}$, where $x_i$ is the \emph{i}-th input port, and $M\in N$ is the total number of input ports. Each port $x \in X$ is associated with a signal. We may use input port or input signal interchangablely. To simplify the notation, we use the port ID $x$ to denote the associated \emph{signal}. Outputs are defined similarly: $Y = \{y_1, y_2, ..., y_K\}$, where $K\in N$ is the total number of output ports.  
-A \emph{valuation} of input ports is the valuation of all input signals. That is, $I(n) = \{x_1(n), x_2(n), ... x_N(n)\}$, where $n \in N$. Similarly, a \emph{valuation} of output ports $O(n) = \{y_1(n), y_2(n), ... y_N(n)\}$, where $n \in N$. 
+%{\bf Port.}
+%$Y$ is a set of typed ports. A \emph{valuation or snapshot} of ports is a function that maps each port to a value: $y  \mpasto T_y$.
+%That is, $I(n) = \{x_1(n), x_2(n), ... x_N(n)\}$, where $n \in N$. Each port $x \in X$ is associated with a signal. 
+%To simplify the notation, we use the port ID $x$ to denote the associated \emph{signal}. Outputs are defined similarly: $Y = \{y_1, y_2, ..., y_K\}$, where $K\in N$ is the total number of output ports.  
+% Similarly, a \emph{valuation} of output ports $O(n) = \{y_1(n), y_2(n), ... y_N(n)\}$, where $n \in N$. 
 
-We model the AADL ports as signals. In particular, an event port is modelled as a Boolean signal. The value \emph{1} or \emph{0} indicates the event is \emph{present} or \emph{absent} at the port, respectively. 
-An event data port is modelled as a pair of data signal and event signal.  %An event data port is modelled as a pair of data signal $p$ and event signal $event(p)$.  
+%We model the AADL ports as signals. In particular, an event port is modelled as a Boolean signal. The value \emph{1} or \emph{0} indicates the event is \emph{present} or \emph{absent} at the port, respectively. 
+%An event data port is modelled as a pair of data signal and event signal.  %An event data port is modelled as a pair of data signal $p$ and event signal $event(p)$.  
+
+{\bf Dispatch and Complete.}
+Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
+\begin{enumerate}
+	\item there eixsts no $n\in N$ such that $dispatch(n) = 1$ and $complete(n) =  1$.
+	\item there exists $n\in N$ such that $dispatch(n) = 1$ if and only if there exists $m\in N$, such that $m > n, complete(m) =  1$.
+	\item if there exists $n,m\in N, n \neq m$ such that $dispatch(n) = 1, dispatch(m) = 1$, then there exists $k\in N, m >k> n$ such that $complete(k) = 1$.
+\end{enumerate}
+The first condition states that \emph{dispatch} and \emph{complete} are mutual exclusive. The second condition states that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The third condition states that \emph{dispatch} and \emph{complete} appear alternately. 
+%A pair of well-ordered ($dispatch$, $complete$) signals defines a sequence of \emph{intervals}. 
+$[n, m], n,m \in N$ is an \emph{interval} of a pair of well-ordered $dispatch$ and $complet$e if $dispatch(n) = 1$, $complete(m) = 1$, and $\forall k\in (n, m], dispatch(k)=0$. We denote the interval as $\delta(n)$.
 
 {\bf Component.}
-A component $c$ is a nine-tuple $(S, s_0, I, O, \delta, A, P, dispatch, complete)$, where: 
+%A component $c$ is a nine-tuple $(S, s_0, I, O, \delta, A, P, dispatch, complete)$, where: 
+A component $c$ is a six-tuple $(I, O, A, P, dispatch, complete)$, where: 
 \begin{itemize}
-    	\item $S$ is a finite non-empty set of states;
-    	\item $s_0 \in S$ is the initial state;
-    	\item $I$ is a set of input signals valuations;
-    	\item $O$ is a set of output signals valuations;
-    	\item $\delta$ is the state transfer function of the form $\delta: I \times O \times S \mapsto S$;
-    	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I \times S \mapsto B$;
-    	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I \times O \times S \mapsto B$;
-    	\item $dispatch$ and $complete$ is a pair of \emph{well-ordered} events.
+%    	\item $S$ is a finite non-empty set of states;
+%    	\item $s_0 \in S$ is the initial state;
+    	\item $I = \{x_1, x_2, ..., x_g\}$ is the set of input signals;
+    	\item $O= \{y_1, y_2, ..., y_h\}$ is the set of output signals disjoint from $I$;
+%    	\item $\delta$ is the state transfer function of the form $\delta: I \times O \times S \mapsto S$;
+ 	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I^{\omega} \mapsto B$;
+ 	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I^{\omega} \times O^{\omega} \mapsto B$;
+%  	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I \times S \mapsto B$;
+%  	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I \times O \times S \mapsto B$;
+    	\item $dispatch$ and $complete$ are a pair of \emph{well-ordered} Boolean signals.
 %	\item $complete$ is a Boolean signal.
 %	\item $clock$ is a Boolean signal $clock(n) \Rightarrow \lnot clock(n+1) \land  \lnot clock(n-1), \forall i \in N$ .
 \end{itemize}
-
-Two events $dispatch$ and $complete$ are \emph{well-ordered} if 
-\begin{itemize}
-	\item there eixsts no $i\in N$ such that $dispatch(i) = 1$ and $complete(i) =  1$.
-	\item there exists $i\in N$ such that $dispatch(i) = 1$ if and only if there exists $j\in N$, such that $j > i, complete(j) =  1$.
-	\item if there exists $i, j\in N$ such that $i \neq j, dispatch(i) = 1, dispatch(j) = 1$, then there exists $k\in T$ such that $j >k> i, complete(j) = 1$.
-\end{itemize}
-
-Let $s$ be a \emph{valuation} of $S$. That is, $s: N \mapsto S$. We have $ s(n+1) = \delta (s(n), I(n))$.
-
-Note that the guarantees represent a general relation, not a function. This allows users to models the non-derterminism introduced by design decision or implementation choice.
-  
+%We use $a_n$ and $p_n$ to denote the function $a$ and $p$ with signals of length $n$, respectively. 
+%Note that the guarantees represent a general relation, not a function. This allows users to models the non-derterminism introduced by design decision or implementation choice.
 %The ports of a thread are divided into two finite disctinct sets: input ports ($I$) and output ports ($O$). Correspondingly, the associated signals are divided int to input signals and output signals. We model the \emph{state} of a thread with a finite set $S$ of signals. %The next state function is $T: S x I \mapsto S'$. The output function is $T: S x I \mapsto S$. Then, a thread is %A thread is modelled as a collection of input signals and output signals. A thread could be aossciated with /emph{local} states, which are not accessible outside the scope of the thread. They are modelled as signals, noted as set S . 
-
 %{\bf component execution.}
-
 %A component is associated with two Boolean signals (events) \emph{dispatch} ($d$) and \emph{complete} ($c$). A component is \emph{dispatched} at time $i$, if and only if $d(i) = true$. A component is \emph{complete} at time $i$, if and only if $c(i) = true$. %A component can be in either \emph{active} or \emph{sleep} mode. 
 %At \emph{dispatch} a component evaluates the inputs. At \emph{complete}, it updates its output and transitions to its \emph{next state}. After \emph{complete}, it holds its state and output till next \emph{complete}. That is,
-
 %A \emph{valuation} of an assumption $a$ is defined as $a(n) =  a(I(n), s(n))$.
 %A \emph{valuation} of a gurarantee $p$ is defined as $p(n) =  p(I(n), O(n), s(n))$.
+A component satisfies the following rules.
 
-At \emph{dispatch}, the \emph{assumptions} $A$ should hold. That is,
-
+The \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
 \label{eqn:assumption}
-dispatch(n) \Rightarrow a(I(n), s(n)), \forall n\in N, \forall a \in A
+%dispatch(n) \Rightarrow a(I(n), s(n)), \forall n\in N, \forall a \in A
+dispatch(n) \Rightarrow a(I^n), \forall n\in N, \forall a \in A
 \end{equation}
+%where $I^n = ({x_1}^n, {x_2}^n,..., {x_g}^n)$.
 
-Once \emph{dispatch}, input freeze till \emph{complete}. That is,
-
+Inputs freeze between dispatch and complete. That is,
 \begin{equation} 
 \label{eqn:inputfreeze}
-x(n) = x(n-1), \forall n\in Act, \forall x \in X
+dispatch(n) \Rightarrow (x(i) = x(j)), \forall i,j\in \delta(n), \forall x \in I
 \end{equation}
-where $Act = \{k | k\in N, i<k\le j, dispatch(i)=1, complete(j) = 1, dispatch(k)=0, complete(k)=0\}$.
 
-At \emph{complete}, the \emph{gurarantees} $P$ should hold. That is,
-
+The \emph{gurarantees} hold at \emph{complete}. That is,
 \begin{equation} 
 \label{eqn:guarantee}
-complete(n) \Rightarrow p(I(n), O(n), s(n)), \forall n\in N, \forall p \in P
+%complete(n) \Rightarrow p(I(n), O(n), s(n)), \forall n\in N, \forall p \in P
+complete(n) \Rightarrow p(I^n, O^n), \forall n\in N, \forall p \in P
 \end{equation}
+%where $O^n = ({y_1}^n, {y_2}^n,..., {y_h}^n)$.
 
-A compoent holds its state and output between \emph{complete}. That is,
-
+Outputs freeze between \emph{completes}. That is,
 \begin{equation} 
-\label{eqn:outputhold}
-\lnot complete(n) \Rightarrow y(n) = y(n-1), \forall n \in N, \forall y \in Y
+\label{eqn:outputfreeze}
+\lnot complete(n) \Rightarrow (y(n) = y(n-1)), \forall n \in N, n>0, \forall y \in O
 \end{equation}
 
-\begin{equation} 
-\label{eqn:statehold}
-\lnot complete(n) \Rightarrow s(n) = s(n-1), \forall n \in N, \forall s \in S
-\end{equation}
+%Let $s$ be a \emph{valuation} of $S$. That is, $s: N \mapsto S$. 
+%\begin{equation} 
+%\label{eqn:statetransfer}
+%complete(n) \Rightarrow s(n) = \delta (s(n-1), I(n-1), O(n-1), \forall n \in N, \forall s \in S
+%\end{equation}
+
+%\begin{equation} 
+%\label{eqn:statehold}
+%\lnot complete(n) \Rightarrow s(n) = s(n-1), \forall n \in N, \forall s \in S
+%\end{equation}
 
 %The \emph{dispatch} and \emph{complete} models, respectively, the start and end of the time slot that a component to run. 
 %When its \emph{dispatch} event $d$ is present, a thread samples the input values and starts execution. This is the time when the associated AGREE \emph{assumptions} $A$ should hold. That is,
 %$$event(d)_i \Rightarrow a_i, \forall i\in N, \forall a \in A $$
 
 {\bf Trace.}
-A trace $\sigma$ of a component $c(S, s_0, I, O, \delta, A, P, dispatch, complete)$ is a function of the form $\sigma: N \mapsto \Sigma$, where
-$\sigma(n) = ((I(n), O(n), s(n), dispatch(n), complete(n))$, for all $n\in N$, that satifies Equation \ref{eqn:assumption}, \ref{eqn:guarantee}, \ref{eqn:outputhold}, \ref{eqn:statehold}. %We denote the set of all traces of a component as $\Sigma$.
-A trace is a possibly infinite sequence of component valuations that satify the contract constraints and the output and state hold rules. 
+A \emph{snapshot} of a component is a valuation of its inputs, outputs, dispatch, and complete signals. %That is, $c(n) = \{I(n),O(n),dispatch(n),complete(n)\}, \forall n\in N$.
+A \emph{trace} of a component is a possibly infinite sequence of snapshots %$(c(0), c(1), c(2),... )$
+%A trace $\sigma$ of a component $c(S, s_0, I, O, \delta, A, P, dispatch, complete)$ is a function of the form $\sigma: N \mapsto \Sigma$, where
+%A trace $\sigma$ of a component $c(I, O, A, P, dispatch, complete)$ is function $\sigma: N \mapsto \Sigma$, where
+%$\sigma(n) = ((I(n), O(n),dispatch(n), complete(n))$, for all $n\in N$, 
+that satifies Equation \ref{eqn:assumption},  \ref{eqn:inputfreeze}, \ref{eqn:guarantee}, and \ref{eqn:outputfreeze}. %We denote the set of all traces of a component as $\Sigma$.
+%A trace is a possibly infinite sequence of component valuations that satify the contract constraints and the input, output and state hold rules.  
+The set of all traces of a component $c$ is called its \emph{language}, denoted as $L(c)$.
 
 {\bf Connection.}
-Suppose component $c$ has output ports $Y$ and component $c', c' \neq c$ has input ports $X$. A connection $e$ is a Boolean function: $Y \times X' \mapsto B$. In AGREE, we have
+%If an output signal $y$ of a component $c$ is \emph{connected} to an input signal $x'$ of a component $c', c' \neq c$, then $y = x'$. That is,
+A \emph{connection} from output signals $O$ of a component $c$ to input signals $I'$ of a component $c', c' \neq c$ is function: $e: I'\mapsto P(O)$. That is,
+%Given two connected components $c_1=(I_1, O_1, A_1, P_1$ and $c_2$, where
+%\begin{equation*}
+%I = I \bigcup I' \backslash \{x'\}
+ %O = O \bigcup O'
+%A = A \bigcup A'
+%P = P \bigcup P'
+%\end{equation*}
+
+%In AGREE, we have
 \begin{equation} 
 \label{eqn:connection}
 e(y, x') \Rightarrow y = x', \forall y \in Y, \forall x \in X'
 \end{equation} 
+where 
 
-A \emph{connection} from an output port of one component to an input port of another component implies the corresponding signals are equal. For an AADL event data prot, this means the data signals and event signals are equal, respectively. 
+%A \emph{connection} from an output port of one component to an input port of another component implies the corresponding signals are equal. For an AADL event data prot, this means the data signals and event signals are equal, respectively. 
 
 %The trace of the simple downsampling system is shown in Table \ref{tab:table1}.
 %\begin{table}[h!]
@@ -166,24 +196,17 @@ A \emph{connection} from an output port of one component to an input port of ano
 %\end{center}
 %\end{table}}
 
-Figure \ref{wpmAGREE} shows an exmaple of direct modelling the component semantics in the AADL AGREE annex. This is mostly done by augumenting the contracts defined in synchronous AGREE, and adding additional contracts to enforce the output hold rule.
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{wpmAGREE.jpg}
-\caption{An AGREE Model Example\label{wpmAGREE}}
-\end{figure}
-
 {\bf Schedule.}
 Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $T \mapsto C\times \{Dispatch, Complete\}$ satisfying:
 \begin{itemize}
-	\item there exists $i\in T$, $c\in C$ such that $\phi(i) = (c, Dispatch)$ if and only if there exists $j\in T$, such that $j > i, \phi(j) =  (c, Complete)$.
-	\item if there exists $i, j\in T$, $c\in C$ such that $i \neq j, \phi(i) = (c, Dispatch), \phi(j) = (c, Dispatch)$, then there exists $k\in T$, such that $j >k> i, \phi(j) =  (c, Complete)$.
+	\item there exists $i\in T$, $c\in C$ such that $\phi(i) = (c, Dispatch)$ if and only if there exists $j\in T$, such that $j > i, \phi(j) =  (c, Complete)$;
+	\item if there exists $i, j\in T$, $c\in C$ such that $i \neq j, \phi(i) = (c, Dispatch), \phi(j) = (c, Dispatch)$, then there exists $k\in T$, such that $j >k> i, \phi(j) =  (c, Complete)$;
+	\item if there exists $i, j, n\in T$, $c, c'\in C$ such that $i < n < j, \phi(i) = (c, Dispatch), \phi(n) = (c', Dispatch), \phi(j) = (c, Complete)$, then there exists $m\in T$, such that $n < m < j, \phi(m) =  (c', Complete)$ and $c$ and $c'$ have no connection.
 \end{itemize}
-The first condition requires that in a schedule \emph{Dispatch} and \emph{Complete} of a component must appear in pairs, and in each pair \emph{Dispatch} appears ``before'' \emph{Complete}. The second condition states that \emph{Dispatch} and \emph{Complete} of a component must appear alternately in a schedule. 
-
-Then given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ can be defined as:
-  
+The first condition requires that in a schedule \emph{Dispatch} and \emph{Complete} of a component must appear in pairs, and in each pair \emph{Dispatch} appears before \emph{Complete}. 
+The second condition states that \emph{Dispatch} and \emph{Complete} of a component must appear alternately in a schedule. 
+The third condition allows a component to be \emph{preempted} by another component if they two have no coonection.
+Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ are defined as follows: 
 \begin{equation}
 \label{eqn:dispatch}
     dispatch(i+kT) =
@@ -204,9 +227,10 @@ Then given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{co
 
 where $i,k\in N$.
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is executed at least once.
-A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each ``tick'' there is a \emph{dispatch} or \emph{complete} event. Note in a synchronous model, a tick represents a global clock that triggers all components to update. While in the proposed model, ticks are used to represent the total order of events. 
+A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each ``tick'' there is a \emph{dispatch} or \emph{complete} event. 
+%Note in a synchronous model, a tick represents a global clock that triggers all components to update. While in the proposed model, ticks are used to represent the total order of events. 
 
-With the output hold, the \emph{connection} definition, and the scheduling semantics, we essentially define an asynchronous communication with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is active at a time, there is no ambiguity on the order of read and write. The comminucation may be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
+With the frozen outputs, the \emph{connection} definition, and the scheduling semantics, we essentially define an asynchronous communication between components with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is active at a time, there is no ambiguity on the order of read and write. The comminucation may be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
 
 {\bf System.}
 A \emph{system} is a triple $(C, E, \phi)$, where:
@@ -216,12 +240,11 @@ A \emph{system} is a triple $(C, E, \phi)$, where:
     	\item $\phi$ is a schedule.
 \end{itemize}
 A \emph{trace} of a system is a trace of it components that satisfies the connection Equation \ref{eqn:connection} for all $e in E$, and the schedule Equation \ref{eqn:dispatch} and Equation \ref{eqn:complete}.
-An \emph{observal trace} of a system is a trace of the system that only has the input and output trajectory.
-A trace of the simple downsampling system is partially shown in Table \ref{tab:table1}.
 
+A trace of the simple downsampling system is partially shown in Table \ref{tab:table1}. For simplicity, we use one symbol to represent the input and output signals that are connected.
 \begin{table}[h!]
 \begin{center}
-\caption{A Simple Downsampling System Trace}
+\caption{A Trace of the Simple Downsampling System}
 \label{tab:table1}
 \begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
 \hline
@@ -244,6 +267,8 @@ dispatchD & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 
 completeD & 0 & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\ 
 \hline
 a(k) & 0 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 4 & 4 & 4 & 4 & 4 \\
+\hline
+pre(a)(k) & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 3 \\
 \hline
 b(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 4 & 4 & 4 \\
 \hline
