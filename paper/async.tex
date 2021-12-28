@@ -155,9 +155,9 @@ that satifies Equation \ref{eqn:assumption},  \ref{eqn:inputfreeze}, \ref{eqn:gu
 %A trace is a possibly infinite sequence of component valuations that satify the contract constraints and the input, output and state hold rules.  
 The set of all traces of a component $c$ is called its \emph{language}, denoted as $L(c)$.
 
-{\bf Connection.}
+%{\bf Connection.}
 %If an output signal $y$ of a component $c$ is \emph{connected} to an input signal $x'$ of a component $c', c' \neq c$, then $y = x'$. That is,
-A \emph{connection} from output signals $O$ of a component $c$ to input signals $I'$ of a component $c', c' \neq c$ is function: $e: I'\mapsto P(O)$. That is,
+%A \emph{connection} from output signals $O$ of a component $c$ to input signals $I'$ of a component $c', c' \neq c$ is function: $e: I'\mapsto P(O)$. That is,
 %Given two connected components $c_1=(I_1, O_1, A_1, P_1$ and $c_2$, where
 %\begin{equation*}
 %I = I \bigcup I' \backslash \{x'\}
@@ -167,11 +167,11 @@ A \emph{connection} from output signals $O$ of a component $c$ to input signals 
 %\end{equation*}
 
 %In AGREE, we have
-\begin{equation} 
-\label{eqn:connection}
-e(y, x') \Rightarrow y = x', \forall y \in Y, \forall x \in X'
-\end{equation} 
-where 
+%\begin{equation} 
+%\label{eqn:connection}
+%e(y, x') \Rightarrow y = x', \forall y \in Y, \forall x \in X'
+%\end{equation} 
+%where 
 
 %A \emph{connection} from an output port of one component to an input port of another component implies the corresponding signals are equal. For an AADL event data prot, this means the data signals and event signals are equal, respectively. 
 
@@ -233,13 +233,27 @@ A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means th
 With the frozen outputs, the \emph{connection} definition, and the scheduling semantics, we essentially define an asynchronous communication between components with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is active at a time, there is no ambiguity on the order of read and write. The comminucation may be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
 
 {\bf System.}
-A \emph{system} is a triple $(C, E, \phi)$, where:
+A set $C$ of components are said to be \emph{compatible} if 
+\begin{equation*}
+\forall c_i,c_j \in C, i\neq j, O(c_i) \cap O(c_j) = \emptyset 
+\end{equation*}
+
+A \emph{system} is a triple $(C, \phi)$, where:
 \begin{itemize}
-    	\item $C$ is a finite non-empty set of components;
-    	\item $E$ is a set of connections;
+    	\item $C$ is a finite set of compatible components;
+%    	\item $E$ is a set of connections;
     	\item $\phi$ is a schedule.
 \end{itemize}
-A \emph{trace} of a system is a trace of it components that satisfies the connection Equation \ref{eqn:connection} for all $e in E$, and the schedule Equation \ref{eqn:dispatch} and Equation \ref{eqn:complete}.
+
+\begin{equation*}
+I(A) = \cup_{c_i \in C}I(c_i) -  \cup_{c_i \in C}O(c_i)
+\end{equation*}
+
+\begin{equation*}
+O(A) = \cup_{c_i \in C}O(c_i)
+\end{equation*}
+
+%A \emph{trace} of a system is a trace of it components that satisfies the connection Equation \ref{eqn:connection} for all $e in E$, and the schedule Equation \ref{eqn:dispatch} and Equation \ref{eqn:complete}.
 
 A trace of the simple downsampling system is partially shown in Table \ref{tab:table1}. For simplicity, we use one symbol to represent the input and output signals that are connected.
 \begin{table}[h!]

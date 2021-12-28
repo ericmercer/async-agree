@@ -2,7 +2,7 @@
 \newcommand{\globally}{\ensuremath{\mathbf{G}}}
 \newcommand{\historically}{\ensuremath{\mathbf{H}}}
 \newcommand{\assumes}{\ensuremath{A}}
-\newcommand{\guarantees}{\ensuremath{G}}
+\newcommand{\guarantees}{\ensuremath{P}}
 \newcommand{\dispatch}{\ensuremath{\mathit{dispatch}}}
 \newcommand{\complete}{\ensuremath{\mathit{complete}}}
 \newcommand{\same}[1]{\ensuremath{\mathit{same}(#1)}}
@@ -22,7 +22,7 @@ Contracts are written over propositions using the \emph{property specification l
 An implementation of a component is correct if and only if $\globally(\historically(\assumes) \implies \guarantees)$.
 Component implementations are assumed correct in the compositional reasoning AGREE framework.
 
-The behavior of a scheduled component is defined by three special propositions: $\dispatch$ denoting when assumptions must hold, $\complete$ denoting when guarantees must hold, $\same(inputs)$ and $\same(\outputs)$ denoting that the component outputs are unchanged from the previous instance. For convenience in presentation
+The behavior of a scheduled component is defined by three special propositions: $\dispatch$ denoting when assumptions must hold, $\complete$ denoting when guarantees must hold, $\same{\inputs}$ and $\same{\outputs}$ denoting that the component outputs are unchanged from the previous instance. For convenience in presentation
 \begin{eqnarray*}
   \dispatch(A) &=& \left[\left(\dispatch \wedge \assumes\right) \vee \left(\neg\dispatch \wedge \same{\inputs}\right)\right] \\
   \complete(A) &=& \left[\left(\complete \wedge \guarantees\right) \vee \left(\neg\complete \wedge \same{\outputs}\right)\right]
