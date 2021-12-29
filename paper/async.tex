@@ -26,7 +26,9 @@ The two events shall appear in pairs and alternately. \emph{dispatch} shall appe
 
 The AGREE reasoning framework uses past-time LTL [2], particularly LTL operator $G$ (globally), $H$ (historically), and $Z$ (previous). Given a component with an assume-gurantee pair ($A,P$) and an event pair (\emph{dispatch}, \emph{complete}), the meaning of the contract can be formally represented as a past-time LTL formula $G(H((dispatch \Rightarrow A)) \Rightarrow (complete \Rightarrow P))$. In synchronous AGREE, the two events \emph{collpase} into a single instant at each tick. Thus, we have $G(H(A) \Rightarrow P)$.
 
-We use \emph{state} to represent the history of both inputs and outputs streams. The state transition depends on both inputs and outputs. This is because AGREE \emph{Guarantee} contracts usually do not completely define the outputs based on the inputs and states. Instead, they impose contraints that all valid outputs shall satisfy.
+%We use \emph{state} to represent the history of both inputs and outputs streams. The state transition depends on both inputs and outputs. This is because AGREE \emph{Guarantee} contracts usually do not completely define the outputs based on the inputs and states. Instead, they impose contraints that all valid outputs shall satisfy.
+
+With the frozen outputs, the \emph{connection} definition, and the scheduling semantics, we essentially define an asynchronous communication between components with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is active at a time, there is no ambiguity on the order of read and write. The comminucation may be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
 
 %In the formal definition, we use indices to represent the total order of scheduling events. TODO
 
@@ -47,7 +49,7 @@ We use \emph{state} to represent the history of both inputs and outputs streams.
 {\bf Signal.}
 A signal $x$ is a function $x: N \mapsto T_x$, where $N$ is the set of natural numbers including zero, and $T_x$ is the data type of $x(n)$ for all $n \in N$.
 $x(n)$, an assignment of a vlaue in $T_x$ to $x$, is called a \emph{valuation} of signal $x$. 
-A \emph{trace} of a signal $x$ is a possibly infinite sequence of valuations $(x(0), x(1), x(2),... )$. 
+A \emph{trace} of a signal $x$ is a possibly infinite sequence of valuations $(x(0), x(1), x(2),... )$, denoted as $\sigma_x$. 
 The \emph{length} of a trace is the number of elements in the sequence. 
 The set of all traces of length $k$ of a signal $x$ is denoted as $x^k$. 
 The set of all possible traces of a signal $x$ is denoted as $x^{\omega}$. 
@@ -81,8 +83,8 @@ A component $c$ is a six-tuple $(I, O, A, P, dispatch, complete)$, where:
 \begin{itemize}
 %    	\item $S$ is a finite non-empty set of states;
 %    	\item $s_0 \in S$ is the initial state;
-    	\item $I = \{x_1, x_2, ..., x_g\}$ is the set of input signals;
-    	\item $O= \{y_1, y_2, ..., y_h\}$ is the set of output signals disjoint from $I$;
+    	\item $I = \{x_1, x_2, ..., x_g\}$ is the set of input signals, also denoted as $I(c)$;
+    	\item $O= \{y_1, y_2, ..., y_h\}$ is the set of output signals disjoint from $I$, also denoted as $O(c)$;
 %    	\item $\delta$ is the state transfer function of the form $\delta: I \times O \times S \mapsto S$;
  	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I^{\omega} \mapsto B$;
  	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I^{\omega} \times O^{\omega} \mapsto B$;
@@ -146,16 +148,18 @@ Outputs freeze between \emph{completes}. That is,
 %$$event(d)_i \Rightarrow a_i, \forall i\in N, \forall a \in A $$
 
 {\bf Trace.}
-A \emph{snapshot} of a component is a valuation of its inputs, outputs, dispatch, and complete signals. %That is, $c(n) = \{I(n),O(n),dispatch(n),complete(n)\}, \forall n\in N$.
-A \emph{trace} of a component is a possibly infinite sequence of snapshots %$(c(0), c(1), c(2),... )$
+A \emph{snapshot} of a component is a valuation of its set $Sig$ of signals, where $Sig = \{I, O, dispatch, complete\}$. %That is, $c(n) = \{I(n),O(n),dispatch(n),complete(n)\}, \forall n\in N$.
+A \emph{trace} $\sigma_c$ of a component $c$ is a possibly infinite sequence of snapshots %$(c(0), c(1), c(2),... )$
 %A trace $\sigma$ of a component $c(S, s_0, I, O, \delta, A, P, dispatch, complete)$ is a function of the form $\sigma: N \mapsto \Sigma$, where
 %A trace $\sigma$ of a component $c(I, O, A, P, dispatch, complete)$ is function $\sigma: N \mapsto \Sigma$, where
 %$\sigma(n) = ((I(n), O(n),dispatch(n), complete(n))$, for all $n\in N$, 
 that satifies Equation \ref{eqn:assumption},  \ref{eqn:inputfreeze}, \ref{eqn:guarantee}, and \ref{eqn:outputfreeze}. %We denote the set of all traces of a component as $\Sigma$.
 %A trace is a possibly infinite sequence of component valuations that satify the contract constraints and the input, output and state hold rules.  
+The \emph{projection} of $\sigma_c$ onto the set $\{I, O\}$: $\sigma_c|_{\{I,O\}} = \{\sigma_x | x\in \{I,O\}, \sigma_x \in \sigma_c\}$.	
 The set of all traces of a component $c$ is called its \emph{language}, denoted as $L(c)$.
 
 %{\bf Connection.}
+
 %If an output signal $y$ of a component $c$ is \emph{connected} to an input signal $x'$ of a component $c', c' \neq c$, then $y = x'$. That is,
 %A \emph{connection} from output signals $O$ of a component $c$ to input signals $I'$ of a component $c', c' \neq c$ is function: $e: I'\mapsto P(O)$. That is,
 %Given two connected components $c_1=(I_1, O_1, A_1, P_1$ and $c_2$, where
@@ -197,7 +201,7 @@ The set of all traces of a component $c$ is called its \emph{language}, denoted 
 %\end{table}}
 
 {\bf Schedule.}
-Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $T \mapsto C\times \{Dispatch, Complete\}$ satisfying:
+Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T] \mapsto C\times \{Dispatch, Complete\}$ satisfying:
 \begin{itemize}
 	\item there exists $i\in T$, $c\in C$ such that $\phi(i) = (c, Dispatch)$ if and only if there exists $j\in T$, such that $j > i, \phi(j) =  (c, Complete)$;
 	\item if there exists $i, j\in T$, $c\in C$ such that $i \neq j, \phi(i) = (c, Dispatch), \phi(j) = (c, Dispatch)$, then there exists $k\in T$, such that $j >k> i, \phi(j) =  (c, Complete)$;
@@ -206,10 +210,12 @@ Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{lengt
 The first condition requires that in a schedule \emph{Dispatch} and \emph{Complete} of a component must appear in pairs, and in each pair \emph{Dispatch} appears before \emph{Complete}. 
 The second condition states that \emph{Dispatch} and \emph{Complete} of a component must appear alternately in a schedule. 
 The third condition allows a component to be \emph{preempted} by another component if they two have no coonection.
+If the schedule is not premptive, we could simplify a schedule as a partial function $[1, T] \mapsto C$.
+
 Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ are defined as follows: 
 \begin{equation}
 \label{eqn:dispatch}
-    dispatch(i+kT) =
+    dispatch_c^\phi(i+kT) =
     \begin{cases}
       1, & \text{if}\ \phi(i) = (c, Dispatch) \\
       0, & \text{otherwise}
@@ -218,142 +224,155 @@ Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complet
 
 \begin{equation}
 \label{eqn:complete}
-    complete(i+kT) =
+    complete_c^\phi(i+kT) =
     \begin{cases}
       1, & \text{if}\ \phi(i) = (c, Complete) \\
       0, & \text{otherwise}
     \end{cases}
 \end{equation}
 
-where $i,k\in N$.
+where $i,k\in N$. 
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is executed at least once.
-A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each ``tick'' there is a \emph{dispatch} or \emph{complete} event. 
+A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} signal is true. 
+For simplicity, we only considerl minimal schedules.
 %Note in a synchronous model, a tick represents a global clock that triggers all components to update. While in the proposed model, ticks are used to represent the total order of events. 
 
-With the frozen outputs, the \emph{connection} definition, and the scheduling semantics, we essentially define an asynchronous communication between components with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is active at a time, there is no ambiguity on the order of read and write. The comminucation may be viewed as a queue of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
-
 {\bf System.}
+A component $c$ is \emph{connected} to another component $c'$ if there exists a signal $x$ such that $x \in O(c)$ and $x \in I(c')$. 
+%Let $I(c), O(c)$ denote the set of input and output signals of a component $c$, respectively.
 A set $C$ of components are said to be \emph{compatible} if 
-\begin{equation*}
-\forall c_i,c_j \in C, i\neq j, O(c_i) \cap O(c_j) = \emptyset 
-\end{equation*}
+%\begin{equation*}
+$\forall c_i,c_j \in C, i\neq j, O(c_i) \cap O(c_j) = \emptyset$.
+%\end{equation*}
 
-A \emph{system} is a triple $(C, \phi)$, where:
+A set $C$ of connected, compatible, and scheduled components is a \emph{system} (component), where:
 \begin{itemize}
-    	\item $C$ is a finite set of compatible components;
-%    	\item $E$ is a set of connections;
-    	\item $\phi$ is a schedule.
+	\item $I = \cup_{\forall c \in C}I(c) -  \cup_{\forall c \in C}O(c)$;
+	\item $O = \cup_{\forall c \in C}O(c)$;
+	\item $A$ is the system-level assumptions;
+	\item $P$ is the system-level guarantees;
+	\item $dispatch = dispatch_c$ such that $\phi(1) = (c, Dispatch)$;
+	\item $complete = complete_c$ such that $\phi(T) = (c, Complete)$.
+%	\item $dispatch (i) = 
+%	    	\begin{cases}
+%      		1, & \text{if}\ i = kT+1 (k=0,1,...)\\
+%	     		0, & \text{otherwise}
+%   	 	\end{cases}$;
+%   	\item $complete (i) =
+%   		\begin{cases}
+%      		1, & \text{if}\ i = kT (k=1,2,...)\\
+%	     		0, & \text{otherwise}
+%   	 	\end{cases}$.
 \end{itemize}
+Let $L(S)$ denote the language of a system $S$. 
 
-\begin{equation*}
-I(A) = \cup_{c_i \in C}I(c_i) -  \cup_{c_i \in C}O(c_i)
-\end{equation*}
-
-\begin{equation*}
-O(A) = \cup_{c_i \in C}O(c_i)
-\end{equation*}
-
-%A \emph{trace} of a system is a trace of it components that satisfies the connection Equation \ref{eqn:connection} for all $e in E$, and the schedule Equation \ref{eqn:dispatch} and Equation \ref{eqn:complete}.
-
-A trace of the simple downsampling system is partially shown in Table \ref{tab:table1}. For simplicity, we use one symbol to represent the input and output signals that are connected.
-\begin{table}[h!]
-\begin{center}
-\caption{A Trace of the Simple Downsampling System}
-\label{tab:table1}
-\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
-\hline
-            k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10  & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 \\
-\hline
-dispatchA  & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0  \\ 
-\hline
-completeA & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0  \\ 
-\hline
-dispatchB & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0  \\ 
-\hline
-completeB & 0 & 0 & 0 &0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\ 
-\hline
-dispatchC & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\ 
-\hline
-completeC & 0 & 0 & 0 & 1  & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
-\hline
-dispatchD & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\ 
-\hline
-completeD & 0 & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\ 
-\hline
-a(k) & 0 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 4 & 4 & 4 & 4 & 4 \\
-\hline
-pre(a)(k) & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 3 \\
-\hline
-b(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 4 & 4 & 4 \\
-\hline
-c(k) & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 3 & 3 & 3 & 3 & 3 & 3 & 3 \\
-\hline
-d(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
+%A trace of the simple downsampling system is partially shown in Table \ref{tab:table1}. For simplicity, we use one symbol to represent the input and output signals that are connected.
+%\begin{table}[h!]
+%\begin{center}
+%\caption{A Trace of the Simple Downsampling System}
+%\label{tab:table1}
+%\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
+%\hline
+%            k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10  & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 \\
+%\hline
+%dispatchA  & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0  \\ 
+%\hline
+%completeA & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0  \\ 
+%\hline
+%dispatchB & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0  \\ 
+%\hline
+%completeB & 0 & 0 & 0 &0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\ 
+%\hline
+%dispatchC & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\ 
+%\hline
+%completeC & 0 & 0 & 0 & 1  & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
+%\hline
+%dispatchD & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\ 
+%\hline
+%completeD & 0 & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\ 
+%\hline
+%a(k) & 0 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 4 & 4 & 4 & 4 & 4 \\
+%\hline
+%pre(a)(k) & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 3 \\
+%\hline
+%b(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 4 & 4 & 4 \\
+%\hline
+%c(k) & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 3 & 3 & 3 & 3 & 3 & 3 & 3 \\
+%\hline
+%d(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+%\hline
+%\end{tabular}
+%\end{center}
+%\end{table}
 
 {\bf Assume-Guarantee Reasoning.}
-Given a system and a set of system \emph{assumptions} $A_s$ and a \emph{guarantee} $p_s$, a \emph{trace} of the contract is a sequence of inputs and outputs valuations that satisfies:
+The language of a set $C$ of connected, compatible, and scheduled components: 
+%\begin{equation*} 
+$L(C) = \cup_{\forall c \in C} L(c)$  such that $\forall c\in C, dispatch_c = dispatch_c^\phi, complete_c = complete_c^\phi$
+%\end{equation*}
 
-\begin{equation} 
-\label{eqn:sys_assumption}
-dispatch_s(n) \Rightarrow a_s(n), \forall n\in N, \forall a_s \in A_s
-\end{equation}
+The verification goal is to check whether $L(S)|_{\{I(S),O(S)\}} \subseteq L(C)|_{\{I(S),O(S)\}}$ holds.
 
-\begin{equation} 
-\label{eqn:sys_assumption}
-complete_s(n) \Rightarrow p_s(n), \forall n\in N
-\end{equation}
+%Given a system and a set of system \emph{assumptions} $A_s$ and a \emph{guarantee} $p_s$, a \emph{trace} of the contract is a sequence of inputs and outputs valuations that satisfies:
+%
+%\begin{equation} 
+%\label{eqn:sys_assumption}
+%dispatch_s(n) \Rightarrow a_s(n), \forall n\in N, \forall a_s \in A_s
+%\end{equation}
+%
+%\begin{equation} 
+%\label{eqn:sys_assumption}
+%complete_s(n) \Rightarrow p_s(n), \forall n\in N
+%\end{equation}
+%
+%where:
+%\begin{equation}
+%\label{eqn:sys_dispatch}
+%    dispatch_s(n) =
+%    \begin{cases}
+%      1, & \text{if}\ n = kT, k=0,1,... \\
+%      0, & \text{otherwise}
+%    \end{cases}
+%\end{equation}
+%
+%\begin{equation}
+%\label{eqn:sys_complete}
+%    complete_s(n) =
+%    \begin{cases}
+%      1, & \text{if}\ n = kT-1, k=1,2,... \\
+%      0, & \text{otherwise}
+%    \end{cases}
+%\end{equation}
 
-where:
-\begin{equation}
-\label{eqn:sys_dispatch}
-    dispatch_s(n) =
-    \begin{cases}
-      1, & \text{if}\ n = kT, k=0,1,... \\
-      0, & \text{otherwise}
-    \end{cases}
-\end{equation}
+%Verifying a system satisfies its contract $(A_s, p_s)$ is to check whether the set of traces of the contract is a subset of the oberservable traces of the system. TODO
 
-\begin{equation}
-\label{eqn:sys_complete}
-    complete_s(n) =
-    \begin{cases}
-      1, & \text{if}\ n = kT-1, k=1,2,... \\
-      0, & \text{otherwise}
-    \end{cases}
-\end{equation}
-
-Verifying a system satisfies its contract $(A_s, p_s)$ is to check whether the set of traces of the contract is a subset of the oberservable traces of the system. TODO
-
-{\bf Hierarchical Composition.}
-The proposed semantics supports hierarchical composition and Hierarchical Scheduling Framework (HSF) \cite{HSF}. This is possible if the structural proximity of the models is coincidental with the temporal proximity of their time slots in a schedule. We illustrate this using the example shown in Figure \ref{pic:hierarchy}. A system $G$ consists of components $A$ and $B$. Suppose given the lower-level schedule $(ABA)$, we prove the contracts of $G$. Then, at the structural higher-level, $G$ could be viewed as a component. And since component $A$ and $B$ are also scheduled to execute one after another, $G$'s time slot is the concatenation of the time slots of its components. Thus its \emph{dispatch} and \emph{complete} events is the start and end of the combined time slot, respectively.
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=100mm]{Hierarchy.jpg}
-\caption{An Example of Hierarchical Composition in AGREE\label{pic:hierarchy}}
-\end{figure}
-
-Note that if all the inputs of a component are connected to the outputs of other components, the inputs value will not change while the component is active. This is because the other components hold their outputs while inactive. It implies assumptions could be checked at \emph{complete}, instead of \emph{dispatch}. Thus, we do not necessarily need \emph{dispatch} event for verification purposes. Actually, in the backend implementation, assumptions at checked at \emph{complete}. We keep \emph{dispatch} event mainly for usability reasons. The (\emph{dispatch, complete}) pair helps users to understand a counterexample and mentally construct the system trace. This is particularly useful when the schedule is preemptive .
-
-{\bf Model of Real-Time Schedule.}
-In practice, a schedule often comes in form of real-time schedule, a sequence of time slots associated wtih components. The real-time schedule could come from an AADL scheduling tool like Cheddar \cite{Cheddar}, or from a scheduler provided by the RTOS/Microkernel verdor, like seL4\cite{seL4}. To properly model the schedule in AGREE, the component execution time has to be considered. One example is shown in Figure \ref{RTschedule}, where there are two components $A$ and $B$. 
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{RTschedule.jpg}
-\caption{A Model of Real-Time Schedule in AGREE\label{RTschedule}}
-\end{figure}
-Given the same real-time schedule, due to the different execution time $C_A$ of $A$, different AGREE schedules are created. In Figure\ref{RTschedule}(b), since the first time slot assigned for $A$ is less than its execution time, the end of the first time slot is interpreted as \emph{preemption}, instead of \emph{complete}.
-
-We introduce a circular counter to model a schedule in AGREE. The maximum count models the period of the schedule. An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in Figure \ref{schedule}.
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=100mm]{schedule.jpg}
-\caption{A Model of Schedule in AGREE\label{schedule}}
-\end{figure}
+%{\bf Hierarchical Composition.}
+%The proposed framework supports hierarchical composition.% and Hierarchical Scheduling Framework (HSF) \cite{HSF}. 
+%This is possible if the structural proximity of the components is coincidental with the temporal proximity of their time slots in a schedule. We illustrate this using the example shown in Figure \ref{pic:hierarchy}. A system $G$ consists of components $A$ and $B$. Suppose given the lower-level schedule $(ABA)$, we prove the contracts of $G$. Then, at the structural higher-level, $G$ could be viewed as a component. And since component $A$ and $B$ are also scheduled to execute one after another, $G$'s time slot is the concatenation of the time slots of its components. Thus its \emph{dispatch} and \emph{complete} events is the start and end of the combined time slot, respectively.
+%
+%\begin{figure}[ht!]
+%\centering
+%\includegraphics[width=100mm]{Hierarchy.jpg}
+%\caption{An Example of Hierarchical Composition in AGREE\label{pic:hierarchy}}
+%\end{figure}
+%
+%Note that if all the inputs of a component are connected to the outputs of other components, the inputs value will not change while the component is active. This is because the other components hold their outputs while inactive. It implies assumptions could be checked at \emph{complete}, instead of \emph{dispatch}. Thus, we do not necessarily need \emph{dispatch} event for verification purposes. Actually, in the backend implementation, assumptions at checked at \emph{complete}. We keep \emph{dispatch} event mainly for usability reasons. The (\emph{dispatch, complete}) pair helps users to understand a counterexample and mentally construct the system trace. This is particularly useful when the schedule is preemptive .
+%
+%{\bf Model of Real-Time Schedule.}
+%In practice, a schedule often comes in form of real-time schedule, a sequence of time slots associated wtih components. The real-time schedule could come from an AADL scheduling tool like Cheddar \cite{Cheddar}, or from a scheduler provided by the RTOS/Microkernel verdor, like seL4\cite{seL4}. To properly model the schedule in AGREE, the component execution time has to be considered. One example is shown in Figure \ref{RTschedule}, where there are two components $A$ and $B$. 
+%\begin{figure}[ht!]
+%\centering
+%\includegraphics[width=130mm]{RTschedule.jpg}
+%\caption{A Model of Real-Time Schedule in AGREE\label{RTschedule}}
+%\end{figure}
+%Given the same real-time schedule, due to the different execution time $C_A$ of $A$, different AGREE schedules are created. In Figure\ref{RTschedule}(b), since the first time slot assigned for $A$ is less than its execution time, the end of the first time slot is interpreted as \emph{preemption}, instead of \emph{complete}.
+%
+%We introduce a circular counter to model a schedule in AGREE. The maximum count models the period of the schedule. An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in Figure \ref{schedule}.
+%\begin{figure}[ht!]
+%\centering
+%\includegraphics[width=100mm]{schedule.jpg}
+%\caption{A Model of Schedule in AGREE\label{schedule}}
+%\end{figure}
 
 
 %An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in code~\ref{schedule_model}
@@ -389,7 +408,7 @@ We introduce a circular counter to model a schedule in AGREE. The maximum count 
 %It is possible to show that any counter-example found in the proof of the system property of model with schedule $\phi$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\phi'$,  and vice versa.  
 
 {\bf External Input.} 
-System inputs from the environment could arrive at any instant, while the system runs periodically. To avoid missing events, we assume that there is a buffer mechanism that stores all the input messages on a queue and periodically send it out to the system for processing. We assume the communication can be modelled as a shared variable, and the communication rate is the same as the system execution rate. 
+System inputs from the environment could arrive at any instant, while the system runs periodically. To avoid missing events, we assume that there is a buffer mechanism that stores all the input messages on a queue and periodically send it out to the system for processing.% We assume the communication can be modelled as a shared variable, and the communication rate is the same as the system execution rate. 
 
 %\documentclass{article}
 %\usepackage{multirow}
