@@ -54,14 +54,7 @@ A component $c$ is a six-tuple $(I, O, A, P, dispatch, complete)$, where:
 %	\item $complete$ is a boolean signal.
 %	\item $clock$ is a boolean signal $clock(n) \Rightarrow \lnot clock(n+1) \land  \lnot clock(n-1), \forall i \in N$ .
 \end{itemize}
-%We use $a_n$ and $p_n$ to denote the function $a$ and $p$ with signals of length $n$, respectively. 
 %Note that the guarantees represent a general relation, not a function. This allows users to models the non-derterminism introduced by design decision or implementation choice.
-%The ports of a thread are divided into two finite disctinct sets: input ports ($I$) and output ports ($O$). Correspondingly, the associated signals are divided int to input signals and output signals. We model the \emph{state} of a thread with a finite set $S$ of signals. %The next state function is $T: S x I \rightarrow S'$. The output function is $T: S x I \rightarrow S$. Then, a thread is %A thread is modelled as a collection of input signals and output signals. A thread could be aossciated with /emph{local} states, which are not accessible outside the scope of the thread. They are modelled as signals, noted as set S . 
-%{\bf component execution.}
-%A component is associated with two boolean signals (events) \emph{dispatch} ($d$) and \emph{complete} ($c$). A component is \emph{dispatched} at time $i$, if and only if $d(i) = true$. A component is \emph{complete} at time $i$, if and only if $c(i) = true$. %A component can be in either \emph{active} or \emph{sleep} mode. 
-%At \emph{dispatch} a component evaluates the inputs. At \emph{complete}, it updates its output and transitions to its \emph{next state}. After \emph{complete}, it holds its state and output till next \emph{complete}. That is,
-%A \emph{valuation} of an assumption $a$ is defined as $a(n) =  a(I(n), s(n))$.
-%A \emph{valuation} of a gurarantee $p$ is defined as $p(n) =  p(I(n), O(n), s(n))$.
 A component satisfies the following rules.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
@@ -139,27 +132,6 @@ Outputs freeze between \emph{completes}. That is,
 
 %A \emph{connection} from an output port of one component to an input port of another component implies the corresponding signals are equal. For an AADL event data prot, this means the data signals and event signals are equal, respectively. 
 
-%The trace of the simple downsampling system is shown in Table \ref{tab:table1}.
-%\begin{table}[h!]
-%\begin{center}
-%\caption{A Simple Downsampling System Trace}
-%\label{tab:table2}
-%\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c| } 
-%\hline
-%k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
-%\hline
-%a(k) & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
-%\hline
-%b(k) & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
-%\hline
-%c(k) & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
-%\hline
-%d(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-%\hline
-%\end{tabular}
-%\end{center}
-%\end{table}}
-
 {\bf Schedule.}
 Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T] \rightarrow C\times \{Dispatch, Complete\}$ satisfying:
 \begin{itemize}
@@ -205,25 +177,50 @@ A set $C$ of components are said to be \emph{compatible} if
 $\forall c_i,c_j \in C, i\neq j, O(c_i) \cap O(c_j) = \emptyset$.
 %\end{equation*}
 
-A set $C$ of connected, compatible, and scheduled components is a \emph{system} (component), where:
+A set $C$ of connected, compatible, and scheduled components is a \emph{system} $S$ (component), where:
 \begin{itemize}
-	\item $I = \cup_{\forall c \in C}I(c) -  \cup_{\forall c \in C}O(c)$;
-	\item $O = \cup_{\forall c \in C}O(c)$;
-	\item $A$ is the system-level assumptions;
-	\item $P$ is the system-level guarantees;
-	\item $dispatch = dispatch_c$ such that $\phi(1) = (c, Dispatch)$;
-	\item $complete = complete_c$ such that $\phi(T) = (c, Complete)$.
-%	\item $dispatch (i) = 
-%	    	\begin{cases}
-%      		1, & \text{if}\ i = kT+1 (k=0,1,...)\\
-%	     		0, & \text{otherwise}
-%   	 	\end{cases}$;
-%   	\item $complete (i) =
-%   		\begin{cases}
-%      		1, & \text{if}\ i = kT (k=1,2,...)\\
-%	     		0, & \text{otherwise}
-%   	 	\end{cases}$.
+	\item $I = \cup_{\forall c \in C}I(c) -  \cup_{\forall c \in C}O(c)$, also denoted as $I(S)$;
+	\item $O = \cup_{\forall c \in C}O(c)$, also denoted as $O(S)$;
+	\item $A$ is a set of system-level \emph{assumptions} over $I$;
+	\item $P$ is a set of system-level \emph{guarantees} over $\{I, O\}$;
+	\item $dispatch (i) = 
+	    	\begin{cases}
+      		1, & \text{if}\ i = kT+1 (k=0,1,...)\\
+	     	0, & \text{otherwise}
+   	 	\end{cases}$;
+   	\item $complete (i) =
+   		\begin{cases}
+      		1, & \text{if}\ i = kT (k=1,2,...)\\
+	     	0, & \text{otherwise}
+   	 	\end{cases}$.
 \end{itemize}
+
+Similarly to the component definition, we have
+The \emph{assumptions} hold at \emph{dispatch}. That is,
+\begin{equation} 
+\label{eqn:assumption}
+dispatch(n) \Rightarrow a(I^n), \forall n\in N, \forall a \in A
+\end{equation}
+
+Inputs freeze between dispatch and complete. That is,
+\begin{equation} 
+\label{eqn:inputfreeze}
+dispatch(n) \Rightarrow (x(i) = x(j)), \forall i,j\in \delta(n), \forall x \in I
+\end{equation}
+
+The \emph{gurarantees} hold at \emph{complete}. That is,
+\begin{equation} 
+\label{eqn:guarantee}
+complete(n) \Rightarrow p(I^n, O^n), \forall n\in N, \forall p \in P
+\end{equation}
+
+Outputs freeze between \emph{completes}. That is,
+\begin{equation} 
+\label{eqn:outputfreeze}
+\lnot complete(n) \Rightarrow (y(n) = y(n-1)), \forall n \in N, n>0, \forall y \in O
+\end{equation}
+
+
 %Let $L(S)$ denote the language of a system $S$. 
 
 %A trace of the simple downsampling system is partially shown in Table \ref{tab:table1}. For simplicity, we use one symbol to represent the input and output signals that are connected.
