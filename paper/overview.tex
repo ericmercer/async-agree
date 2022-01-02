@@ -23,11 +23,13 @@ The two events shall appear in pairs and alternately. dispatch shall appear befo
 
 In SCADE and SIGNAL, when a component is not activated, its outputs keep their previous values. We adopt the same notion of output freeze. The outputs are frozen between complete events. 
 
-We inherit the communication mechnanism used in synchronous AGREE. A connection between two components means their contracts refer to the same variable. 
-This essentially simulates an asynchronous communication between components with shared variable. It has one writer and possibly multiple readers. Since the schedule ensures at most one component is activated at a time, there is no ambiguity on the order of read and write. For a preemptive schedule, we require a component can only be prempted by another component if they do not have connections.
-%The comminucation may also be viewed as a buffer of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty.
+We inherit the communication mechnanism used in synchronous AGREE. The existence of a connection between two components means their contracts refer to the same variable. 
+This essentially simulates an asynchronous communication between components with shared variable. It has one writer and possibly multiple readers. This is consisten with the AADL data port communication semantics.
+Since the schedule ensures at most one component is activated at a time, there is no ambiguity on the order of read and write. For a preemptive schedule, we require a component can only be prempted by another component if they do not have connections.
 
-Note that if all the inputs of a component are connected to the outputs of other components, the inputs value will not change while the component is activated. This is because the other inactivated components hold their outputs. This implies assumptions could be examined at \emph{complete}, instead of \emph{dispatch}. Thus, we do not necessarily need introducing \emph{dispatch} event. We keep \emph{dispatch} event mainly for usability reasons. The (\emph{dispatch, complete}) pair helps users to understand a counterexample and mentally construct the system trace. This is particularly useful when the schedule is preemptive.
+The comminucation may also be viewed as a buffer of size one, which has exactly one writer and one reader. The writer overwrites when overflow occurs. The reader reads the last value if the queue is empty. This means the model only supports restrictive AADL event data port communication.
+
+Following the AADL frozen input concept, we require the inputs values do not change while the component is activated. This implies assumptions could be examined at \emph{complete}, instead of \emph{dispatch}. Thus, we do not necessarily need introducing \emph{dispatch} event. We keep \emph{dispatch} event mainly for usability reasons. The (\emph{dispatch, complete}) pair helps users to understand a counterexample and mentally construct the system trace. This is particularly useful when the schedule is preemptive.
 
 %{\bf Model of Real-Time Schedule.}
 In practice, a schedule often orignally comes in form of a sequence of time slots associated wtih components. 

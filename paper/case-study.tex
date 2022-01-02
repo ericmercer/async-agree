@@ -5,7 +5,10 @@ Figure \ref{SW} shows an overview of the software architecture. The UAV software
 By applying the CASE tools, some security vunerabilities were identified. Then the user was guided by the tools to invoke a series of model transformations to address the issues. The transformation inserted 8 threads (assurance components): attestation gate, attestation manager, 2 monitors, and 4 filters. The verification goal is to prove that the key system security properties are satisfied after the transformation.  
 
 The seL4 microkernel was chosen as part of the implementation platform. A seL4 domain schedule was created to execute the 13 threads on a single processor. All threads are periodic with a period of 500 ms. Each thread is activated exactly once in the scheduling cycle. The allocated execution time for each thread ranges from 2 ms (filter/monitor) to 100 ms (UxAS).
-Four system-level security properties were proved in less than 2 minutes on a PC with 2.6 GHz CPU and 32 GB RAM.
+
+In the AADL model, event ports and event data ports, instead of data ports, are mostly used.  However, they are not intended to model a dataflow where the data items (or \emph{tokens}) accumulate in the communication channel. Instead, they are used to model the \emph{sporadic execution} of periodic threads. The component contracts usually use the presence of an input event as the precondition. Since the schedule allows each thread to execute exactly once, the semantics fits in the proposed model.
+
+Four system-level security properties were created to ensure 1) the output UART and RF messages are well-formed; 2) the system only responds to trusted sources; 3) the waypoints sent by UART are geo-fenced. The properties were proved in less than 2 minutes on a PC with 2.6 GHz CPU and 32 GB RAM.
 
 \begin{figure}[ht!]
 \centering
