@@ -33,7 +33,7 @@ Following the AADL frozen input concept, we require the inputs values do not cha
 
 %{\bf Model of Real-Time Schedule.}
 In practice, a schedule often orignally comes in form of a sequence of time slots associated wtih components. 
-The schedule could come from an AADL real-time scheduling tool like Cheddar \cite{cheddar}, or from a scheduler provided by the RTOS/Microkernel verdor, like seL4\cite{seL4}. 
+The schedule could come from an AADL real-time scheduling tool like Cheddar \cite{cheddar}, or from a scheduler provided by the RTOS/Microkernel verdor, like seL4 \cite{sel4}. 
 To properly model the schedule in AGREE, the component execution time has to be considered. Consider the example shown in Figure \ref{RTschedule}. There are two scheduled components $A$ and $B$. We refer the original schedule as real-time schedule. We refer its model in AGREE as AGREE schedule.
 \begin{figure}[ht!]
 \centering
@@ -58,4 +58,6 @@ Given the same real-time schedule, due to the different execution time $C_A$ of 
 %A component satisfies its guarantees at completion time. 
 %And the output holds its data value between its completions.
 
+%{\bf External Input.} 
+System inputs from the environment could arrive at any instant, while the system runs periodically. To avoid missing events, we assume that either there is a buffer mechanism that stores all the input messages on a queue and periodically send it out to the system for processing, or the message arrival is synchronized with the component activation. % We assume the communication can be modelled as a shared variable, and the communication rate is the same as the system execution rate. 
 

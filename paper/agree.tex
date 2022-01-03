@@ -1,6 +1,6 @@
 At the component level, the scheduling semantics often can be directly modelled in the AADL AGREE annex. This requires introducing two boolean variables dispatch and complete, augumenting the orignal contracts with dispatch or complete, and adding additional guarantees to enforce the output freeze rule. We often omit the assumptions to enforce the input freeze rule, as they are trivially satisfied by the output freeze rule.
-Figure \ref{wpmAGREE} shows an example taken from an AADL model developed in the CASE project. The first two guarantees are added. And the orignal contracts (the assumption and the third guarantee) are augumented. 
-It could be complicated to direct model contracts that dependend on past history. We rely on our Lustre backend model to handle the general case.
+Figure \ref{wpmAGREE} shows an example taken from an AADL model developed in the CASE project. The first two guarantees are added to freeze outputs between completes. And the orignal contracts (the assumption and the third guarantee) are augumented with dispatch and complete.
+Note that in general it is a complex task to direct model the semantics in AGREE annex, particularly if the contracts dependend on past history. We rely on the Lustre backend model to handle the general case.
 
 \begin{figure}[ht!]
 \centering
@@ -9,7 +9,7 @@ It could be complicated to direct model contracts that dependend on past history
 \end{figure}
 
 At the system-level, we use a circular counter to model a cyclic schedule in AGREE. 
-The counter updates at every instant. Once it reaches the limit, it resets to 1 in the next instant.
+The counter updates at every instant. Once it reaches the limit, it resets to 1 at the next instant.
 We set the limit to the period of the schedule. 
 %The counter is a direct encoding of schedule $\phi$ defined previously.
 Then based on the current count, a corresponding scheduling event is raised.
