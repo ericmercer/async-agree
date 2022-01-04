@@ -1,11 +1,11 @@
-At the component level, the scheduling semantics often can be directly modelled in the AADL AGREE annex. This requires introducing two boolean variables dispatch and complete, augumenting the orignal contracts with dispatch or complete, and adding additional guarantees to enforce the output freeze rule. We often omit the assumptions to enforce the input freeze rule, as they are trivially satisfied by the output freeze rule.
-Figure \ref{wpmAGREE} shows an example taken from an AADL model developed in the CASE project. The first two guarantees are added to freeze outputs between completes. And the orignal contracts (the assumption and the third guarantee) are augumented with dispatch and complete.
-Note that in general it is a complex task to direct model the semantics in AGREE annex, particularly if the contracts dependend on past history. We rely on the Lustre backend model to handle the general case.
+At the component level, the scheduling semantics often can be directly modeled in the AADL AGREE annex. This requires introducing two Boolean variables dispatch and complete, augmenting the original contracts with dispatch or complete, and adding additional guarantees to enforce the output freeze rule. We often omit the assumptions to enforce the input freeze rule, as they are trivially satisfied by the output freeze rule.
+Figure \ref{wpmAGREE} shows an example taken from an AADL model developed in the CASE project. The first two guarantees are added to freeze outputs between completes. And the original contracts (the assumption and the third guarantee) are augmented with dispatch and complete.
+Note that in general it is a complex task to direct model the semantics in AGREE annex, particularly if the contracts depend on past history. We let the Lustre backend model to handle the general case.
 
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=130mm]{wpmAGREE3.jpg}
-\caption{Direct Modelling Scheduling Semantics in AGREE\label{wpmAGREE}}
+\caption{Direct Modeling Scheduling Semantics in AGREE\label{wpmAGREE}}
 \end{figure}
 
 At the system-level, we use a circular counter to model a cyclic schedule in AGREE. 

@@ -1,148 +1,89 @@
-
 {\bf Signal.}
 A signal $x$ is a function $x: N \rightarrow V$, where $N$ is the set of natural numbers including zero, and $V$ is a value set. 
-A signal is \emph{boolean} if the value set is the set of booleans.
+A signal is \emph{Boolean} if the value set is the Boolean domain.
 We write $x(n)$ for the value of the signal $x$ at instant $n$. 
 A \emph{trace} $\sigma_x$ of a signal $x$ is a possibly infinite sequence of values $(x(0), x(1), x(2),... )$. 
 The \emph{length} of a trace is the number of elements in the sequence. 
 The set of all traces of length $k$ of a signal $x$ is denoted as $x^k$. 
 The set of all possible traces of a signal $x$ is denoted as $x^{\omega}$. 
-%We may refer a boolean signal as an \emph{event}.
-%The data type can be either a primitive data type (e.g. real, bool, int, and enumeration types) or a composite data type (e.g. record types). 
-%Assume the data type of signal $x$ and $y$ is $T_x$ and $T_y$, respectively, $x = y$ means that $T_x=T_y$ and $x_i = y_i$ for all $i \in N$. 
-
-%{\bf Port.}
-%$Y$ is a set of typed ports. A \emph{valuation or snapshot} of ports is a function that maps each port to a value: $y  \mpasto T_y$.
-%That is, $I(n) = \{x_1(n), x_2(n), ... x_N(n)\}$, where $n \in N$. Each port $x \in X$ is associated with a signal. 
-%To simplify the notation, we use the port ID $x$ to denote the associated \emph{signal}. Outputs are defined similarly: $Y = \{y_1, y_2, ..., y_K\}$, where $K\in N$ is the total number of output ports.  
-% Similarly, a \emph{valuation} of output ports $O(n) = \{y_1(n), y_2(n), ... y_N(n)\}$, where $n \in N$. 
-
-%We model the AADL ports as signals. In particular, an event port is modelled as a boolean signal. The value \emph{1} or \emph{0} indicates the event is \emph{present} or \emph{absent} at the port, respectively. 
-%An event data port is modelled as a pair of data signal and event signal.  %An event data port is modelled as a pair of data signal $p$ and event signal $event(p)$.  
 
 {\bf Dispatch and Complete.}
-Two boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
+Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
+
 \begin{enumerate}
-	\item there eixsts no $n\in N$ such that $dispatch(n) = 1$ and $complete(n) =  1$;
-	\item there exists $n\in N$ such that $dispatch(n) = 1$ if and only if there exists $m\in N$, such that $m > n, complete(m) =  1$;
-	\item if there exists $n,m\in N, n \neq m$ such that $dispatch(n) = 1, dispatch(m) = 1$, then there exists $k\in N, m >k> n$ such that $complete(k) = 1$.
+	\item $ \nexists n\in N, dispatch(n) = 1 \text{ and } complete(n) =  1 $, 
+	\item $ \exists n\in N, dispatch(n) = 1 \text{ if and only if } \exists m\in N, m > n, complete(m) =  1 $,
+	\item $ \text{if } \exists n,m\in N, n \neq m, dispatch(n) = 1, dispatch(m) = 1, \text{ then } \exists k\in N, m >k> n, complete(k) = 1 $.
 \end{enumerate}
+
 The first condition states that \emph{dispatch} and \emph{complete} are mutual exclusive. The second condition states that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The third condition states that \emph{dispatch} and \emph{complete} appear alternately. 
-%A pair of well-ordered ($dispatch$, $complete$) signals defines a sequence of \emph{intervals}. 
+From hereon we only consider well-ordered (\emph{dispatch}, \emph{complete}).
 
-$[n, m], n,m \in N, n<m$, is an \emph{interval} of a pair of well-ordered $dispatch$ and $complet$e if $dispatch(n) = 1$, $complete(m) = 1$, and $\forall k\in (n, m], dispatch(k)=0$. We denote the interval as $\delta(n)$.
+An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a closed interval $[n, m], n,m \in N, m>n$, satisfying
 
-{\bf AGREE Contracts.}
-An \emph{assumption} or a \emph{guarantee} is a past-time LTL formula over the traces of a set of signals.
+\begin{enumerate}
+	\item $ dispatch(n) = 1 $, 
+	\item $ complete(m) = 1 $, 
+	\item $ \forall k\in (n, m), dispatch(k)=0 \text{ and } complete(k)=0 $.
+\end{enumerate}
+
+We denote the set of all intervals as $\Delta$.
 
 {\bf Component.}
-%A component $c$ is a nine-tuple $(S, s_0, I, O, \delta, A, P, dispatch, complete)$, where: 
-A component $c$ is a six-tuple $(I, O, A, P, dispatch, complete)$, where: 
+A component $c$ is a tuple $(I, O, A, P, dispatch, complete)$, where: 
+
 \begin{itemize}
-%    	\item $S$ is a finite non-empty set of states;
-%    	\item $s_0 \in S$ is the initial state;
-    	\item $I = \{x_1, x_2, ..., x_g\}$ is the set of input signals, also denoted as $I(c)$;
-    	\item $O= \{y_1, y_2, ..., y_h\}$ is the set of output signals disjoint from $I$, also denoted as $O(c)$;
-%    	\item $\delta$ is the state transfer function of the form $\delta: I \times O \times S \rightarrow S$;
-	\item $A$ is a set of \emph{assumptions} over $I$;
-	\item $P$ is a set of \emph{gurarantees} over $\{I, O\}$;
-% 	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I^{\omega} \rightarrow B$;
-% 	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I^{\omega} \times O^{\omega} \rightarrow B$;
-%  	\item $A$ is a set of \emph{assumptions}, for all $a \in A$, $a$ is a Boolan function $I \times S \rightarrow B$;
-%  	\item $P$ is a set of \emph{gurarantees}, for all $p \in P$, $p$ is a Boolan function $I \times O \times S \rightarrow B$;
-    	\item $dispatch$ and $complete$ are a pair of \emph{well-ordered} boolean signals.
-%	\item $complete$ is a boolean signal.
-%	\item $clock$ is a boolean signal $clock(n) \Rightarrow \lnot clock(n+1) \land  \lnot clock(n-1), \forall i \in N$ .
+    	\item $I$ is a finite set of signals, referred to as inputs, also denoted as $I(c)$,
+    	\item $O$ is a finite set of signals disjoint from $I$, referred to as outputs, also denoted as $O(c)$,
+	\item $A$ and $P$ are prefix-closed subsets of $(I \cup O)^\omega$, called \emph{assumptions} and \emph{guarantees}, respectively,
+    	\item ($dispatch$, $complete$) is a pair of \emph{well-ordered} Boolean signals.
 \end{itemize}
-%Note that the guarantees represent a general relation, not a function. This allows users to models the non-derterminism introduced by design decision or implementation choice.
-A component satisfies the following rules.
+
+A component is said to be \emph{consistent} if it satisfies the following rules.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
 \label{eqn:assumption}
-%dispatch(n) \Rightarrow a(I(n), s(n)), \forall n\in N, \forall a \in A
-dispatch(n) \Rightarrow a(I^n), \forall n\in N, \forall a \in A
+	dispatch(n) \Rightarrow a(I^n, O^n), \forall n\in N, \forall a \in A
 \end{equation}
-%where $I^n = ({x_1}^n, {x_2}^n,..., {x_g}^n)$.
 
 Inputs freeze between dispatch and complete. That is,
 \begin{equation} 
 \label{eqn:inputfreeze}
-dispatch(n) \Rightarrow (x(i) = x(j)), \forall i,j\in \delta(n), \forall x \in I
+	x(i) = x(j), \forall i,j\in \delta, \forall \delta \in \Delta, \forall x \in I
 \end{equation}
 
-The \emph{gurarantees} hold at \emph{complete}. That is,
+The \emph{guarantees} hold at \emph{complete}. That is,
 \begin{equation} 
 \label{eqn:guarantee}
-%complete(n) \Rightarrow p(I(n), O(n), s(n)), \forall n\in N, \forall p \in P
-complete(n) \Rightarrow p(I^n, O^n), \forall n\in N, \forall p \in P
+	complete(n) \Rightarrow p(I^n, O^n), \forall n\in N, \forall p \in P
 \end{equation}
-%where $O^n = ({y_1}^n, {y_2}^n,..., {y_h}^n)$.
+
 
 Outputs freeze between \emph{completes}. That is,
 \begin{equation} 
 \label{eqn:outputfreeze}
-\lnot complete(n) \Rightarrow (y(n) = y(n-1)), \forall n \in N, n>0, \forall y \in O
+\lnot complete(n) \Rightarrow y(n) = y(n-1), \forall n \in N, n>0, \forall y \in O
 \end{equation}
 
-%Let $s$ be a \emph{valuation} of $S$. That is, $s: N \rightarrow S$. 
-%\begin{equation} 
-%\label{eqn:statetransfer}
-%complete(n) \Rightarrow s(n) = \delta (s(n-1), I(n-1), O(n-1), \forall n \in N, \forall s \in S
-%\end{equation}
-
-%\begin{equation} 
-%\label{eqn:statehold}
-%\lnot complete(n) \Rightarrow s(n) = s(n-1), \forall n \in N, \forall s \in S
-%\end{equation}
-
-%The \emph{dispatch} and \emph{complete} models, respectively, the start and end of the time slot that a component to run. 
-%When its \emph{dispatch} event $d$ is present, a thread samples the input values and starts execution. This is the time when the associated AGREE \emph{assumptions} $A$ should hold. That is,
-%$$event(d)_i \Rightarrow a_i, \forall i\in N, \forall a \in A $$
-
-%{\bf Trace.}
-%A \emph{snapshot} of a component is a valuation of its associated set of signals $\{I, O, dispatch, complete\}$. %That is, $c(n) = \{I(n),O(n),dispatch(n),complete(n)\}, \forall n\in N$.
-%A \emph{trace} $\sigma_c$ of a component $c$ is a possibly infinite sequence of snapshots %$(c(0), c(1), c(2),... )$
-%A trace $\sigma$ of a component $c(S, s_0, I, O, \delta, A, P, dispatch, complete)$ is a function of the form $\sigma: N \rightarrow \Sigma$, where
-%A trace $\sigma$ of a component $c(I, O, A, P, dispatch, complete)$ is function $\sigma: N \rightarrow \Sigma$, where
-%$\sigma(n) = ((I(n), O(n),dispatch(n), complete(n))$, for all $n\in N$, 
-%that satifies Equation \ref{eqn:assumption},  \ref{eqn:inputfreeze}, \ref{eqn:guarantee}, and \ref{eqn:outputfreeze}. %We denote the set of all traces of a component as $\Sigma$.
-%A trace is a possibly infinite sequence of component valuations that satify the contract constraints and the input, output and state hold rules.  
-%The \emph{projection} of $\sigma_c$ onto the set $\{I, O\}$: $\sigma_c|_{\{I,O\}} = \{\sigma_x | x\in \{I,O\}, \sigma_x \in \sigma_c\}$.	
-%The set of all traces of a component $c$ is called its \emph{language}, denoted as $L(c)$.
-
-%{\bf Connection.}
-
-%If an output signal $y$ of a component $c$ is \emph{connected} to an input signal $x'$ of a component $c', c' \neq c$, then $y = x'$. That is,
-%A \emph{connection} from output signals $O$ of a component $c$ to input signals $I'$ of a component $c', c' \neq c$ is function: $e: I'\rightarrow P(O)$. That is,
-%Given two connected components $c_1=(I_1, O_1, A_1, P_1$ and $c_2$, where
-%\begin{equation*}
-%I = I \bigcup I' \backslash \{x'\}
- %O = O \bigcup O'
-%A = A \bigcup A'
-%P = P \bigcup P'
-%\end{equation*}
-
-%In AGREE, we have
-%\begin{equation} 
-%\label{eqn:connection}
-%e(y, x') \Rightarrow y = x', \forall y \in Y, \forall x \in X'
-%\end{equation} 
-%where 
-
-%A \emph{connection} from an output port of one component to an input port of another component implies the corresponding signals are equal. For an AADL event data prot, this means the data signals and event signals are equal, respectively. 
-
 {\bf Schedule.}
+Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
+\begin{equation*}
+	O(c) \cap I(c') \neq \emptyset \text{ or } O(c') \cap I(c) \neq \emptyset.
+\end{equation*}
+
 Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T] \rightarrow C\times \{Dispatch, Complete\}$ satisfying:
-\begin{itemize}
-	\item there exists $i\in T$, $c\in C$ such that $\phi(i) = (c, Dispatch)$ if and only if there exists $j\in T$, such that $j > i, \phi(j) =  (c, Complete)$;
-	\item if there exists $i, j\in T$, $c\in C$ such that $i \neq j, \phi(i) = (c, Dispatch), \phi(j) = (c, Dispatch)$, then there exists $k\in T$, such that $j >k> i, \phi(j) =  (c, Complete)$;
-	\item if there exists $i, j, n\in T$, $c, c'\in C$ such that $i < n < j, \phi(i) = (c, Dispatch), \phi(n) = (c', Dispatch), \phi(j) = (c, Complete)$, then there exists $m\in T$, such that $n < m < j, \phi(m) =  (c', Complete)$ and $c$ and $c'$ have no connection.
-\end{itemize}
+
+\begin{enumerate}
+	\item $ \exists i\in T, c\in C, \phi(i) = (c, Dispatch) \text{ if and only if } \exists j\in T, j > i, \phi(j) =  (c, Complete) $,
+	\item $ \text{if } \exists i, j\in T, c\in C, i \neq j, \phi(i) = (c, Dispatch), \phi(j) = (c, Dispatch), \text{ then } \exists k\in T, j >k> i, \phi(j) =  (c, Complete) $,
+	\item $ \text{if } \exists i, j, n\in T, i < n < j, c, c'\in C, \phi(i) = (c, Dispatch), \phi(n) = (c', Dispatch), \phi(j) = (c, Complete), \text{ then } c, c' \text{ are not connected, and }\exists m\in T, n < m < j, \phi(m) =  (c', Complete) $.
+\end{enumerate}
+
 The first condition requires that in a schedule \emph{Dispatch} and \emph{Complete} of a component must appear in pairs, and in each pair \emph{Dispatch} appears before \emph{Complete}. 
 The second condition states that \emph{Dispatch} and \emph{Complete} of a component must appear alternately in a schedule. 
-The third condition allows a component to be \emph{preempted} by another component if they two have no coonection.
-If the schedule is not premptive, we could simplify a schedule as a partial function $[1, T] \rightarrow C$.
+The third condition allows a component to be \emph{preempted} by another component if they two have no connection.
+If the schedule is not preemptive, we could denote a schedule as a function $[1, T] \rightarrow C$, as shown in previous examples.
 
 Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ are defined as follows: 
 \begin{equation}
@@ -164,258 +105,27 @@ Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complet
 \end{equation}
 
 where $i,k\in N$. 
+
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is executed at least once.
-A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} signal is true. 
-For simplicity, we only considerl minimal schedules.
-%Note in a synchronous model, a tick represents a global clock that triggers all components to update. While in the proposed model, ticks are used to represent the total order of events. 
+A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} signal evaluates to true. 
+%For simplicity, we only consider minimal schedules.
 
 {\bf System.}
-A component $c$ is \emph{connected} to another component $c'$ if there exists a signal $x$ such that $x \in O(c)$ and $x \in I(c')$. 
-%Let $I(c), O(c)$ denote the set of input and output signals of a component $c$, respectively.
 A set $C$ of components are said to be \emph{compatible} if 
-%\begin{equation*}
-$\forall c_i,c_j \in C, i\neq j, O(c_i) \cap O(c_j) = \emptyset$.
-%\end{equation*}
 
-A set $C$ of connected, compatible, and scheduled components is a \emph{system} $S$ (component), where:
+\begin{equation*}
+\forall c_i,c_j \in C, c_i\neq c_j, O(c_i) \cap O(c_j) = \emptyset.
+\end{equation*}
+
+A set $C$ of components are said to be \emph{connected} if
+\begin{equation*}
+\forall c_i \in C, \exists c_j \in C, c_i\neq c_j, O(c_i) \cap I(c_j) \neq \emptyset \text{ or } O(c_j) \cap I(c_i) \neq \emptyset.
+\end{equation*}
+
+A set $C$ of compatible, connected, scheduled, and consistent components is a \emph{system} $S = (I, O, A, P, \phi)$, where:
 \begin{itemize}
-	\item $I = \cup_{\forall c \in C}I(c) -  \cup_{\forall c \in C}O(c)$, also denoted as $I(S)$;
-	\item $O = \cup_{\forall c \in C}O(c)$, also denoted as $O(S)$;
-	\item $A$ is a set of system-level \emph{assumptions} over $I$;
-	\item $P$ is a set of system-level \emph{guarantees} over $\{I, O\}$;
-	\item $dispatch (i) = 
-	    	\begin{cases}
-      		1, & \text{if}\ i = kT+1 (k=0,1,...)\\
-	     	0, & \text{otherwise}
-   	 	\end{cases}$;
-   	\item $complete (i) =
-   		\begin{cases}
-      		1, & \text{if}\ i = kT (k=1,2,...)\\
-	     	0, & \text{otherwise}
-   	 	\end{cases}$.
+	\item $I = \cup_{\forall c \in C}I(c) -  \cup_{\forall c \in C}O(c)$, also denoted as $I(S)$,
+	\item $O = \cup_{\forall c \in C}O(c)$, also denoted as $O(S)$,
+	\item $A$ and $P$ are prefix-closed subsets of $(I \cup O)^\omega$, called \emph{assumptions} and \emph{guarantees}, respectively,
+	\item $\phi$ is a schedule of $C$.	
 \end{itemize}
-
-Similarly to the component definition, we have
-The \emph{assumptions} hold at \emph{dispatch}. That is,
-\begin{equation} 
-\label{eqn:assumption}
-dispatch(n) \Rightarrow a(I^n), \forall n\in N, \forall a \in A
-\end{equation}
-
-Inputs freeze between dispatch and complete. That is,
-\begin{equation} 
-\label{eqn:inputfreeze}
-dispatch(n) \Rightarrow (x(i) = x(j)), \forall i,j\in \delta(n), \forall x \in I
-\end{equation}
-
-The \emph{gurarantees} hold at \emph{complete}. That is,
-\begin{equation} 
-\label{eqn:guarantee}
-complete(n) \Rightarrow p(I^n, O^n), \forall n\in N, \forall p \in P
-\end{equation}
-
-Outputs freeze between \emph{completes}. That is,
-\begin{equation} 
-\label{eqn:outputfreeze}
-\lnot complete(n) \Rightarrow (y(n) = y(n-1)), \forall n \in N, n>0, \forall y \in O
-\end{equation}
-
-
-%Let $L(S)$ denote the language of a system $S$. 
-
-%A trace of the simple downsampling system is partially shown in Table \ref{tab:table1}. For simplicity, we use one symbol to represent the input and output signals that are connected.
-%\begin{table}[h!]
-%\begin{center}
-%\caption{A Trace of the Simple Downsampling System}
-%\label{tab:table1}
-%\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
-%\hline
-%            k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10  & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 & 19 \\
-%\hline
-%dispatchA  & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0  \\ 
-%\hline
-%completeA & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0  \\ 
-%\hline
-%dispatchB & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0  \\ 
-%\hline
-%completeB & 0 & 0 & 0 &0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\ 
-%\hline
-%dispatchC & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\ 
-%\hline
-%completeC & 0 & 0 & 0 & 1  & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
-%\hline
-%dispatchD & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\ 
-%\hline
-%completeD & 0 & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\ 
-%\hline
-%a(k) & 0 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 4 & 4 & 4 & 4 & 4 \\
-%\hline
-%pre(a)(k) & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 3 & 3 & 3 & 3 & 3 \\
-%\hline
-%b(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 4 & 4 & 4 \\
-%\hline
-%c(k) & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 3 & 3 & 3 & 3 & 3 & 3 & 3 \\
-%\hline
-%d(k) & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-%\hline
-%\end{tabular}
-%\end{center}
-%\end{table}
-
-%{\bf Assume-Guarantee Reasoning.}
-%The language of a set $C$ of connected, compatible, and scheduled components: 
-%\begin{equation*} 
-%$L(C) = \cup_{\forall c \in C} L(c)$  such that $\forall c\in C, dispatch_c = dispatch_c^\phi, complete_c = complete_c^\phi$
-%\end{equation*}
-
-%The verification goal is to check whether $L(S)|_{\{I(S),O(S)\}} \subseteq L(C)|_{\{I(S),O(S)\}}$ holds.
-
-%Given a system and a set of system \emph{assumptions} $A_s$ and a \emph{guarantee} $p_s$, a \emph{trace} of the contract is a sequence of inputs and outputs valuations that satisfies:
-%
-%\begin{equation} 
-%\label{eqn:sys_assumption}
-%dispatch_s(n) \Rightarrow a_s(n), \forall n\in N, \forall a_s \in A_s
-%\end{equation}
-%
-%\begin{equation} 
-%\label{eqn:sys_assumption}
-%complete_s(n) \Rightarrow p_s(n), \forall n\in N
-%\end{equation}
-%
-%where:
-%\begin{equation}
-%\label{eqn:sys_dispatch}
-%    dispatch_s(n) =
-%    \begin{cases}
-%      1, & \text{if}\ n = kT, k=0,1,... \\
-%      0, & \text{otherwise}
-%    \end{cases}
-%\end{equation}
-%
-%\begin{equation}
-%\label{eqn:sys_complete}
-%    complete_s(n) =
-%    \begin{cases}
-%      1, & \text{if}\ n = kT-1, k=1,2,... \\
-%      0, & \text{otherwise}
-%    \end{cases}
-%\end{equation}
-
-%Verifying a system satisfies its contract $(A_s, p_s)$ is to check whether the set of traces of the contract is a subset of the oberservable traces of the system. TODO
-
-%{\bf Hierarchical Composition.}
-%The proposed framework supports hierarchical composition.% and Hierarchical Scheduling Framework (HSF) \cite{HSF}. 
-%This is possible if the structural proximity of the components is coincidental with the temporal proximity of their time slots in a schedule. We illustrate this using the example shown in Figure \ref{pic:hierarchy}. A system $G$ consists of components $A$ and $B$. Suppose given the lower-level schedule $(ABA)$, we prove the contracts of $G$. Then, at the structural higher-level, $G$ could be viewed as a component. And since component $A$ and $B$ are also scheduled to execute one after another, $G$'s time slot is the concatenation of the time slots of its components. Thus its \emph{dispatch} and \emph{complete} events is the start and end of the combined time slot, respectively.
-%
-%\begin{figure}[ht!]
-%\centering
-%\includegraphics[width=100mm]{Hierarchy.jpg}
-%\caption{An Example of Hierarchical Composition in AGREE\label{pic:hierarchy}}
-%\end{figure}
-%
-%Note that if all the inputs of a component are connected to the outputs of other components, the inputs value will not change while the component is active. This is because the other components hold their outputs while inactive. It implies assumptions could be checked at \emph{complete}, instead of \emph{dispatch}. Thus, we do not necessarily need \emph{dispatch} event for verification purposes. Actually, in the backend implementation, assumptions at checked at \emph{complete}. We keep \emph{dispatch} event mainly for usability reasons. The (\emph{dispatch, complete}) pair helps users to understand a counterexample and mentally construct the system trace. This is particularly useful when the schedule is preemptive .
-%
-%{\bf Model of Real-Time Schedule.}
-%In practice, a schedule often comes in form of real-time schedule, a sequence of time slots associated wtih components. The real-time schedule could come from an AADL scheduling tool like Cheddar \cite{Cheddar}, or from a scheduler provided by the RTOS/Microkernel verdor, like seL4\cite{seL4}. To properly model the schedule in AGREE, the component execution time has to be considered. One example is shown in Figure \ref{RTschedule}, where there are two components $A$ and $B$. 
-%\begin{figure}[ht!]
-%\centering
-%\includegraphics[width=130mm]{RTschedule.jpg}
-%\caption{A Model of Real-Time Schedule in AGREE\label{RTschedule}}
-%\end{figure}
-%Given the same real-time schedule, due to the different execution time $C_A$ of $A$, different AGREE schedules are created. In Figure\ref{RTschedule}(b), since the first time slot assigned for $A$ is less than its execution time, the end of the first time slot is interpreted as \emph{preemption}, instead of \emph{complete}.
-%
-%We introduce a circular counter to model a schedule in AGREE. The maximum count models the period of the schedule. An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in Figure \ref{schedule}.
-%\begin{figure}[ht!]
-%\centering
-%\includegraphics[width=100mm]{schedule.jpg}
-%\caption{A Model of Schedule in AGREE\label{schedule}}
-%\end{figure}
-
-
-%An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in code~\ref{schedule_model}
-
-%\begin{lstlisting}[language=c,frame=single,caption=An AGREE model of a schedule,label=schedule_model]
-%node CircularCounter (init: int, incr: int, reset: bool)	
-%returns (count: int);
-%let
-%	count = if reset then init
-%		else init-> (pre(count) + incr);
-%tel;
-%				
-%eq tick : int = CircularCounter(1,1,prev(tick=10,false));
-%
-%assume "Schedule ABACD" :
-%	A_dispatch = (tick = 1 or tick = 5) and
-%	A_complete = (tick = 2 or tick = 6) and					
-%	B_dispatch = (tick = 3) and	
-%	B_complete = (tick = 4) and
-%	C_dispatch = (tick = 7) and
-%	C_complete = (tick = 8) and	
-%	D_dispatch = (tick = 9) and
-%	D_complete = (tick = 10);			
-%\end{lstlisting}	
-
-%The model of a schedule can be simplified to potentially improve the formal verification performance. The thread execution time can be modelled as just one tick. The idle time or communication delay can be abstracted out. For the same example above, a simplified schedule could be  $\phi' = \{d(A)=(1,0,0)^*, c(A) = (0,1,0)^*, d(B) = (0,1,0)^*, c(B) = (0,0,1)^*\}$. The intuition is that as long as the execution order is preserved, the verfication problem of such a model is equavilent to that of a model directly mapping each base time unit to a tick. 
-%	
-%\begin{theorem}
-%Given an AADL model with two \emph{equavilent} schedules $\phi$ and $\phi'$, a property of the model holds under schedule $\phi$ if and only if it hold under schedule $\phi'$.
-%\end{theorem}
-%
-%{\bf Proof sketch.} 
-%It is possible to show that any counter-example found in the proof of the system property of model with schedule $\phi$ can be mapped to a counter-example of the proof of the same system property of the same model with schedule $\phi'$,  and vice versa.  
-
-%\documentclass{article}
-%\usepackage{multirow}
-%\begin{document}
-%\begin{center}
-%\begin{tabular}{ |c|c|c|c|c|c|c|c|c|c|c|c| } 
-%\hline
-%k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
-%\hline
-%& Active & - & A & B & A & C & D & A & B & A & C & D \\ 
-%\hline
-%\end{tabular}
-%\end{center}
-%\end{document}
-
-%As suggested by previous examples, the schedule or execution order has an impact on the system behavior. This differs from other dataflow models, such as Synchronous Dataflow \cite{sdf}, or other variants of Kahn Process Networks \cite{kpn}. It is known 
-
-%{\bf model of execution delay.}
-%The thread exeution delay is not directly modelled. Instead, the time slot allocated to a thread in a schedule is modelled by the \emph{distance} between the thread \emph{dispatch} and \emph{complete}. If we assume there is no pre-emption, this modells  the worst case execution time or deadline.
-
-%{\bf model of communication delay.}
-%The communication delay is abstracted out. However, in a schedule there is often a time window between the complete event of the one thread and the dispatch event of the next thread. This time window models the %worst case communication delay.
-
-%{\bf AGREE contracts.}
-
-%Our approach to modelling the AADL asynchronous MoC in AGREE is to keep the existing AADL model structure intact and add new AGREE contracts and augument existing contracts. The added contracts model the asynchronous communication between AADL ports. The modification of the exisiting contracts reflcts the interpretation of the contracts under the asychronous AGREE MoC. 
-
-%\begin{figure}[ht!]
-%\centering
-%\includegraphics[width=80mm]{aadl_events.jpg}
-%\caption{An AADL Model with AGREE Contracts\label{motivation}}
-%\end{figure}
-
-%In asynchronous AGREE, the \emph{Execution\_Time} property is modelled by the time interval between the \emph{Dispatch} event and the \emph{Complete} event.
-%The assumptions hold at the \emph{Dispatch} event \[Dispatch => Assumption\] , and the guarantees hold at the \emph{Complete} event, i.e. \[Complete => Guarantee\] 
-%
-%% Assumptions
-%We make the following assumptions. The \emph{Input\_Time} property value is unspecified, thus default to dispatch time. The \emph{Output\_Time} property value is unspecified, thus default to the execution completion time. The \emph{Queue\_Size} property value is unspecified, thus default to size one. The \emph{Execution\_Time} property represent a single value, not a real range. The \emph{Dispatch\_Protocol} property value is periodic. The \emph{Timing} property value of each connection is unspecified, thus default to immediate connection. There is no simultaneous read and write access to a queue or buffer (data port). If an event data queue or a data port buffer is empty, the most recent data is used. The \emph{Dequeue} occurs at every dispatch. There is no preemption. There is no propagation delay.
-%
-%% Modelling
-%For an output event data port of a thread, the event and data holds till the thread's next \emph{Complete} event. This is represented by the following AGREE contracts.
-%
-%\begin{math} 
-%not Complete => (event(Port) = prev(event(Port), false))
-%\end{math} 
-%
-%\begin{math}
-%not Complete => (true -> (Port = pre(Port)))
-%\end{math}  
-%
-%% Rational
-%The output event hold models the latching behavior of an event queue (size one). At the end of execution of a thread, an output event may or may not be raised. However, the AGREE contracts representing the functional requirements only ensures an event is raised only at that exact time instant (i.e. \emph{Complete}). The event is latched so that the target thread, once dispatched, samples the correct result. The consideration for the output data hold is similar.
-% 
-%% Schedule
-%In asynchronous AGREE, a schedule defines the sequential execution order of threads. It is specified by the user. It often come from the actual software execution schedule on the target platform (e.g. seL4 domain schedule). Currently AADL does not define a standard format to specify a schedule. We used AGREE \emph{assumption} on each thread's \emph{Dispatch} and \emph{Complete} event to represent a schedule. For example, \emph{assume "schedule" :			ThreadA\_Dispatch = (Frame = 60) and ThreadA\_Complete = (Frame = 70) and ...}
-
