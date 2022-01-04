@@ -1,8 +1,8 @@
 {\bf Signal.}
-A signal $x$ is a function $x: N \rightarrow V$, where $N$ is the set of natural numbers including zero, and $V$ is a value set. 
+A signal $x$ is a function $x: N \rightarrow V$, where $N$ is the set of natural numbers, and $V$ is a value set. 
 A signal is \emph{Boolean} if the value set is the Boolean domain.
 We write $x(n)$ for the value of the signal $x$ at instant $n$. 
-A \emph{trace} $\sigma_x$ of a signal $x$ is a possibly infinite sequence of values $(x(0), x(1), x(2),... )$. 
+A \emph{trace} $\sigma_x$ of a signal $x$ is a possibly infinite sequence of values $(x(1), x(2),... )$. 
 The \emph{length} of a trace is the number of elements in the sequence. 
 The set of all traces of length $k$ of a signal $x$ is denoted as $x^k$. 
 The set of all possible traces of a signal $x$ is denoted as $x^{\omega}$. 
@@ -80,10 +80,9 @@ Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{lengt
 	\item $ \text{if } \exists i, j, n\in T, i < n < j, c, c'\in C, \phi(i) = (c, Dispatch), \phi(n) = (c', Dispatch), \phi(j) = (c, Complete), \text{ then } c, c' \text{ are not connected, and }\exists m\in T, n < m < j, \phi(m) =  (c', Complete) $.
 \end{enumerate}
 
-The first condition requires that in a schedule \emph{Dispatch} and \emph{Complete} of a component must appear in pairs, and in each pair \emph{Dispatch} appears before \emph{Complete}. 
-The second condition states that \emph{Dispatch} and \emph{Complete} of a component must appear alternately in a schedule. 
+The first two conditions define the patterns of (Dispatch, Complete) in a schedule. 
 The third condition allows a component to be \emph{preempted} by another component if they two have no connection.
-If the schedule is not preemptive, we could denote a schedule as a function $[1, T] \rightarrow C$, as shown in previous examples.
+If the schedule is not preemptive, we could simplify the notation and denote a schedule as a function $[1, T] \rightarrow C$, as shown in the previous examples.
 
 Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ are defined as follows: 
 \begin{equation}
@@ -126,6 +125,6 @@ A set $C$ of compatible, connected, scheduled, and consistent components is a \e
 \begin{itemize}
 	\item $I = \cup_{\forall c \in C}I(c) -  \cup_{\forall c \in C}O(c)$, also denoted as $I(S)$,
 	\item $O = \cup_{\forall c \in C}O(c)$, also denoted as $O(S)$,
-	\item $A$ and $P$ are prefix-closed subsets of $(I \cup O)^\omega$, called \emph{assumptions} and \emph{guarantees}, respectively,
+	\item $A$ and $P$ are \emph{assumptions} and \emph{guarantees} over $(I \cup O)^\omega$, respectively,
 	\item $\phi$ is a schedule of $C$.	
 \end{itemize}

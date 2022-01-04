@@ -1,6 +1,4 @@
-At the component level, the scheduling semantics often can be directly modeled in the AADL AGREE annex. This requires introducing two Boolean variables dispatch and complete, augmenting the original contracts with dispatch or complete, and adding additional guarantees to enforce the output freeze rule. We often omit the assumptions to enforce the input freeze rule, as they are trivially satisfied by the output freeze rule.
-Figure \ref{wpmAGREE} shows an example taken from an AADL model developed in the CASE project. The first two guarantees are added to freeze outputs between completes. And the original contracts (the assumption and the third guarantee) are augmented with dispatch and complete.
-Note that in general it is a complex task to direct model the semantics in AGREE annex, particularly if the contracts depend on past history. We let the Lustre backend model to handle the general case.
+At the component level, the scheduling semantics can often be directly modeled in the AADL AGREE annex. This requires introducing two Boolean variables dispatch and complete, augmenting the original contracts with dispatch or complete, and adding additional guarantees to enforce the output freeze rule. We omit the assumptions of frozen inputs, as it is often trivia to check that they are guaranteed by the output freeze rule and the system-level assumptions.
 
 \begin{figure}[ht!]
 \centering
@@ -8,18 +6,22 @@ Note that in general it is a complex task to direct model the semantics in AGREE
 \caption{Direct Modeling Scheduling Semantics in AGREE\label{wpmAGREE}}
 \end{figure}
 
+Figure \ref{wpmAGREE} shows an example taken from an AADL model developed in the CASE project. The first two guarantees are added to freeze outputs between completions. And the original contracts (the assumption and the third guarantee) are augmented with dispatch and complete.
+In practice, we find that direct modeling is helpful to clarify the semantics with users. However, in general it is a complex task, particularly if the contracts depend on past history. We rely on the Lustre backend model to handle the general case.
+
 At the system-level, we use a circular counter to model a cyclic schedule in AGREE. 
-The counter updates at every instant. Once it reaches the limit, it resets to 1 at the next instant.
+The counter updates at every instant. Once it reaches the limit, it resets to one at the next instant.
 We set the limit to the period of the schedule. 
 %The counter is a direct encoding of schedule $\phi$ defined previously.
-Then based on the current count, a corresponding scheduling event is raised.
-Figure \ref{schedule} shows an AGREE model of the schedule $(ABACD)$.
+Based on the current count, the counter triggers a corresponding scheduling event.
 
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=80mm]{schedule.jpg}
 \caption{A Model of Schedule in AGREE\label{schedule}}
 \end{figure}
+
+Figure \ref{schedule} shows an AGREE model of the schedule $(ABACD)$.
 
 %An AGREE model of the schedule $(ABACD)^*$ used in the example is shown in code~\ref{schedule_model}
 

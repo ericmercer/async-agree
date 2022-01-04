@@ -24,10 +24,11 @@ Component implementations are assumed correct in the compositional reasoning AGR
 
 The behavior of a scheduled component is defined by three special propositions: $\dispatch$ denoting when assumptions must hold, $\complete$ denoting when guarantees must hold, $\same{\inputs}$ and $\same{\outputs}$ denoting that the component outputs are unchanged from the previous instance. For convenience in presentation
 \begin{eqnarray*}
-  \dispatch(A) &=& \left[\left(\dispatch \wedge \assumes\right) \vee \left(\neg\dispatch \wedge \same{\inputs}\right)\right] \\
+  \dispatch(A) &=& \left[\left(\dispatch \wedge \assumes\right) \vee \left(\delta(\dispatch, \complete) \wedge \same{\inputs}\right)\right] \\
   \complete(A) &=& \left[\left(\complete \wedge \guarantees\right) \vee \left(\neg\complete \wedge \same{\outputs}\right)\right]
 \end{eqnarray*}
-The assumptions must hold at dispatch and the inputs may not change (I think this is too strong and is only needed a the system level). 
+The assumptions must hold at dispatch and the inputs may not change during activation.
+%(I think this is too strong and is only needed a the system level). 
 The guarantees must hold at complete and the outputs must not change between completions.
 A scheduled component is correct if and only if
 \[
@@ -49,7 +50,7 @@ A schedule is said to be \emph{valid}, $\valid(\schedule)$ if and only if every 
   \globally(\historically(\dispatch(A) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \implies \complete(\guarantees)))
 \end{array}
 \]
-A correct system has assumptions string enough to meet assumptions on any component input, and the guarantees from the components are string enough to meet the guarantees on the system. These ensure the correctness of the following statement for the system composed of several components.
+A correct system has assumptions strong enough to meet assumptions on any component input, and the guarantees from the components are string enough to meet the guarantees on the system. These ensure the correctness of the following statement for the system composed of several components.
 \[
   \globally\left(
     \historically\left(\dispatch(\assumes)\right) \implies \complete(\guarantees) \right)
