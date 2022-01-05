@@ -6,12 +6,14 @@ A \emph{trace} $\sigma_x$ of a signal $x$ is a possibly infinite sequence of val
 The \emph{length} of a trace is the number of elements in the sequence. 
 The set of all traces of length $k$ of a signal $x$ is denoted as $x^k$. 
 The set of all possible traces of a signal $x$ is denoted as $x^{\omega}$. 
+The set of all possible traces of a set $X$ of signals is denoted as $X^{\omega}$. 
 
 {\bf Dispatch and Complete.}
 Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
 
 \begin{enumerate}
-	\item $ \nexists n\in N, dispatch(n) = 1 \text{ and } complete(n) =  1 $, 
+%	\item $ \nexists n\in N, dispatch(n) = 1 \text{ and } complete(n) =  1 $, 
+	\item $\forall n \in N, dispatch(n) \ne 1 \vee complete(n) \ne 1 $,
 	\item $ \exists n\in N, dispatch(n) = 1 \text{ if and only if } \exists m\in N, m > n, complete(m) =  1 $,
 	\item $ \text{if } \exists n,m\in N, n \neq m, dispatch(n) = 1, dispatch(m) = 1, \text{ then } \exists k\in N, m >k> n, complete(k) = 1 $.
 \end{enumerate}
@@ -42,29 +44,29 @@ A component $c$ is a tuple $(I, O, A, P, dispatch, complete)$, where:
 A component is said to be \emph{consistent} if it satisfies the following rules.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
-\begin{equation} 
+\begin{equation*} 
 \label{eqn:assumption}
 	dispatch(n) \Rightarrow a(I^n, O^n), \forall n\in N, \forall a \in A
-\end{equation}
+\end{equation*}
 
 Inputs freeze between dispatch and complete. That is,
-\begin{equation} 
+\begin{equation*} 
 \label{eqn:inputfreeze}
 	x(i) = x(j), \forall i,j\in \delta, \forall \delta \in \Delta, \forall x \in I
-\end{equation}
+\end{equation*}
 
 The \emph{guarantees} hold at \emph{complete}. That is,
-\begin{equation} 
+\begin{equation*} 
 \label{eqn:guarantee}
 	complete(n) \Rightarrow p(I^n, O^n), \forall n\in N, \forall p \in P
-\end{equation}
+\end{equation*}
 
 
 Outputs freeze between \emph{completes}. That is,
-\begin{equation} 
+\begin{equation*} 
 \label{eqn:outputfreeze}
 \lnot complete(n) \Rightarrow y(n) = y(n-1), \forall n \in N, n>0, \forall y \in O
-\end{equation}
+\end{equation*}
 
 {\bf Schedule.}
 Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
@@ -85,29 +87,28 @@ The third condition allows a component to be \emph{preempted} by another compone
 If the schedule is not preemptive, we could simplify the notation and denote a schedule as a function $[1, T] \rightarrow C$, as shown in the previous examples.
 
 Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ are defined as follows: 
-\begin{equation}
+\begin{equation*}
 \label{eqn:dispatch}
     dispatch_c^\phi(i+kT) =
     \begin{cases}
       1, & \text{if}\ \phi(i) = (c, Dispatch) \\
       0, & \text{otherwise}
     \end{cases}
-\end{equation}
+\end{equation*}
 
-\begin{equation}
+\begin{equation*}
 \label{eqn:complete}
     complete_c^\phi(i+kT) =
     \begin{cases}
       1, & \text{if}\ \phi(i) = (c, Complete) \\
       0, & \text{otherwise}
     \end{cases}
-\end{equation}
+\end{equation*}
 
 where $i,k\in N$. 
-
-A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is executed at least once.
 A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} signal evaluates to true. 
-%For simplicity, we only consider minimal schedules.
+A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
+In our framework, we only consider fair schedules.
 
 {\bf System.}
 A set $C$ of components are said to be \emph{compatible} if 
