@@ -32,11 +32,11 @@ We define $\mathbb{I}_c$ to be the set of components providing input to some com
         & \forall c \in \components &  
             \globally(\historically(\assumes \wedge 
             \bigwedge_{c^\prime \in \mathbb{I}_c} P_{c^\prime}) 
-            \Rightarrow \assumes_c) \\
+            \implies \assumes_c) \\
  \wedge &   & 
             \globally(\historically(\assumes \wedge 
             \bigwedge_{c^\prime \in \mathbb{O}} \guarantees_{c^\prime}) 
-            \Rightarrow \guarantees)
+            \implies \guarantees)
 \end{array}
 \]
 The first condition checks the input assumptions on each component under the system assumptions and upstream component guarantees. The second checks the output guarantees of the system under the system assumptions and component guarantees providing the output.  If both conditions hold, then the system is said to be \emph{correct} meaning that $\globally(\historically(\assumes) \implies \guarantees)$ holds.
@@ -62,12 +62,12 @@ An scheduled system, $\system = (\inputs, \outputs, \assumes, \guarantees, \sche
         & \forall c \in \components &  
             \globally\left[\historically\left(\dispred_S\left(\assumes\right) \wedge 
             \bigwedge_{c^\prime \in \mathbb{I}_c} \compred_{c^\prime}\left(P_{c^\prime}\right)\right) 
-            \Rightarrow \dispred_c\left(\assumes_c\right)\right] \\ \\
+            \implies \dispred_c\left(\assumes_c\right)\right] \\ \\
  \bigwedge &   & 
             \globally\left[\historically\left(\dispred_S\left(\assumes\right) \wedge 
             \bigwedge_{c^\prime \in \mathbb{O}} \compred_{c^\prime}\left(\guarantees_{c^\prime}\right)\right)
-            \Rightarrow \compred_{\system}\left(\guarantees\right)\right]
+            \implies \compred_{\system}\left(\guarantees\right)\right]
 \end{array}
 \]
-Here the system itself needs a dispatch cycle in the schedule to ensure the input hold through that cycle and the complete hold between dispatch cycles. As before, if both conditions hold, then a scheduled system is said to be correct meaning that $\globally\left[\historically\left(\dispred_S\left(\assumes\right)\right) \wedge 
-\Rightarrow \compred_{\system}\left(\guarantees\right)\right]$ holds.
+Here the system itself needs a dispatch cycle in the schedule to ensure the input hold through that cycle and the output hold between cycles. As before, if both conditions hold, then a scheduled system is said to be correct meaning that $\globally\left[\historically\left(\dispred_S\left(\assumes\right)\right) 
+\implies \compred_{\system}\left(\guarantees\right)\right]$ holds.
