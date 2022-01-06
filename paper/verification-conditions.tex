@@ -13,14 +13,38 @@
 \newcommand{\schedule}{\ensuremath{\phi}}
 \newcommand{\valid}{\ensuremath{\mathit{valid}}}
 
-For the reasoning framework, we use past-time linear temporal logic (PLTL) to formulate the correctness obligations.
-PLTL defines operators  $\globally$ (globally) and $\historically$ (historically) over paths $\pi$ and a moment of evaluation $i$ as follows:
-\begin{equation*}
- (\pi, i) \models \globally(f) \iff \forall j \ge i, (\pi, j) \models f
-\end{equation*}
-\begin{equation*}
-(\pi, i) \models \historically(f) \iff \forall 0 \le j \le i, (\pi, j) \models f
-\end{equation*}
+Scheduled components lend themselves to hierarchical assume-guarantee reasoning in a manner similar to that in \cite{AGREE2}.
+The verification conditions to prove a system of unscheduled components correct are formalized in \emph{past-time linear temporal logic} (PLTL). 
+The two PLTL operators necessary for the verification conditions are $\globally$ (globally) and $\historically$ (historically).
+These are defined over a trace of the system, $\pi$, and a moment of evaluation in the trace, $i$, as follows:
+\begin{eqnarray*}
+ (\pi, i) \models \globally(f) & \iff & \forall j \ge i, (\pi, j) \models f \\
+(\pi, i) \models \historically(f) & \iff & \forall 0 \le j \le i, (\pi, j) \models f
+\end{eqnarray*}
+Globally is invariant from the current moment into the future and historically is invariant from the beginning to the current moment.
+
+We define $\mathbb{I}_c$ to be the set of components providing input to some component $c$ in the system, and we define $\mathbb{O}$ to be the set of components that provide the output for the system. An unscheduled system, $\system = (\inputs, \outputs, \assumes, \guarantees)$, is correct if and only if for all $\pi$ and for all $i \ge 0$ the following holds:
+\[
+\begin{array}{lll}
+        & \forall c \in \components &  
+            \globally(\historically(\assumes \wedge 
+            \bigwedge_{c^\prime \in \mathbb{I}_c} P_{c^\prime}) 
+            \Rightarrow \assumes_c) \\
+ \wedge &   & 
+            \globally(\historically(\assumes \wedge 
+            \bigwedge_{c^\prime \in \mathbb{O}_\system} \guarantees_{c^\prime}) 
+            \Rightarrow \guarantees))
+\end{array}
+\]
+The first condition checks the input assumptions on each component under the system assumptions and upstream component guarantees. The second checks the output guarantees of the system under the system assumptions and component guarantees providing the output.  If both conditions hold, then the system is said to be \emph{correct} meaning that $\globally(\historically(\assumes) \implies \guarantees)$ holds.
+
+
+%   \item $ \forall (\assumes_i, \guarantees_i) \in \components, \globally(\historically(\dispatch(A_s) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \Rightarrow \dispatch(\assumes_i)) $
+%   \item $ \globally(\historically(\dispatch(A_s) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \Rightarrow \complete(\guarantees_s))) $	
+% \end{enumerate}
+
+%
+
 
 A component is associated with a contract $(\assumes_c, \guarantees_c)$, where $\assumes_c$ are the component assumptions and $\guarantees_c$ are the component guarantees when the assumptions hold.
 Contracts are written over propositions using the \emph{property specification language} (PSL).
