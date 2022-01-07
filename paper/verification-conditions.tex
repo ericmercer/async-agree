@@ -12,58 +12,62 @@
 \newcommand{\components}{\ensuremath{C}}
 \newcommand{\schedule}{\ensuremath{\phi}}
 \newcommand{\valid}{\ensuremath{\mathit{valid}}}
+\newcommand{\dpred}{\ensuremath{\delta^\phi}}
+\newcommand{\dispred}{\ensuremath{\mathbb{D}^\phi}}
+\newcommand{\compred}{\ensuremath{\mathbb{C}^\phi}}
 
-For the reasoning framework, we use past-time linear temporal logic (PLTL) to formulate the correctness obligations.
-PLTL defines operators  $\globally$ (globally) and $\historically$ (historically) over paths $\pi$ and a moment of evaluation $i$ as follows:
-\begin{equation*}
- (\pi, i) \models \globally(f) \iff \forall j \ge i, (\pi, j) \models f
-\end{equation*}
-\begin{equation*}
-(\pi, i) \models \historically(f) \iff \forall 0 \le j \le i, (\pi, j) \models f
-\end{equation*}
-
-A component is associated with a contract $(\assumes_c, \guarantees_c)$, where $\assumes_c$ are the component assumptions and $\guarantees_c$ are the component guarantees when the assumptions hold.
-Contracts are written over propositions using the \emph{property specification language} (PSL).
-An implementation of a component is correct if and only if $\globally(\historically(\assumes_c) \Rightarrow \guarantees_c)$.
-Component implementations are assumed correct in the compositional reasoning AGREE framework.
-
-The behavior of a scheduled component is defined by four special propositions: $\dispatch$ denoting when assumptions must hold, $\complete$ denoting when guarantees must hold, $\same{\inputs}$ and $\same{\outputs}$ denoting that the component outputs are unchanged from the previous instant. For convenience in presentation
+Scheduled components lend themselves to hierarchical assume-guarantee reasoning in a manner similar to that in \cite{AGREE2}.
+The verification conditions to prove a system of unscheduled components correct are formalized in \emph{past-time linear temporal logic} (PLTL). 
+The two PLTL operators necessary for the verification conditions are $\globally$ (globally) and $\historically$ (historically).
+These are defined over a trace of the system, $\pi$, and a moment of evaluation in the trace, $i$, as follows:
 \begin{eqnarray*}
-  \dispatch(A_c) &=& \left[\left(\dispatch \wedge \assumes_c\right) \vee \left(\delta(\dispatch, \complete) \wedge \same{\inputs}\right)\right] \\
-  \complete(P_c) &=& \left[\left(\complete \wedge \guarantees_c\right) \vee \left(\neg\complete \wedge \same{\outputs}\right)\right]
+ (\pi, i) \models \globally(f) & \iff & \forall j \ge i, (\pi, j) \models f \\
+(\pi, i) \models \historically(f) & \iff & \forall 0 \le j \le i, (\pi, j) \models f
+\end{eqnarray*}
+Globally is invariant from the current moment into the future and historically is invariant from the beginning to the current moment.
+
+We define $\mathbb{I}_c$ to be the set of components providing input to some component $c$ in the system, and we define $\mathbb{O}$ to be the set of components that provide the output for the system. An unscheduled system, $\system = (\inputs, \outputs, \assumes, \guarantees)$, is correct if and only if for all $\pi$ and for all $i \ge 0$ the following holds:
+\[
+\begin{array}{lll}
+        & \forall c \in \components &  
+            \globally(\historically(\assumes \wedge 
+            \bigwedge_{c^\prime \in \mathbb{I}_c} P_{c^\prime}) 
+            \implies \assumes_c) \\
+ \wedge &   & 
+            \globally(\historically(\assumes \wedge 
+            \bigwedge_{c^\prime \in \mathbb{O}} \guarantees_{c^\prime}) 
+            \implies \guarantees)
+\end{array}
+\]
+The first condition checks the input assumptions on each component under the system assumptions and upstream component guarantees. The second checks the output guarantees of the system under the system assumptions and component guarantees providing the output.  If both conditions hold, then the system is said to be \emph{correct} meaning that $\globally(\historically(\assumes) \implies \guarantees)$ holds.
+
+The verification conditions are extended to scheduled components by adding a notion of dispatch and complete to the verification conditions.
+We define $\same{X}$ to be a predicate that is true in the very first moment and true thereafter if and only if the signals in the set $X$ are unchanged from the previous moment.
+We also define the predicate $\dpred_c$ to be true if the current moment is in a dispatch interval for the component $c$ according the schedule.
+
+The assumptions in a scheduled component hold at dispatch, and the guarantees of the same component hold at complete.
+A component also assumes its inputs are invariant through the dispatch interval and the outputs are invariant between complete cycles.
+These requirements for a component $c$ are captured in the following predicates:
+\begin{eqnarray*}
+  \dispred_c(\assumes_c) &=& \left[\left(\dispatch^\schedule_c \wedge \assumes_c\right) \vee \left(\dpred_c \wedge \same{\inputs_c}\right)\right] \\
+  \compred_c(\guarantees_c) &=& \left[\left(\complete^\schedule_c \wedge \guarantees_c\right) \vee \left(\neg\complete^\schedule_c \wedge \same{\outputs_c}\right)\right]
 \end{eqnarray*}
 The assumptions must hold at dispatch and the inputs may not change during activation.
 %(I think this is too strong and is only needed a the system level). 
 The guarantees must hold at complete and the outputs must not change between completions.
-A scheduled component is correct if and only if
+
+An scheduled system, $\system = (\inputs, \outputs, \assumes, \guarantees, \schedule)$, is correct if and only if for all $\pi$ and for all $i \ge 0$ the following holds:
 \[
-  \globally\left(
-    \historically\left(\dispatch(\assumes_c)\right) \Rightarrow \complete(\guarantees_c) \right)
+\begin{array}{lll}
+        & \forall c \in \components &  
+            \globally\left[\historically\left(\dispred_S\left(\assumes\right) \wedge 
+            \bigwedge_{c^\prime \in \mathbb{I}_c} \compred_{c^\prime}\left(P_{c^\prime}\right)\right) 
+            \implies \dispred_c\left(\assumes_c\right)\right] \\ \\
+ \bigwedge &   & 
+            \globally\left[\historically\left(\dispred_S\left(\assumes\right) \wedge 
+            \bigwedge_{c^\prime \in \mathbb{O}} \compred_{c^\prime}\left(\guarantees_{c^\prime}\right)\right)
+            \implies \compred_{\system}\left(\guarantees\right)\right]
+\end{array}
 \]
-A component is said to be \emph{scheduled} if and only if every $\dispatch$ is eventually closed with a $\complete$ and the $\dispatch$ eventually holds at some instant.
-A component is assumed correct in the compositional reasoning.
-
-A system is defined by its own contract, the contracts from each of its constituent components that implement it, and a schedule, $\system = (\assumes_s, \guarantees_s, \components, \schedule)$ where $\components$ are the constituent component contracts and $\schedule$ defines the $\dispatch$ and $\complete$ sequences for each component.
-Components \emph{communicate} in the sense that their formulas may refer to the same variables.
-
-%A schedule is said to be \emph{fair}, $\valid(\schedule)$ if and only if every component in the system is scheduled. 
-
-A system is correct if and only if all of the following holds: %$\valid(\schedule) \Rightarrow$
-\begin{enumerate}
-	 \item $ \forall (\assumes_i, \guarantees_i) \in \components, \globally(\historically(\dispatch(A_s) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \Rightarrow \dispatch(\assumes_i)) $
-	 \item $ \globally(\historically(\dispatch(A_s) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \Rightarrow \complete(\guarantees_s))) $	
-\end{enumerate}
-
-%\[
-%\begin{array}{ll}
-%  & \forall (\assumes_i, \guarantees_i) \in \components, \\
-%  & \ \ \ \ \globally(\historically(\dispatch(A_s) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \Rightarrow \dispatch(\assumes_i)) \\
-%  \wedge & 
-%  \globally(\historically(\dispatch(A_s) \wedge \bigwedge_{(\assumes_j,\guarantees_j) \in \components} \complete(P_j)) \Rightarrow \complete(\guarantees_s)))
-%\end{array}
-%\]
-A correct system has system assumptions and component guarantees strong enough to meet each component assumptions and the system guarantees. These ensure the correctness of the following statement for the system composed of scheduled components.
-\[
-  \globally\left(
-    \historically\left(\dispatch(\assumes_s)\right) \Rightarrow \complete(\guarantees_s) \right)
-\]
+Here the system itself needs a dispatch cycle in the schedule to ensure the input hold through that cycle and the output hold between cycles. As before, if both conditions hold, then a scheduled system is said to be correct meaning that $\globally\left[\historically\left(\dispred_S\left(\assumes\right)\right) 
+\implies \compred_{\system}\left(\guarantees\right)\right]$ holds.
