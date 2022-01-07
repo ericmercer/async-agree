@@ -16,9 +16,9 @@ Let $Q$  be a set of ports.
 For each port $q \in Q$, a set $V_q$ denotes the values that may be assigned to port $q$. %$V_q$ is called the type of port $q$. 
 %A \emph{valuation} of $Q$ is an assignment of a value in $V_q$ to each port $q \in Q$.
 A signal $x_q$ of a port $q$ is a function $x_q: N \rightarrow V_q$.
-A \emph{trace} $\sigma_Q$ of $Q$ is an assignment of a signal $x_q$ to each port $q$ in $Q$.
-We use $\Sigma_Q$ to denote the set of all traces of $Q$.
-Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto $Q'$ is the assignment of signal $x_q$ to each port $q$ in $Q'$ defined in $\sigma_Q$, denoted as $\sigma_Q|_{Q'}$.   
+A \emph{trace} $\sigma_Q$ of ports $Q$ is an assignment of a signal $x_q$ to each port $q$ in $Q$.
+We use $\Sigma_Q$ to denote the set of all traces of ports $Q$.
+Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto ports $Q'$ is the assignment of signal $x_q$ to each port $q$ in $Q'$ defined in $\sigma_Q$, as defined in $\sigma_Q$. We denote the projection as $\sigma_Q|_{Q'}$.   
  
 {\bf Dispatch and Complete.}
 Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
@@ -48,8 +48,8 @@ We denote the set of all intervals as $\Delta$.
 A component $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where: 
 
 \begin{itemize}
-    	\item $I_c$ is a finite set of ports, called inputs,
-    	\item $O_c$ is a finite set of ports disjoint from $I_c$, called outputs,
+    	\item $I_c$ is a finite set of ports, called \emph{inputs},
+    	\item $O_c$ is a finite set of ports disjoint from $I_c$, called \emph{outputs},
 %	\item $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, called behavior,
 %	\item $A_c$ and $P_c$ are prefix-closed subsets of $(I_c \cup O_c)^\omega$, called \emph{assumptions} and \emph{guarantees}, respectively,
 %	\item $A_c$ and $P_c$ are two Boolean functions $(I_c \cup O_c)^\omega \rightarrow B$, called \emph{assumptions} and \emph{guarantees}, respectively,	
@@ -65,7 +65,7 @@ A component $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where
 %A component satisfies the following rules.
 %Given a component $c$ and a trace $\sigma_c \in \Sigma_{I_c \cup O_c}$, we define the following propositions:
 
-The \emph{behavior} of a component $c$ is a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that for all $\sigma_c \in \Sigma_c$ the following propositions hold.
+The \emph{behavior} of a component $c$ is a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that for all trace $\sigma_c \in \Sigma_c$ the following propositions hold.
 %A component $c$ is said to be \emph{consistent} if for all $\sigma_c \in \Sigma_c$ the following propositions hold.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
@@ -75,10 +75,10 @@ The \emph{assumptions} hold at \emph{dispatch}. That is,
 	dispatch_c(n) \Rightarrow (\sigma_c, n) \models A_c, \forall n\in N.
 \end{equation}
 
-Inputs freeze between dispatch and complete. That is,
+Inputs freeze between \emph{dispatch} and \emph{complete}. That is,
 \begin{equation} 
 \label{eqn:inputfreeze}
-	x(i) = x(j), \forall i,j\in \delta, \forall \delta \in \Delta, \forall x \in \sigma_c|_{I_c}.
+	x(i) = x(j), \forall i,j\in \delta \cap N, \forall \delta \in \Delta, \forall x \in \sigma_c|_{I_c}.
 \end{equation}
 
 The \emph{guarantees} hold at \emph{complete}. That is,
@@ -87,7 +87,6 @@ The \emph{guarantees} hold at \emph{complete}. That is,
 %	complete_c(n) \Rightarrow P((I_c \cup O_c)^n), \forall n\in N.
 	complete_c(n) \Rightarrow (\sigma_c, n) \models P_c, \forall n\in N.
 \end{equation}
-
 
 Outputs freeze between \emph{completes}. That is,
 \begin{equation} 
@@ -101,27 +100,30 @@ Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
 	O_c \cap I_{c'} \neq \emptyset \vee O_{c'} \cap I_c \neq \emptyset.
 \end{equation*}
 
-Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T] \rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$ satisfying:
+Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T]  \cap N\rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$ satisfying:
 
 \begin{enumerate}
-	\item $ \forall i\in [1,T], c\in C, \phi(i) = (c, \textsf{Dispatch}) \Rightarrow \exists j\in [1,T], j > i, \phi(j) =  (c, \textsf{Complete}) $,
-	\item $ \forall j\in [1,T], c\in C, \phi(j) = (c, \textsf{Complete}) \Rightarrow \exists i\in [1,T], j > i, \phi(i) =  (c, \textsf{Dispatch}) $,
-	\item $ \forall i, j\in [1,T], c\in C, i \neq j, \phi(i) = (c, \textsf{Dispatch}), \phi(j) = (c, \textsf{Dispatch}) \Rightarrow \exists k\in [1,T], j >k> i, \phi(j) =  (c, \textsf{Complete}) $,
-	\item $ \forall i, j, n\in [1,T], i < n < j, c, c'\in C, \phi(i) = (c, \textsf{Dispatch}), \phi(n) = (c', \textsf{Dispatch}), \phi(j) = (c, \textsf{Complete}) \Rightarrow c, c' \text{ are not connected, and }\exists m\in [1,T], n < m < j, \phi(m) =  (c', \textsf{Complete}) $.
+	\item $ \forall i\in \text{dom }\phi, c\in C, \phi(i) = (c, \textsf{Dispatch}) \Rightarrow \exists j\in \text{dom }\phi, j > i, \phi(j) =  (c, \textsf{Complete}) $,
+	\item $ \forall j\in \text{dom }\phi, c\in C, \phi(j) = (c, \textsf{Complete}) \Rightarrow \exists i\in \text{dom }\phi, j > i, \phi(i) =  (c, \textsf{Dispatch}) $,
+	\item $ \forall i, j\in \text{dom }\phi, c\in C, i \neq j, \phi(i) = (c, \textsf{Dispatch}), \phi(j) = (c, \textsf{Dispatch}) \Rightarrow \exists k\in \text{dom }\phi, j >k> i, \phi(j) =  (c, \textsf{Complete}) $,
+	\item $ \forall i, j, n\in \text{dom }\phi, i < n < j, c, c'\in C, \phi(i) = (c, \textsf{Dispatch}), \phi(n) = (c', \textsf{Dispatch}), \phi(j) = (c, \textsf{Complete}) \Rightarrow c, c' \text{ are not connected, and }\exists m\in \text{dom }\phi, n < m < j, \phi(m) =  (c', \textsf{Complete}) $.
 \end{enumerate}
 
-The first three conditions ensure the (\textsf{Dispatch}, \textsf{Complete}) associated with a component is \emph{well-ordered} in a schedule. 
+The first three conditions ensure the pair (\textsf{Dispatch}, \textsf{Complete}) associated with a component is \emph{well-ordered} in a schedule. 
 The fourth condition allows a component to be \emph{preempted} by another component if they two have no connection.
-If the schedule is not preemptive, we could simplify the notation and denote a schedule as a function that maps $[1, T]$ to $C$, as shown in the previous examples.
+If the schedule is not preemptive, we could simplify the notation and denote a schedule as a function that maps $[1, T] \cap N$ to $C$, as shown in the previous examples.
+A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} signal evaluates to true. 
+A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
+%In our framework, we only consider fair schedules.
 
-Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ are defined as follows: 
+Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ are defined as follows: $\forall i \in N$,
 \begin{equation*}
 \label{eqn:dispatch}
     dispatch_c^\phi(i) =
     \begin{cases}
       1, & \text{if } \phi(i \mod T) = (c, \textsf{Dispatch}) \\
       0, & \text{otherwise}
-    \end{cases}
+    \end{cases},
 \end{equation*}
 
 \begin{equation*}
@@ -130,13 +132,8 @@ Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complet
     \begin{cases}
       1, & \text{if } \phi(i \mod T) = (c, \textsf{Complete}) \\
       0, & \text{otherwise}
-    \end{cases}
+    \end{cases}.
 \end{equation*}
-
-where $i \in N$. 
-A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} signal evaluates to true. 
-A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
-In our framework, we only consider fair schedules.
 
 {\bf System.}
 A set $C$ of components are said to be \emph{compatible} if 
@@ -156,14 +153,38 @@ A set $C$ of compatible, connected, scheduled components is a \emph{system} $S =
 	\item $O_s = \cup_{\forall c \in C}O_c$,
 	\item $A_s$ and $P_s$ are system-level \emph{assumptions} and \emph{guarantees}, respectively,
 	\item $\phi$ is a schedule of $C$,	
-	\item $dispatch_s (i) = 
+	\item $dispatch_s^\phi (i) = 
 	    	\begin{cases}
       		1, & \text{if}\ i \mod T =1 \\
 	     	0, & \text{otherwise}
-   	 	\end{cases},  i \in N$,
-   	\item $complete_s (i) =
+   	 	\end{cases}, \forall i \in N$,
+   	\item $complete_s^\phi (i) =
    		\begin{cases}
       		1, & \text{if}\ i \mod T = 0 \\
 	     	0, & \text{otherwise}
-   	 	\end{cases}, i \in N$.
+   	 	\end{cases}, \forall i \in N, i > 0$.
 \end{itemize}
+
+We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s^\phi, complete_s^\phi$). We use $\Delta_s$ to denote the set of all such intervals.
+
+The \emph{behavior} of a system $s$ is a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$, such that for all trace $\sigma_s \in \Sigma_s$ the following propositions hold.
+
+We define the following propositions.
+
+The \emph{assumptions} hold at \emph{dispatch}. That is,
+\begin{equation} 
+\label{eqn:assumption}
+dispatch_s^\phi(n) \Rightarrow (\sigma_s, n) \models A_s, \forall n\in N.
+\end{equation}
+
+Inputs freeze between dispatch and complete. That is,
+\begin{equation} 
+\label{eqn:inputfreeze}
+x(i) = x(j), \forall i,j\in \delta_s \cap N, \forall \delta_s \in \Delta_s, \forall x \in \sigma_s|_{I_s}.
+\end{equation}
+
+The \emph{gurarantees} hold at \emph{complete}. That is,
+\begin{equation} 
+\label{eqn:guarantee}
+complete_s^\phi(n) \Rightarrow (\sigma_s, n) \models P_s, \forall n\in N.
+\end{equation}
