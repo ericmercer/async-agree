@@ -15,10 +15,10 @@ We use $x(n)$ to denote the value of the signal $x$ at instant $n$.
 Let $Q$  be a set of ports. 
 For each port $q \in Q$, a set $V_q$ denotes the values that may be assigned to port $q$. %$V_q$ is called the type of port $q$. 
 %A \emph{valuation} of $Q$ is an assignment of a value in $V_q$ to each port $q \in Q$.
-A signal $x_q$ of a port $q$ is a function $x_q: N \rightarrow V_q$.
+A signal $x_q$ at port $q$ is a function $x_q: N \rightarrow V_q$.
 A \emph{trace} $\sigma_Q$ of $Q$ is an assignment of a signal $x_q$ to each port $q$ in $Q$.
 We use $\Sigma_Q$ to denote the set of all traces of $Q$.
-Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto $Q'$ is the assignment of signal $x_q$ to each port $q$ in $Q'$ defined in $\sigma_Q$, as defined in $\sigma_Q$. We denote the projection as $\sigma_Q|_{Q'}$.
+Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto $Q'$ is the assignment of signal $x_q$ to each port $q$ in $Q'$, as defined in $\sigma_Q$. We denote the projection as $\sigma_Q|_{Q'}$.
  
 {\bf Dispatch and Complete.}
 Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
@@ -65,7 +65,7 @@ A component $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where
 %A component satisfies the following rules.
 %Given a component $c$ and a trace $\sigma_c \in \Sigma_{I_c \cup O_c}$, we define the following propositions:
 
-The \emph{behavior} of a component $c$ is a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that for all trace $\sigma_c \in \Sigma_c$ the following propositions hold.
+The \emph{behavior} of a component $c$ is a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that $\forall \sigma_c \in \Sigma_{I_c \cup O_c}, \sigma_c \in \Sigma_c $ if and only if the following propositions hold.
 %A component $c$ is said to be \emph{consistent} if for all $\sigma_c \in \Sigma_c$ the following propositions hold.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
@@ -162,13 +162,13 @@ A set $C$ of compatible, connected, scheduled components is a \emph{system} $S =
 	     	0, & \text{otherwise}
    	 	\end{cases}, \forall i \in N, i > 0$.
 \end{itemize}
-The \emph{behavior} of a system $S$ is a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$ satisfying: 
+We have $I_s  \cup O_s = \cup_{\forall c \in C}(I_c \cup O_c)$.
+The \emph{behavior} of a system $S$ is a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$, such that $\forall \sigma_s \in \Sigma_{I_s \cup O_s}$, 
 \begin{equation*}
-	\forall \sigma_s \in \Sigma_s,  \forall c \in C, \exists \sigma_c \in \Sigma_c, \sigma_s|_{I_c \cup O_c} = \sigma_c.
+	\sigma_s\in \Sigma_s  \iff \forall c \in C, \exists \sigma_c \in \Sigma_c, \sigma_s|_{I_c \cup O_c} = \sigma_c.
 \end{equation*}
-
 We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). We use $\Delta_s$ to denote the set of all such intervals.
-We define the following propositions.
+Given a system $S$ and a trace $\sigma_s\in \Sigma_s$, we define the following propositions.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
@@ -188,4 +188,4 @@ The \emph{gurarantees} hold at \emph{complete}. That is,
 	complete_s(n) \Rightarrow (\sigma_s, n) \models P_s, \forall n\in N.
 \end{equation}
 
-Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system under consideration is viewed as a component and activated periodically.
+Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system is viewed as a component and activated periodically.
