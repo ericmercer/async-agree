@@ -91,7 +91,7 @@ The \emph{guarantees} hold at \emph{complete}. That is,
 Outputs freeze between \emph{completes}. That is,
 \begin{equation} 
 \label{eqn:outputfreeze}
-\lnot complete_c(n) \Rightarrow y(n) = y(n-1), \forall n \in N, n > 0, \forall y \in \sigma_c|_{O_c}.
+	\lnot complete_c(n) \Rightarrow y(n) = y(n-1), \forall n \in N, n > 0, \forall y \in \sigma_c|_{O_c}.
 \end{equation}
 
 {\bf Schedule.}
@@ -137,54 +137,55 @@ Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complet
 
 {\bf System.}
 A set $C$ of components are said to be \emph{compatible} if 
-
 \begin{equation*}
-\forall c_i,c_j \in C, c_i\neq c_j, O_{c_i} \cap O_{c_j} = \emptyset.
+	\forall c_i,c_j \in C, c_i\neq c_j, O_{c_i} \cap O_{c_j} = \emptyset.
 \end{equation*}
-
 A set $C$ of components are said to be \emph{connected} if
 \begin{equation*}
-\forall c_i \in C, \exists c_j \in C, c_i\neq c_j, O_{c_i} \cap I_{c_j} \neq \emptyset \vee O_{c_j} \cap I_{c_i} \neq \emptyset.
+	\forall c_i \in C, \exists c_j \in C, c_i\neq c_j, O_{c_i} \cap I_{c_j} \neq \emptyset \vee O_{c_j} \cap I_{c_i} \neq \emptyset.
 \end{equation*}
-
-A set $C$ of compatible, connected, scheduled components is a \emph{system} $S = (I_s, O_s, A_s, P_s, \phi, dispatch_s, complete_s)$, where:
+%A set $C$ of compatible, connected, scheduled components is a \emph{system} $S = (I_s, O_s, A_s, P_s, \phi, dispatch_s, complete_s)$, where:
+A set $C$ of compatible, connected, scheduled components is a \emph{system} $S = (I_s, O_s, A_s, P_s, dispatch_s, complete_s)$, where:
 \begin{itemize}
 	\item $I_s = \cup_{\forall c \in C}I_c -  \cup_{\forall c \in C}O_c$,
 	\item $O_s = \cup_{\forall c \in C}O_c$,
-	\item $A_s$ and $P_s$ are system-level \emph{assumptions} and \emph{guarantees}, respectively,
-	\item $\phi$ is a schedule of $C$,	
-	\item $dispatch_s^\phi (i) = 
+	\item $A_s$ and $P_s$ are two Boolean functions $\Sigma_{I_s \cup O_s} \rightarrow B$, called system-level \emph{assumptions} and \emph{guarantees}, respectively,
+%	\item $\phi$ is a schedule of $C$,	
+	\item $dispatch_s (i) = 
 	    	\begin{cases}
       		1, & \text{if}\ i \mod T =1 \\
 	     	0, & \text{otherwise}
    	 	\end{cases}, \forall i \in N$,
-   	\item $complete_s^\phi (i) =
+   	\item $complete_s (i) =
    		\begin{cases}
       		1, & \text{if}\ i \mod T = 0 \\
 	     	0, & \text{otherwise}
    	 	\end{cases}, \forall i \in N, i > 0$.
 \end{itemize}
+The \emph{behavior} of a system $S$ is a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$ satisfying: 
+\begin{equation*}
+	\forall \sigma_s \in \Sigma_s,  \forall c \in C, \exists \sigma_c \in \Sigma_c, \sigma_s|_{I_c \cup O_c} = \sigma_c.
+\end{equation*}
 
-We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s^\phi, complete_s^\phi$). We use $\Delta_s$ to denote the set of all such intervals.
-
-The \emph{behavior} of a system $s$ is a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$, such that for all trace $\sigma_s \in \Sigma_s$ the following propositions hold.
-
+We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). We use $\Delta_s$ to denote the set of all such intervals.
 We define the following propositions.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
 \label{eqn:assumption}
-dispatch_s^\phi(n) \Rightarrow (\sigma_s, n) \models A_s, \forall n\in N.
+	dispatch_s(n) \Rightarrow (\sigma_s, n) \models A_s, \forall n\in N.
 \end{equation}
 
 Inputs freeze between dispatch and complete. That is,
 \begin{equation} 
 \label{eqn:inputfreeze}
-x(i) = x(j), \forall i,j\in \delta_s \cap N, \forall \delta_s \in \Delta_s, \forall x \in \sigma_s|_{I_s}.
+	x(i) = x(j), \forall i,j\in \delta_s \cap N, \forall \delta_s \in \Delta_s, \forall x \in \sigma_s|_{I_s}.
 \end{equation}
 
 The \emph{gurarantees} hold at \emph{complete}. That is,
 \begin{equation} 
 \label{eqn:guarantee}
-complete_s^\phi(n) \Rightarrow (\sigma_s, n) \models P_s, \forall n\in N.
+	complete_s(n) \Rightarrow (\sigma_s, n) \models P_s, \forall n\in N.
 \end{equation}
+
+Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system under consideration is viewed as a component.

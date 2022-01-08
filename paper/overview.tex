@@ -22,7 +22,7 @@ Thus, we introduce two distinctive events \emph{dispatch} and \emph{complete} fo
 %Similarly, for a system (consists of components), the two events model the start and end of a scheduling cycle. 
 The two events shall appear in pairs and alternately. \emph{dispatch} shall appear before \emph{complete}. We will introduce the notion of \emph{well-ordered} to capture the pattern.
 
-In SCADE and SIGNAL, when a component is not activated, its outputs keep their previous values. We adopt a similar output freeze rule. The outputs will not change value between \emph{complete} events. 
+In SCADE and SIGNAL, when a component is not activated, its outputs keep their previous values. We extend the output freeze time window to between \emph{complete} events, including activation. We understand in practice, the actual output values may change during activation. We choose this because we interpret the \emph{guarantees} as steady-state requirements of outputs at \emph{complete}. The outputs values between dispatch and complete is undefined. Thus, we model them with the last outputs values, so that the outputs have well-defined behavior at every instant.
 
 We inherit the same notion of composition used in the current AGREE framework. A connection between two components means their contracts refer to the same signal. 
 This, combined with a schedule, essentially simulates an asynchronous communication between components with \emph{shared variable}. 
