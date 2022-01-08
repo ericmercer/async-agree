@@ -16,9 +16,9 @@ Let $Q$  be a set of ports.
 For each port $q \in Q$, a set $V_q$ denotes the values that may be assigned to port $q$. %$V_q$ is called the type of port $q$. 
 %A \emph{valuation} of $Q$ is an assignment of a value in $V_q$ to each port $q \in Q$.
 A signal $x_q$ of a port $q$ is a function $x_q: N \rightarrow V_q$.
-A \emph{trace} $\sigma_Q$ of ports $Q$ is an assignment of a signal $x_q$ to each port $q$ in $Q$.
-We use $\Sigma_Q$ to denote the set of all traces of ports $Q$.
-Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto ports $Q'$ is the assignment of signal $x_q$ to each port $q$ in $Q'$ defined in $\sigma_Q$, as defined in $\sigma_Q$. We denote the projection as $\sigma_Q|_{Q'}$.   
+A \emph{trace} $\sigma_Q$ of $Q$ is an assignment of a signal $x_q$ to each port $q$ in $Q$.
+We use $\Sigma_Q$ to denote the set of all traces of $Q$.
+Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto $Q'$ is the assignment of signal $x_q$ to each port $q$ in $Q'$ defined in $\sigma_Q$, as defined in $\sigma_Q$. We denote the projection as $\sigma_Q|_{Q'}$.
  
 {\bf Dispatch and Complete.}
 Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
@@ -34,15 +34,15 @@ Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} 
 The first condition states that \emph{dispatch} and \emph{complete} are mutual exclusive. The second and third condition state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth condition states that \emph{dispatch} and \emph{complete} appear alternately. 
 From hereon we only consider a well-ordered pair (\emph{dispatch}, \emph{complete}).
 
-An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a closed interval $[n, m], n,m \in N, m>n$, satisfying:
+An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a set of integers $[n, m] \cap N, n,m \in N, m>n$, satisfying:
 
 \begin{enumerate}
 	\item $ dispatch(n) = 1 $, 
 	\item $ complete(m) = 1 $, 
-	\item $ \forall k\in (n, m), dispatch(k)=0 \wedge complete(k)=0 $.
+	\item $ \forall k\in (n, m) \cap N, dispatch(k)=0 \wedge complete(k)=0 $.
 \end{enumerate}
 
-We denote the set of all intervals as $\Delta$.
+We denote the set of all such intervals as $\Delta$.
 
 {\bf Component.}
 A component $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where: 
@@ -116,7 +116,7 @@ A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means th
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
 %In our framework, we only consider fair schedules.
 
-Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of a component $c \in C$ are defined as follows: $\forall i \in N$,
+Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of each component $c \in C$ are defined as follows: $\forall i \in N$,
 \begin{equation*}
 \label{eqn:dispatch}
     dispatch_c^\phi(i) =
@@ -188,4 +188,4 @@ The \emph{gurarantees} hold at \emph{complete}. That is,
 	complete_s(n) \Rightarrow (\sigma_s, n) \models P_s, \forall n\in N.
 \end{equation}
 
-Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system under consideration is viewed as a component.
+Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system under consideration is viewed as a component and activated periodically.
