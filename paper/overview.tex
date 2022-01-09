@@ -24,11 +24,10 @@ The two events shall appear in pairs and alternately. \emph{dispatch} shall appe
 
 In SCADE and SIGNAL, when a component is not activated, its outputs keep their previous values. We extend the output freeze time window to between \emph{complete} events, including activation. We understand in practice, the actual output values may change during activation. We choose this because we interpret the \emph{guarantees} as steady-state requirements of outputs at \emph{complete}. The outputs values between dispatch and complete is undefined. Thus, we model them with the last outputs values, so that the outputs have well-defined behavior at every instant.
 
-We inherit the same notion of composition used in the current AGREE framework. A connection between two components means their contracts refer to the same signal. 
+We inherit the same notion of composition used in the current AGREE framework. A connection between two components means their contracts refer to the same variable. 
 This, combined with a schedule, essentially simulates an asynchronous communication between components with \emph{shared variable}. 
 %This is consistent with the AADL data port sampling semantics. 
-
-We consider single-processor schedules. The schedule ensures at most one component is activated at a time. For a preemptive schedule, we require a component can only be preempted by another component if they do not have connections. Thus, there is no ambiguity on the order of read and write or the variable value referenced in the contracts.
+We consider single-machine schedules. The scheduler ensures at most one component is activated at a time. For a preemptive schedule, we require a component can only be preempted by another component if they do not have connections. Thus, there is no ambiguity on the order of read and write or the variable value referenced in the contracts.
 The communication channel may also be viewed as a buffer or queue of size one. %The writer overwrites when overflow occurs. The reader reads the last value if the buffer is empty. 
 This means the proposed model only supports limited AADL event data port communication.
  
