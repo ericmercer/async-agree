@@ -1,1 +1,16 @@
-AGREE is an AADL-based compositional verification framework used in safety-critical applications. It is based on a synchronous model of computation (simultaneous execution). However, in the implementation, the components of a system are often executed in a sequential order (e.g. defined by a static cyclic schedule), due to the sharing of computational resources. This paper describes an approach to incorporating a schedule in the assume-guarantee reasoning. We define our semantic interpretation of contracts when components are executed sequentially. We introduce virtual scheduling events, which tie AADL timing and execution semantics to AGREE contracts. A case study based on the models developed in the DARPA CASE project is provided to illustrate our approach.
+%AGREE is an AADL-based compositional verification framework used in safety-critical applications. It
+%is based on a synchronous model of computation (simultaneous execution). However, in the
+%implementation, the components of a system are often executed in a sequential order (e.g. defined by
+%a static cyclic schedule), due to the sharing of computational resources. 
+Contract-based assume-guarantee reasoning can be used to improve the scalability of model checking
+by decomposing complex verification problems.  In previous work, we have demonstrated this approach 
+for systems modeled using the Architecture Analysis and Design Language (AADL) assuming a 
+synchronous model of computation.  This allows nondeterministic ordering of parallel components
+and generally results in an overapproximation of real behavior.  
+This paper describes an
+approach to incorporating an execution schedule in the assume-guarantee reasoning. We define our semantic
+interpretation of contracts when components are executed according to this schedule, 
+more accurately reflecting the behavior of the system implementation. 
+We introduce virtual scheduling events which tie AADL timing and execution semantics to contracts. 
+A case study based on a simple unmanned air vehicle surveillance system is provided to illustrate our approach.
+
