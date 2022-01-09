@@ -26,15 +26,15 @@ Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} 
 \begin{enumerate}
 %	\item $ \nexists n\in N, dispatch(n) = 1 \text{ and } complete(n) =  1 $, 
 	\item $\forall n \in N, dispatch(n) \ne 1 \vee complete(n) \ne 1 $,
-	\item $ \forall n\in N, dispatch(n) = 1 \Rightarrow \exists m\in N, m > n, complete(m) =  1 $,
-	\item $ \forall m\in N, complete(m) = 1 \Rightarrow \exists n\in N, m > n, dispatch(n) =  1 $,
-	\item $ \forall n,m\in N, n \neq m, dispatch(n) = 1, dispatch(m) = 1 \Rightarrow \exists k\in N, m >k> n, complete(k) = 1 $.
+	\item $ \forall n\in N, dispatch(n) = 1 \implies \exists m\in N, m > n, complete(m) =  1 $,
+	\item $ \forall m\in N, complete(m) = 1 \implies \exists n\in N, n < m, dispatch(n) =  1 $,
+	\item $ \forall n,m\in N, n < m, dispatch(n) = 1 \wedge dispatch(m) = 1 \implies \exists k\in N, n < k < m, complete(k) = 1 $.
 \end{enumerate}
 
 The first condition states that \emph{dispatch} and \emph{complete} are mutual exclusive. The second and third condition state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth condition states that \emph{dispatch} and \emph{complete} appear alternately. 
 From hereon we only consider a well-ordered pair (\emph{dispatch}, \emph{complete}).
 
-An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a set of integers $[n, m] \cap N, n,m \in N, m>n$, satisfying:
+An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a set of integers $[n, m] \cap N, n,m \in N, n < m$, satisfying:
 
 \begin{enumerate}
 	\item $ dispatch(n) = 1 $, 
@@ -65,14 +65,14 @@ A component $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where
 %A component satisfies the following rules.
 %Given a component $c$ and a trace $\sigma_c \in \Sigma_{I_c \cup O_c}$, we define the following propositions:
 
-The \emph{behavior} of a component $c$ is a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that $\forall \sigma_c \in \Sigma_{I_c \cup O_c}, \sigma_c \in \Sigma_c $ if and only if the following propositions hold.
+The \emph{behaviors} of a component $c$ is a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that $\forall \sigma_c \in \Sigma_{I_c \cup O_c}, \sigma_c \in \Sigma_c $ if and only if the following propositions hold.
 %A component $c$ is said to be \emph{consistent} if for all $\sigma_c \in \Sigma_c$ the following propositions hold.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
 \label{eqn:assumption}
-%	dispatch_c(n) \Rightarrow A((I_c \cup O_c)^n), \forall n\in N.
-	dispatch_c(n) \Rightarrow (\sigma_c, n) \models A_c, \forall n\in N.
+%	dispatch_c(n) \implies A((I_c \cup O_c)^n), \forall n\in N.
+	dispatch_c(n) \implies (\sigma_c, n) \models A_c, \forall n\in N.
 \end{equation}
 
 Inputs freeze between \emph{dispatch} and \emph{complete}. That is,
@@ -84,35 +84,37 @@ Inputs freeze between \emph{dispatch} and \emph{complete}. That is,
 The \emph{guarantees} hold at \emph{complete}. That is,
 \begin{equation} 
 \label{eqn:guarantee}
-%	complete_c(n) \Rightarrow P((I_c \cup O_c)^n), \forall n\in N.
-	complete_c(n) \Rightarrow (\sigma_c, n) \models P_c, \forall n\in N.
+%	complete_c(n) \implies P((I_c \cup O_c)^n), \forall n\in N.
+	complete_c(n) \implies (\sigma_c, n) \models P_c, \forall n\in N.
 \end{equation}
 
 Outputs freeze between \emph{completes}. That is,
 \begin{equation} 
 \label{eqn:outputfreeze}
-	\lnot complete_c(n) \Rightarrow y(n) = y(n-1), \forall n \in N, n > 0, \forall y \in \sigma_c|_{O_c}.
+	\lnot complete_c(n) \implies y(n) = y(n-1), \forall n \in N, n > 0, \forall y \in \sigma_c|_{O_c}.
 \end{equation}
+Equation \ref{eqn:assumption}, \ref{eqn:inputfreeze}, \ref{eqn:guarantee}, and \ref{eqn:outputfreeze} represent the component specification.
 
 {\bf Schedule.}
 Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
 \begin{equation*}
-	O_c \cap I_{c'} \neq \emptyset \vee O_{c'} \cap I_c \neq \emptyset.
+	O_c \cap I_{c'} \neq \varnothing \vee O_{c'} \cap I_c \neq \varnothing.
 \end{equation*}
 
 Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T]  \cap N\rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$ satisfying:
 
 \begin{enumerate}
-	\item $ \forall i\in \text{dom }\phi, c\in C, \phi(i) = (c, \textsf{Dispatch}) \Rightarrow \exists j\in \text{dom }\phi, j > i, \phi(j) =  (c, \textsf{Complete}) $,
-	\item $ \forall j\in \text{dom }\phi, c\in C, \phi(j) = (c, \textsf{Complete}) \Rightarrow \exists i\in \text{dom }\phi, j > i, \phi(i) =  (c, \textsf{Dispatch}) $,
-	\item $ \forall i, j\in \text{dom }\phi, c\in C, i \neq j, \phi(i) = (c, \textsf{Dispatch}), \phi(j) = (c, \textsf{Dispatch}) \Rightarrow \exists k\in \text{dom }\phi, j >k> i, \phi(j) =  (c, \textsf{Complete}) $,
-	\item $ \forall i, j, n\in \text{dom }\phi, i < n < j, c, c'\in C, \phi(i) = (c, \textsf{Dispatch}), \phi(n) = (c', \textsf{Dispatch}), \phi(j) = (c, \textsf{Complete}) \Rightarrow c, c' \text{ are not connected, and }\exists m\in \text{dom }\phi, n < m < j, \phi(m) =  (c', \textsf{Complete}) $.
+	\item $ \forall i \in \text{dom }\phi, c\in C, \phi(i) = (c, \textsf{Dispatch}) \implies \exists j\in \text{dom }\phi, j > i, \phi(j) =  (c, \textsf{Complete}) $,
+	\item $ \forall j \in \text{dom }\phi, c\in C, \phi(j) = (c, \textsf{Complete}) \implies \exists i\in \text{dom }\phi, i < j, \phi(i) =  (c, \textsf{Dispatch}) $,
+	\item $ \forall i, j \in \text{dom }\phi, i < j, c\in C,  \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c, \textsf{Dispatch}) \implies \exists k\in \text{dom }\phi, i < k < j, \phi(j) =  (c, \textsf{Complete}) $,
+	\item $ \forall i, j \in \text{dom }\phi, i < j, c, c'\in C, c \neq c', \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c', \textsf{Dispatch}) \wedge \forall n \in N, i < n <j, \phi(n) \neq (c, \textsf{Complete}) \implies c, c'$ are not connected.
+	\item $ \forall i, j, k \in \text{dom }\phi, i < j < k, c, c'\in C, c \neq c', \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c', \textsf{Dispatch}) \wedge \phi(k) = (c, \textsf{Complete}) \implies \exists n \in N, j < n < k, \phi(n) = (c', \textsf{Complete}) $.
 \end{enumerate}
 
 The first three conditions ensure the pair (\textsf{Dispatch}, \textsf{Complete}) associated with a component is \emph{well-ordered} in a schedule. 
-The fourth condition allows a component to be \emph{preempted} by another component if they two have no connection.
-If the schedule is not preemptive, we could simplify the notation and denote a schedule as a function that maps $[1, T] \cap N$ to $C$, as shown in the previous examples.
-A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} signal evaluates to true. 
+The fourth condition allows a component to be \emph{preempted} by another component if they two have no connection. The fifth condition ensures the scheduling events of two components are interleaved in a proper order.
+If the schedule is not preemptive, we could simplify the notation and denote a schedule as a function that maps $[1, |C|] \cap N$ to $C$, as shown in the previous examples.
+%A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} . 
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
 %In our framework, we only consider fair schedules.
 
@@ -136,21 +138,23 @@ Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complet
 \end{equation*}
 
 {\bf System.}
-A set $C$ of components are said to be \emph{compatible} if 
+A set $C$ of components are said to be \emph{compatible} if no two components drive the same output. That is,
 \begin{equation*}
-	\forall c_i,c_j \in C, c_i\neq c_j, O_{c_i} \cap O_{c_j} = \emptyset.
+	\forall c_i,c_j \in C, c_i\neq c_j, O_{c_i} \cap O_{c_j} = \varnothing.
 \end{equation*}
-A set $C$ of components are said to be \emph{connected} if
-\begin{equation*}
-	\forall c_i \in C, \exists c_j \in C, c_i\neq c_j, O_{c_i} \cap I_{c_j} \neq \emptyset \vee O_{c_j} \cap I_{c_i} \neq \emptyset.
-\end{equation*}
+%A set $C$ of components are said to be \emph{connected} if a
+%\begin{equation*}
+%	\forall c_i \in C, \exists c_j \in C, c_i\neq c_j, O_{c_i} \cap I_{c_j} \neq \varnothing \vee O_{c_j} \cap I_{c_i} \neq \varnothing.
+%\end{equation*}
 %A set $C$ of compatible, connected, scheduled components is a \emph{system} $S = (I_s, O_s, A_s, P_s, \phi, dispatch_s, complete_s)$, where:
-A set $C$ of compatible, connected, scheduled components is a \emph{system} $S = (I_s, O_s, A_s, P_s, dispatch_s, complete_s)$, where:
+%A set $C$ of compatible, connected, scheduled components is a \emph{system} $S = (I_s, O_s, A_s, P_s, dispatch_s, complete_s)$, where:
+A \emph{system} $S$ is a tuple $(C, \phi, I_s, O_s, A_s, P_s, dispatch_s, complete_s)$, where:
 \begin{itemize}
+	\item $C$ is a set of compatible, scheduled components,
+	\item $\phi$ is a schedule of $C$,	
 	\item $I_s = \cup_{\forall c \in C}I_c -  \cup_{\forall c \in C}O_c$,
 	\item $O_s = \cup_{\forall c \in C}O_c$,
 	\item $A_s$ and $P_s$ are two Boolean functions $\Sigma_{I_s \cup O_s} \rightarrow B$, called system-level \emph{assumptions} and \emph{guarantees}, respectively,
-%	\item $\phi$ is a schedule of $C$,	
 	\item $dispatch_s (i) = 
 	    	\begin{cases}
       		1, & \text{if}\ i \mod T =1 \\
@@ -163,29 +167,31 @@ A set $C$ of compatible, connected, scheduled components is a \emph{system} $S =
    	 	\end{cases}, \forall i \in N, i > 0$.
 \end{itemize}
 We have $I_s  \cup O_s = \cup_{\forall c \in C}(I_c \cup O_c)$.
-The \emph{behavior} of a system $S$ is a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$, such that $\forall \sigma_s \in \Sigma_{I_s \cup O_s}$, 
+The \emph{behaviors} of a system $S$ is a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$, such that $\forall \sigma_s \in \Sigma_{I_s \cup O_s}$, 
 \begin{equation*}
 	\sigma_s\in \Sigma_s  \iff \forall c \in C, \exists \sigma_c \in \Sigma_c, \sigma_s|_{I_c \cup O_c} = \sigma_c.
 \end{equation*}
+Informally, a trace of a system's ports is a behavior of the system if its projection onto any component's ports is a behavior of the component.
 We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). We use $\Delta_s$ to denote the set of all such intervals.
-Given a system $S$ and a trace $\sigma_s\in \Sigma_s$, we define the following propositions.
+Given a system $S$ and a trace $\sigma \in \Sigma_{I_s \cup O_s}$, we define the following propositions.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
-\label{eqn:assumption}
-	dispatch_s(n) \Rightarrow (\sigma_s, n) \models A_s, \forall n\in N.
+\label{eqn:sys_assumption}
+	dispatch_s(n) \implies (\sigma, n) \models A_s, \forall n\in N.
 \end{equation}
 
 Inputs freeze between dispatch and complete. That is,
 \begin{equation} 
-\label{eqn:inputfreeze}
-	x(i) = x(j), \forall i,j\in \delta_s \cap N, \forall \delta_s \in \Delta_s, \forall x \in \sigma_s|_{I_s}.
+\label{eqn:sys_inputfreeze}
+	x(i) = x(j), \forall i,j\in \delta_s \cap N, \forall \delta_s \in \Delta_s, \forall x \in \sigma|_{I_s}.
 \end{equation}
 
-The \emph{gurarantees} hold at \emph{complete}. That is,
+The \emph{guarantees} hold at \emph{complete}. That is,
 \begin{equation} 
-\label{eqn:guarantee}
-	complete_s(n) \Rightarrow (\sigma_s, n) \models P_s, \forall n\in N.
+\label{eqn:sys_guarantee}
+	complete_s(n) \implies (\sigma, n) \models P_s, \forall n\in N.
 \end{equation}
 
+Equation \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification to be verified.
 Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system is viewed as a component and activated periodically.
