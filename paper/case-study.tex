@@ -1,10 +1,20 @@
 
 
-In the DARPA CASE project, a suite of tools were developed to help system engineers design cyber-physical systems that must satisfy cyber-resiliency requirements.
-For demonstration, we modeled a UAV system. The target application is waterway monitor. The waterway area consists of a set of fly-in zones and fly-out zones. The goal of the UAV is to fly from one end of the waterway to the other end in minimum distance, while staying inside the fly-in zones and outside the fly-out zones.
+%For demonstration, we modeled a UAV system. The target application is waterway monitor. The waterway area consists of a set of fly-in zones and fly-out zones. The goal of the UAV is to fly from one end of the waterway to the other end in minimum distance, while staying inside the fly-in zones and outside the fly-out zones.
  
-Figure \ref{SW} shows an overview of the software architecture. The UAV software originally contains 5 threads: UxAS \cite{uxas}, waypoint plan manager, UART driver, radio driver, and fly zone database. They are associated with various levels of trustworthy. For example, the UxAS thread, used as a blackbox software component, was deemed as potentially security-compromised.
-By applying the CASE tools, a list of security vulnerabilities were identified. Then the user was guided by the tools to invoke a series of model transformations to address the vulnerabilities. The transformation automatically inserted assurance components (8 threads): attestation gate, attestation manager, 2 monitors, and 4 filters. The verification goal is to prove that the key system security properties are satisfied after the transformation.
+The CASE toolchain was developed as a part of the DARPA CASE program to help system engineers design cyber-physical systems that satisfy cyber-resiliency requirements.
+A UAV system was modeled as a part of the demonstration effort,
+and the UAV's goal was to fly from one end of a (meandering) waterway to the other while adhering to a set of keep-in and keep-out zones.
+
+Figure \ref{SW} shows an overview of the software architecture.
+The baseline UAV software contained the UxAS \cite{uxas}, waypoint plan manager, UART driver, radio driver, and fly zone database.
+These components were associated with varying levels of trustworthiness,
+in particular, the UxAS was treated as a blackbox software component and deemed as potentially security-compromised.
+The CASE toolchain's cyber-security analysis tools generated a list of requirements to mitigate the cyber-security vulnerabilities that they detected in the UAV model,
+and these requirements were addressed by the user using the CASE toolchain's model transformation tools.
+The transformations added the following high assurance components into the model:
+attestation gate, attestation manager, 2 monitors, and 4 filters.
+The specifications for these high assurance components were filled-in by the user based on the cyber security vulnerabilities being mitigated.
 
 \begin{figure}[ht!]
 \centering
@@ -12,11 +22,21 @@ By applying the CASE tools, a list of security vulnerabilities were identified. 
 \caption{A UAV Software Architecture Model in AADL \label{SW}}
 \end{figure}
 
-All 13 threads were mapped to the mission computer processor. The seL4 microkernel was chosen as part of the implementation platform. And an seL4 domain schedule was created. All threads are periodic with a period of 500 ms. Each thread is activated exactly once in the scheduling cycle. The allocated processor time for each thread ranges from 2 ms (filter/monitor) to 100 ms (UxAS).
+The hardened model (baseline plus high assurance components) contained 13 threads,
+all of which were mapped to a single mission computer processor running the seL4 microkernel (chosen for its cyber security properties).
+An seL4 domain schedule was added to the model with all threads designated to run once per scheduling cycle with a period of 500 ms.
+The processor time allocated to each thread ranged from 2 ms (filters and monitors) to 100 ms (UxAS).
+The verification goal was to prove that the key system security properties are satisfied by the hardened model with the components executing according to the seL4 domain schedule.
 
-Although in the AADL model, event and event data ports are mostly used, they are intended to model the event-triggered execution of periodic threads. 
-Since each thread executes exactly once in every scheduling cycle, the number of queued events or data is always equal or less than one. 
-Thus, the proposed modeling framework can be applied.
+We note that, although in the UAV's AADL model, event and event data ports are used, they are intended to model the event-triggered execution of periodic threads.
+In addition, since each thread executes once every scheduling cycle, the number of queued events or data is always equal or less than one,
+making this model suitable for the application of our modeling framework.
 
-Four system-level security properties were created to ensure: 1) the output UART and RF messages are \emph{well-formed}; 2) the system only responds to trusted sources; 3) the waypoints generated are \emph{geo-fenced}. The properties were proved in less than 2 minutes on a PC with 2.6 GHz CPU and 32 GB RAM.
+The following system-level security properties were to be verified in the presence of the seL4 domain schedule:
+\begin{itemize}
+	\item The output UART and RF messages are \emph{well-formed}
+	\item The system only responds to trusted sources
+	\item The waypoints generated are \emph{geo-fenced}
+\end{itemize}
+Our framework was able to prove these properties in less than 2 minutes on a PC with 2.6 GHz CPU and 32 GB RAM.
 
