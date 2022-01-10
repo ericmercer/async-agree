@@ -2,12 +2,12 @@
 
 Formal verification of cyber-physical systems can be a daunting task due to the \emph{state
 explosion problem} \cite{Clarke2012}. We tackle this challenge from two angles. First, we use a
-compositional verification technique \cite{cmc} to decompose the reasoning on the global state space into a
+compositional verification technique \cite{pnueli} \cite{cmc} to decompose the reasoning on the global state space into a
 number of localized problems for each component separately. The system proof is constructed
 from on the individual component proofs. Second, we assume the components execute in a static 
 sequential order. We do not consider all possible execution orders. In other words, non-determinism
 due to scheduling decisions is excluded. In fact, in many safety-critical applications the actual
-implementation executes according to a pre-defined schedule to achieve real-time performance
+implementation executes according to a pre-defined schedule \cite{executive} to achieve real-time performance
 requirements.  
 %, due to the sharing of a computational resource (e.g.
 %processor). And often, in particular for safety-critical applications, the execution order is
