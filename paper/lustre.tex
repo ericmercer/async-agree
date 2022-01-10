@@ -8,11 +8,11 @@ condact (cond, node(node\_inputs, node\_outputs), init\_outputs)
 If the Boolean signal $cond$ is true, node $node$ is activated and updates its local and output signals. Otherwise, the node keeps the previous value of the local and output signals. Before the first activation, the node outputs values are set to \emph{init\_outputs}. %\emph{condact} is essential to model the scheduling semantics. 
 We are aware that the standard Lustre language introduced similar temporal operators like \emph{when} and \emph{current}. We use \emph{condact} simply because it is supported by the underlying SMT solver.
 
-In AGREE, each AADL thread is translated to a Lustre node, where the thread input and output ports are both mapped to the node input signals. Thus, the \emph{condact} expression does not automatically freeze the thread outputs. We add assertions to enforce the output freeze rule. Figure \ref{WPMlustre} shows a part of a simplified Lustre model. It contains the Lustre node translated from the AADL thread in Figure \ref{wpmAGREE} with the original contracts. We use the thread \emph{complete} signal to clock the node.
+In AGREE, each AADL thread is translated to a Lustre node, where the thread input and output ports are both mapped to the node input signals. Thus, the \emph{condact} expression does not automatically freeze the thread outputs. We add assertions to enforce the output freeze rule. And we use the thread \emph{complete} signal to clock the node. Figure \ref{WPMlustre} shows one example. 
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{lustreCode5.jpg}
+\includegraphics[width=120mm]{lustreAsync5.jpg}
 \caption{A Lustre Model of a Scheduled AADL Thread \label{WPMlustre}}
 \end{figure}
 

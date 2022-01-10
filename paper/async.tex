@@ -1,18 +1,12 @@
 {\bf Signal.}
 A signal $x$ is a function $x: N \rightarrow V$, where $N$ is the set of natural numbers including zero, and $V$ is a value set. 
 A signal is \emph{Boolean} if the value set is the Boolean domain.
-We use $x(n)$ to denote the value of the signal $x$ at instant $n$. 
+We use $x(n)$ to denote the value of signal $x$ at instant $n$. 
 %A \emph{trace} $\sigma_x$ of a signal $x$ is a possibly infinite sequence of values $(x(1), x(2),... )$. 
-%We use $X_V$ to denote the set of all possible signals for a value set $V$.
-%The \emph{length} of a trace is the number of elements in the sequence. 
-%The length-$k$ trace of a signal $x$ is denoted as $x^k$.
-%The set of the length-$k$ traces of a set $X$ of signals is denoted as $X^k$.
-%The set of all possible traces of a signal $x$ is denoted as $x^{\omega}$. 
-%The set of all possible traces of a set $X$ of signals is denoted as $X^{\omega}$. 
 
 {\bf Port.}
 %Let $Q ={q_1, ...,q_M}$ be a set of ports, where $q_i$ is the name of the i-th port. 
-Let $Q$  be a set of ports. 
+Let $Q$ be a set of ports. 
 For each port $q \in Q$, a set $V_q$ denotes the values that may be assigned to port $q$. %$V_q$ is called the type of port $q$. 
 %A \emph{valuation} of $Q$ is an assignment of a value in $V_q$ to each port $q \in Q$.
 A signal $x_q$ at port $q$ is a function $x_q: N \rightarrow V_q$.
@@ -31,7 +25,7 @@ Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} 
 	\item $ \forall n,m\in N, n < m, dispatch(n) = 1 \wedge dispatch(m) = 1 \implies \exists k\in N, n < k < m, complete(k) = 1 $.
 \end{enumerate}
 
-The first condition states that \emph{dispatch} and \emph{complete} are mutual exclusive. The second and third condition state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth condition states that \emph{dispatch} and \emph{complete} appear alternately. 
+The first condition requires that \emph{dispatch} and \emph{complete} are mutual exclusive. The second and third condition state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth condition ensures that \emph{dispatch} and \emph{complete} appear alternately. 
 From hereon we only consider a well-ordered pair (\emph{dispatch}, \emph{complete}).
 
 An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a set of integers $[n, m] \cap N, n,m \in N, n < m$, satisfying:
@@ -53,7 +47,7 @@ A (scheduled) component $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complet
 %	\item $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, called behavior,
 %	\item $A_c$ and $P_c$ are prefix-closed subsets of $(I_c \cup O_c)^\omega$, called \emph{assumptions} and \emph{guarantees}, respectively,
 %	\item $A_c$ and $P_c$ are two Boolean functions $(I_c \cup O_c)^\omega \rightarrow B$, called \emph{assumptions} and \emph{guarantees}, respectively,	
-	\item $A_c$ and $P_c$ are two Boolean functions $\Sigma_{I_c \cup O_c} \rightarrow B$, called \emph{assumptions} and \emph{guarantees}, respectively,	
+	\item $A_c$ and $P_c$ are two past-time LTL formulas on a trace $\sigma_c \in \Sigma_{I_c \cup O_c}$, called \emph{assumptions} and \emph{guarantees}, respectively,	
     	\item ($dispatch_c$, $complete_c$) is a pair of \emph{well-ordered} Boolean signals.
 \end{itemize}
 %A \emph{trace} $\sigma_c$ of a component $c$ is an assignment of a signal $x_q$ to each port $q$ in $I \cup O$.
@@ -103,7 +97,7 @@ Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
 Note that by definition the intersection of a component's inputs and outputs is empty. Thus, we forbid a component from connecting to itself.
 
 {\bf Schedule.}
-Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T]  \cap N\rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$ satisfying:
+Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T]  \cap N\rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$, where \textsf{Dispatch} and \textsf{Complete}\ are two strings, satisfying:
 
 \begin{enumerate}
 	\item $ \forall i \in \text{dom }\phi, c\in C, \phi(i) = (c, \textsf{Dispatch}) \implies \exists j\in \text{dom }\phi, j > i, \phi(j) =  (c, \textsf{Complete}) $,
@@ -115,10 +109,10 @@ Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{lengt
 
 The first three conditions ensure the pair (\textsf{Dispatch}, \textsf{Complete}) associated with a component is \emph{well-ordered} in a schedule. 
 The fourth condition allows a component to be \emph{preempted} by another component if they two have no connection. The fifth condition ensures the scheduling events of two components are interleaved in a proper order.
-If the schedule is not preemptive, we could simplify the notation and denote a schedule as a function that maps $[1, |C|] \cap N$ to $C$, as shown in the previous examples.
-%A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant either a \emph{dispatch} or a \emph{complete} . 
+A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant there is either a \emph{dispatch} or a \emph{complete} . 
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
 %In our framework, we only consider fair schedules.
+If a minimal schedule is not preemptive, we could simplify the notation and denote the schedule as a function that maps $[1, |C|] \cap N$ to $C$, as shown in the previous examples.
 
 Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of each component $c \in C$ are defined as follows: $\forall i \in N$,
 \begin{equation*}
@@ -156,7 +150,7 @@ A \emph{system} $S$ is a tuple $(C, \phi, I_s, O_s, A_s, P_s, dispatch_s, comple
 	\item $\phi$ is a schedule of $C$,	
 	\item $I_s = \cup_{\forall c \in C}I_c -  \cup_{\forall c \in C}O_c$,
 	\item $O_s = \cup_{\forall c \in C}O_c$,
-	\item $A_s$ and $P_s$ are two Boolean functions $\Sigma_{I_s \cup O_s} \rightarrow B$, called system-level \emph{assumptions} and \emph{guarantees}, respectively,
+	\item $A_s$ and $P_s$ are two past-time LTL formulas on a trace $\sigma_s \in \Sigma_{I_s \cup O_s}$, called system-level \emph{assumptions} and \emph{guarantees}, respectively,
 	\item $dispatch_s (i) = 
 	    	\begin{cases}
       		1, & \text{if}\ i \mod T =1 \\
@@ -173,28 +167,29 @@ The \emph{behaviors} of a system $S$ is a set $\Sigma_s \subseteq \Sigma_{I_s \c
 \begin{equation*}
 	\sigma_s\in \Sigma_s  \iff \forall c \in C, \exists \sigma_c \in \Sigma_c, \sigma_s|_{I_c \cup O_c} = \sigma_c.
 \end{equation*}
-Informally, a trace of a system's ports is a behavior of the system if its projection onto any component's ports is a behavior of the component. 
+Informally, a trace of a system's ports is a behavior of the system if and only if its projection onto any component's ports is a behavior of the component. 
 This implies a system behavior maps the connected ports to the same signal.
 We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). We use $\Delta_s$ to denote the set of all such intervals.
-Given a system $S$ and a trace $\sigma \in \Sigma_{I_s \cup O_s}$, we define the following propositions.
+Given a system $S$ and a trace $\sigma_s \in \Sigma_{I_s \cup O_s}$, we define the following propositions.
 
-The \emph{assumptions} hold at \emph{dispatch}. That is,
+The system-level \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
 \label{eqn:sys_assumption}
-	dispatch_s(n) \implies (\sigma, n) \models A_s, \forall n\in N.
+	dispatch_s(n) \implies (\sigma_s, n) \models A_s, \forall n\in N.
 \end{equation}
 
 Inputs freeze between dispatch and complete. That is,
 \begin{equation} 
 \label{eqn:sys_inputfreeze}
-	x(i) = x(j), \forall i,j\in \delta_s \cap N, \forall \delta_s \in \Delta_s, \forall x \in \sigma|_{I_s}.
+	x(i) = x(j), \forall i,j\in \delta_s \cap N, \forall \delta_s \in \Delta_s, \forall x \in \sigma_s|_{I_s}.
 \end{equation}
 
-The \emph{guarantees} hold at \emph{complete}. That is,
+The system-level \emph{guarantees} hold at \emph{complete}. That is,
 \begin{equation} 
 \label{eqn:sys_guarantee}
-	complete_s(n) \implies (\sigma, n) \models P_s, \forall n\in N.
+	complete_s(n) \implies (\sigma_s, n) \models P_s, \forall n\in N.
 \end{equation}
 
-Equation \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components.
+Equation \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
+Informally, our verification problem is to check whether the system behaviors satisfy the system specification. 
 Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system is viewed as a component and activated periodically.

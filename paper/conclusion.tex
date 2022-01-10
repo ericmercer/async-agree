@@ -1,5 +1,5 @@
-{\bf Conclusion.}
-Based on the AGREE framework, we presented an approach to assume-guarantee reasoning of scheduled components. The proposed model of computation differs from the synchronous model used in current framework. We introduced the virtual scheduling events to tie AADL timing and execution semantics with AGREE contracts. The effectiveness of our approach is demonstrated in the compositional verification of the DARPA CASE UAV model.
+%{\bf Conclusion.}
+Based on the AGREE framework, we presented an approach to the assume-guarantee reasoning of scheduled components. The proposed model of computation differs from the synchronous model used in the current framework. We introduced the virtual scheduling events to tie AADL execution semantics with AGREE contracts. The effectiveness and practicality of our approach is demonstrated in the compositional verification of the DARPA CASE UAV model.
 
-{\bf Future Work.}
-In the proposed model, the queue associated with an AADL event port or event data port is limited to size of one. This limitation is due to our domain of interest. We believe it is an interesting research direction to extend the modeling framework to allow a larger queue size, particularly for multi-rate dataflow-based applications. Given a \emph{balanced} static schedule, the maximum size of each queue is a constant that can be calculated. In general, the AADL scheduling tool Cheddar could be used to predict the maximum queue size.
+%{\bf Future Work.}
+In the proposed model, the queue associated with an AADL event or event data port is limited to size of one. This limitation is due to our domain of interest. One interesting future work is to extend the modeling framework to allow a larger queue size. Note that given a \emph{balanced} schedule, the maximum size of each queue is a constant that can be calculated from the schedule.

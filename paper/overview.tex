@@ -24,16 +24,16 @@ The two events shall appear in pairs and alternately. \emph{dispatch} shall appe
 
 In SCADE and SIGNAL, when a component is not activated, its outputs keep their previous values. We extend the output freeze time window to between \emph{complete} events, including activation. We understand in practice, the actual output values may change during activation. We choose this because we interpret the \emph{guarantees} as steady-state requirements of outputs at \emph{complete}. The outputs values between dispatch and complete is undefined. Thus, we model them with the last outputs values, so that the outputs have well-defined behavior at every instant.
 
-We inherit the same notion of composition used in the current AGREE framework. A connection between two components means their contracts refer to the same variable. 
-This, combined with a schedule, essentially simulates an asynchronous communication between components with \emph{shared variable}. 
-%This is consistent with the AADL data port sampling semantics. 
-We consider single-machine schedules. The scheduler ensures at most one component is activated at a time. For a preemptive schedule, we require a component can only be preempted by another component if they do not have connections. Thus, there is no ambiguity on the order of read and write or the variable value referenced in the contracts.
-The communication channel may also be viewed as a buffer or queue of size one. %The writer overwrites when overflow occurs. The reader reads the last value if the buffer is empty. 
+We inherit the same notion of composition used in the current AGREE framework. A connection between two components means their contracts refer to the same signal. 
+This, combined with a schedule and the output freeze rule, essentially simulates communication based on \emph{shared variable}. When the producer is not activated, its outputs hold the last values. When the consumer is activated, it reads the last values from the producer. The communication may also be viewed as a FIFO queue, where the queue size is one. %The writer overwrites when overflow occurs. %The reader reads the previous value if the buffer is empty. 
 This means the proposed model only supports limited AADL event data port communication.
- 
-We assume the system-level inputs do not change values when the ultimate destination component is activated. In practice, this means there may exist a queue that stores the system-level input messages, which are periodically sampled by the components. Or the inputs may come from another system, which is inactive while the system is active.
+%This is consistent with the AADL data port sampling semantics. 
 
-The inputs freeze rule may imply the assumptions could be examined at \emph{complete}, instead of \emph{dispatch}. Thus, we may not need the \emph{dispatch} event. We keep it mainly due to two considerations. First, the assumptions in general could depend on the past outputs. And the outputs are updated at \emph{complete}. So the outputs values at \emph{dispatch} may be different from the values at the matching \emph{complete}. Therefore, it is important to distinguish the two events to avoid ambiguity of the outputs values. Second, we find the pair (\emph{dispatch}, \emph{complete}) helps users better understand the counterexample trace, particularly with a preemptive schedule.
+We consider single-machine schedules. The scheduler ensures at most one component is activated at a time. For a preemptive schedule, we require a component can only be preempted by another component if they do not have connections. Thus, there is no ambiguity on the order of read and write or the variable value referenced in the contracts.
+ 
+We assume the system-level inputs do not change values throughout a scheduling cycle. In practice, this means there may exist a queue that hold the system-level input messages, which are periodically sampled by the components. Or the inputs may come from another system, which is inactive while the system under consideration is active.
+
+The inputs freeze rule may imply the assumptions could be examined at \emph{complete}, instead of \emph{dispatch}. Thus, it seems that we may not need the \emph{dispatch} event. We keep it mainly due to two reasons. First, the assumptions in general could depend on the past outputs. And in our model, the outputs are updated at \emph{complete}. So the outputs values at \emph{dispatch} may be different from the values at the matching \emph{complete}. Therefore, it is important to distinguish the two events to avoid ambiguity of the outputs values. Second, we find the pair (\emph{dispatch}, \emph{complete}) helps users better understand the counterexample trace, particularly with a preemptive schedule.
 
 %{\bf Model of Real-Time Schedule.}
 The original schedule is often specified in form of a sequence of time slots assigned to the components. 

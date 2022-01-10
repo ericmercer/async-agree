@@ -1,4 +1,4 @@
-The AADL standard by itself does not have a well-defined execution semantics. In order to formally verify an AADL model, it is often translated to a formal model \cite{AADL2TASM} \cite{AADL2Sync} \cite{AADL2TLA} \cite{AADS} \cite{AADL2BIP}. Then a formal method is applied to analyze the translated model.
+The AADL standard by itself does not have a well-defined execution semantics. In order to formally verify an AADL model, it is often translated to a formal model, like timed automata \cite{behaviorAnnex}, Lustre \cite{AADL2Sync}, and Real-Time Maude \cite{maude}. Then a formal method is applied to analyze the translated model. 
 
 In \emph{aadl2sync} \cite{AADL2Sync}, the AADL behavior models are translated to synchronous programs mainly for simulation. It uses activation condition to model sporadic execution of software components. However, the proposed framework focuses on simulating the detailed timed behavior (with the presence of clock drift). Meanwhile, we focus on the formal verification of system properties based on component requirements, which in general do not completely define component behavior.
 

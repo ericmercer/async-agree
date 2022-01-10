@@ -2,9 +2,9 @@
 
 Formal verification of cyber-physical systems can be a daunting task due to the \emph{state
 explosion problem} \cite{Clarke2012}. We tackle this challenge from two angles. First, we use a
-compositional verification technique to decompose the reasoning on the global state space into a
+compositional verification technique \cite{cmc} to decompose the reasoning on the global state space into a
 number of localized problems for each component separately. The system proof is constructed
-from on the individual component proofs. Second, we assume the components execute in a static, pre-defined
+from on the individual component proofs. Second, we assume the components execute in a static 
 sequential order. We do not consider all possible execution orders. In other words, non-determinism
 due to scheduling decisions is excluded. In fact, in many safety-critical applications the actual
 implementation executes according to a pre-defined schedule to achieve real-time performance
@@ -42,6 +42,6 @@ In previous work, we developed the Assume Guarantee Reasoning Environment (AGREE
 
 AGREE was originally developed to reason about systems that execute synchronously. These systems have straightforward translations to \emph{Lustre}, a synchronous dataflow language interpreted by the model checkers used by AGREE. However, many systems that are modeled in AADL do not behave synchronously. Ideally one can implement a communication protocol between components, such as Physically Asynchronous Logically Synchronous (PALS)~\cite{pals}, that allows the abstraction of synchronous communication to be sound. However, for many systems this is not the case.
 
-In this paper, we extend the AGREE framework to enable verification of asynchronous system architectures. We introduce virtual scheduling events, which tie AADL timing and scheduling semantics to AGREE contracts. This enhancement enables AGREE to better preserve the full AADL semantics and take the software execution schedule into account in the analysis.  Furthermore, it enables formal verification of a new class of embedded system architectures. 
+In this paper, we extend the AGREE framework to enable verification of scheduled AADL models. We introduce virtual scheduling events, which tie AADL timing and scheduling semantics to AGREE contracts. This enhancement enables AGREE to take the software execution schedule into account in the analysis. Furthermore, it enables formal verification of a new class of embedded system architectures. 
 
-First we illustrate the motivation of our work using simple examples in Section~\ref{example}. We then provide a informal description of our interpretation of the asynchronous semantics in Section~\ref{overview}, followed by formal definitions of the model in Section~\ref{async}. We present the modeling of the semantics in AGREE AADL annex and Lustre backend in Section~\ref{agree} and Section~\ref{lustre}, respectively. We demonstrate usage of the proposal model in a case study in Section~\ref{case-study}. Related work is presented in Section~\ref{rw}.  We discuss our conclusions and future work in Section~\ref{conclusion}.  
+First we illustrate the motivation of our work using simple examples in Section~\ref{example}. We then provide an informal description of our interpretation of the scheduling semantics in Section~\ref{overview}, followed by formal definitions of the model in Section~\ref{async}. We present the modeling of the semantics in AGREE AADL annex and Lustre backend in Section~\ref{agree} and Section~\ref{lustre}, respectively. We demonstrate usage of the proposal model in a case study in Section~\ref{case-study}. Related work is presented in Section~\ref{rw}.  We discuss our conclusion and future work in Section~\ref{conclusion}.  
