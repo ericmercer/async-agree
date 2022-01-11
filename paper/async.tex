@@ -4,7 +4,7 @@ A signal is \emph{Boolean} if the value set is the Boolean domain.
 We use $x(n)$ to denote the value of signal $x$ at instant $n$. 
 %A \emph{trace} $\sigma_x$ of a signal $x$ is a possibly infinite sequence of values $(x(1), x(2),... )$. 
 
-{\bf Port.}
+\noindent{\bf Port.}
 %Let $Q ={q_1, ...,q_M}$ be a set of ports, where $q_i$ is the name of the i-th port. 
 Let $Q$ be a set of ports. 
 For each port $q \in Q$, a set $V_q$ denotes the values that may be assigned to port $q$. %$V_q$ is called the type of port $q$. 
@@ -14,7 +14,7 @@ A \emph{trace} $\sigma_Q$ of $Q$ is an assignment of a signal $x_q$ to each port
 We use $\Sigma_Q$ to denote the set of all traces of $Q$.
 Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto $Q'$ is the assignment of signal $x_q$ to each port $q$ in $Q'$, as defined in $\sigma_Q$. We denote the projection as $\sigma_Q|_{Q'}$.
  
-{\bf Dispatch and Complete.}
+\noindent{\bf Dispatch and Complete.}
 Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
 
 \begin{enumerate}
@@ -25,7 +25,7 @@ Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} 
 	\item $ \forall n,m\in N, n < m, complete(n) = 1 \wedge complete(m) = 1 \implies \exists k\in N, n < k < m, dispatch(k) = 1 $.
 \end{enumerate}
 
-The first condition requires that \emph{dispatch} and \emph{complete} are mutual exclusive. The second and third condition state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth and fifth condition ensure that \emph{dispatch} and \emph{complete} appear alternately. 
+The first condition requires that \emph{dispatch} and \emph{complete} are mutually exclusive. The second and third conditions state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth and fifth conditions ensure that \emph{dispatch} and \emph{complete} appear alternately. 
 From hereon we only consider a well-ordered pair (\emph{dispatch}, \emph{complete}).
 
 An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a set of integers $[n, m] \cap N, n,m \in N, n < m$, satisfying:
@@ -38,7 +38,7 @@ An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a se
 
 We denote the set of all such intervals as $\Delta$.
 
-{\bf Component.}
+\noindent{\bf Component.}
 A (scheduled) \emph{component} $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where: 
 
 \begin{itemize}
@@ -89,14 +89,14 @@ Outputs freeze between \emph{completes}. That is,
 \end{equation}
 Equation \ref{eqn:assumption}, \ref{eqn:inputfreeze}, \ref{eqn:guarantee}, and \ref{eqn:outputfreeze} represent the specification of a scheduled component.
 
-{\bf Connection.}
+\noindent{\bf Connection.}
 Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
 \begin{equation*}
 	O_c \cap I_{c'} \neq \varnothing \vee O_{c'} \cap I_c \neq \varnothing.
 \end{equation*}
 Note that by definition the intersection of a component's inputs and outputs is empty. Thus, we forbid a component from connecting to itself.
 
-{\bf Schedule.}
+\noindent{\bf Schedule.}
 Let $C$ be a finite set of components, a \emph{schedule} $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T]  \cap N\rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$, where \textsf{Dispatch} and \textsf{Complete}\ are two strings, satisfying:
 
 \begin{enumerate}
@@ -110,13 +110,13 @@ Let $C$ be a finite set of components, a \emph{schedule} $\phi$ of $C$ with \emp
 \end{enumerate}
 
 The first four conditions ensure the pair (\textsf{Dispatch}, \textsf{Complete}) associated with a component is \emph{well-ordered} in a schedule. 
-The fifth condition allows a component to be \emph{preempted} by another component if they two have no connection. The sixth condition ensures the scheduling events of two components are interleaved in a proper order.
+The fifth condition allows a component to be \emph{preempted} by another component if the two have no connection. The sixth condition ensures the scheduling events of two components are interleaved in a proper order.
 A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant there is either a \emph{dispatch} or a \emph{complete}. 
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
 %In our framework, we only consider fair schedules.
 If a schedule is minimal and non-preemptive, we could simplify the notation and denote the schedule as a function that maps $[1, |C|] \cap N$ to $C$, as shown in the previous examples.
 
-Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of each component $c \in C$ are defined as follows: $\forall i \in N$,
+Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signals of each component $c \in C$ are defined as follows: $\forall i \in N$,
 \begin{equation*}
 \label{eqn:dispatch}
     dispatch_c^\phi(i) =
@@ -135,7 +135,7 @@ Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complet
     \end{cases}.
 \end{equation*}
 
-{\bf System.}
+\noindent{\bf System.}
 A set $C$ of components are said to be \emph{compatible} if no two components drive the same output. That is,
 \begin{equation*}
 	\forall c_i,c_j \in C, c_i\neq c_j, O_{c_i} \cap O_{c_j} = \varnothing.
@@ -192,6 +192,6 @@ The system-level \emph{guarantees} hold at \emph{complete}. That is,
 	complete_s(n) \implies (\sigma_s, n) \models P_s, \forall n\in N.
 \end{equation}
 
-Equation \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
+Equations \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
 Our verification goal is to prove that the system behaviors satisfy the system specification. 
 Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system is viewed as a component and activated periodically.
