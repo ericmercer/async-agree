@@ -49,16 +49,16 @@ The assumptions in a scheduled component hold at dispatch, and the guarantees of
 A component also assumes its inputs are invariant through the dispatch interval and the outputs are invariant between complete cycles.
 These requirements are captured in the following predicates where $x$ is either a system or a component:
 \begin{eqnarray*}
-  \dispred_x(\assumes_x) &=& \left[\left(\dispatch^\schedule_x \wedge \assumes_c\right) \vee \left(\dpred_x \wedge \same{\inputs_x}\right)\right] \\
+  \dispred_x(\assumes_x) &=& \left[\left(\dispatch^\schedule_x \wedge \assumes_x\right) \vee \left(\dpred_x \wedge \same{\inputs_x}\right)\right] \\
   \compred_c(\guarantees_c) &=& \left[\left(\complete^\schedule_c \wedge \guarantees_c\right) \vee \left(\neg\complete^\schedule_c \wedge \same{\outputs_c}\right)\right] \\
   \compred_s(\guarantees_s) &=& \complete^\schedule_s \wedge \guarantees_s
 \end{eqnarray*}
 
 The assumptions must hold at dispatch and the inputs may not change during activation.
 %(I think this is too strong and is only needed a the system level). 
-The guarantees must hold at complete and the outputs must not change between completions.
-These are true for components or systems.
-A scheduled system, $\system = (\inputs, \outputs, \assumes, \guarantees, \schedule)$, is correct if and only if for all $\pi$ and for all $i \ge 0$ the following holds:
+The guarantees must hold at complete.
+These are true for components or systems. The component outputs must not change between completions.
+A scheduled system, $\system = (\components, \schedule, \inputs, \outputs, \assumes, \guarantees)$, is correct if and only if for all $\pi$ and for all $i \ge 0$ the following holds:
 \[
 \begin{array}{lll}
         & \forall c \in \components &  
@@ -71,5 +71,5 @@ A scheduled system, $\system = (\inputs, \outputs, \assumes, \guarantees, \sched
             \implies \compred_{\system}\left(\guarantees\right)\right]
 \end{array}
 \]
-Here the system itself needs a dispatch cycle in the schedule to ensure the input hold through that cycle and the output hold between cycles. As before, if both conditions hold, then a scheduled system is said to be correct meaning that $\globally\left[\historically\left(\dispred_S\left(\assumes\right)\right) 
+Here the system itself needs a dispatch cycle in the schedule to ensure the input hold through that cycle. As before, if both conditions hold, then a scheduled system is said to be correct meaning that $\globally\left[\historically\left(\dispred_S\left(\assumes\right)\right) 
 \implies \compred_{\system}\left(\guarantees\right)\right]$ holds.
