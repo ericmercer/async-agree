@@ -192,6 +192,8 @@ The system-level \emph{guarantees} hold at \emph{complete}. That is,
 	complete_s(n) \implies (\sigma_s, n) \models P_s, \forall n\in N.
 \end{equation}
 
-Equations \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
+%Equations \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
+Equations \ref{eqn:sys_assumption}--\ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
 Our verification goal is to prove that the system behaviors satisfy the system specification. 
-Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system is viewed as a component and activated periodically.
+Note that we do not define the system output freeze rule.
+This is because (in our context) the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system is viewed as a periodically activated component.% and activated periodically.
