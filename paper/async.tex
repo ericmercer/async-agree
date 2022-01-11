@@ -1,5 +1,5 @@
 {\bf Signal.}
-A signal $x$ is a function $x: N \rightarrow V$, where $N$ is the set of natural numbers including zero, and $V$ is a value set. 
+A \emph{signal} $x$ is a function $x: N \rightarrow V$, where $N$ is the set of natural numbers including zero, and $V$ is a value set. 
 A signal is \emph{Boolean} if the value set is the Boolean domain.
 We use $x(n)$ to denote the value of signal $x$ at instant $n$. 
 %A \emph{trace} $\sigma_x$ of a signal $x$ is a possibly infinite sequence of values $(x(1), x(2),... )$. 
@@ -18,14 +18,14 @@ Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto $
 Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
 
 \begin{enumerate}
-%	\item $ \nexists n\in N, dispatch(n) = 1 \text{ and } complete(n) =  1 $, 
 	\item $\forall n \in N, dispatch(n) \ne 1 \vee complete(n) \ne 1 $,
 	\item $ \forall n\in N, dispatch(n) = 1 \implies \exists m\in N, m > n, complete(m) =  1 $,
 	\item $ \forall m\in N, complete(m) = 1 \implies \exists n\in N, n < m, dispatch(n) =  1 $,
 	\item $ \forall n,m\in N, n < m, dispatch(n) = 1 \wedge dispatch(m) = 1 \implies \exists k\in N, n < k < m, complete(k) = 1 $.
+	\item $ \forall n,m\in N, n < m, complete(n) = 1 \wedge complete(m) = 1 \implies \exists k\in N, n < k < m, dispatch(k) = 1 $.
 \end{enumerate}
 
-The first condition requires that \emph{dispatch} and \emph{complete} are mutual exclusive. The second and third condition state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth condition ensures that \emph{dispatch} and \emph{complete} appear alternately. 
+The first condition requires that \emph{dispatch} and \emph{complete} are mutual exclusive. The second and third condition state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth and fifth condition ensure that \emph{dispatch} and \emph{complete} appear alternately. 
 From hereon we only consider a well-ordered pair (\emph{dispatch}, \emph{complete}).
 
 An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a set of integers $[n, m] \cap N, n,m \in N, n < m$, satisfying:
@@ -39,7 +39,7 @@ An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a se
 We denote the set of all such intervals as $\Delta$.
 
 {\bf Component.}
-A (scheduled) component $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where: 
+A (scheduled) \emph{component} $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where: 
 
 \begin{itemize}
     	\item $I_c$ is a finite set of ports, called \emph{inputs},
@@ -59,7 +59,7 @@ A (scheduled) component $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complet
 %A component satisfies the following rules.
 %Given a component $c$ and a trace $\sigma_c \in \Sigma_{I_c \cup O_c}$, we define the following propositions:
 
-The \emph{behaviors} of a component $c$ is a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that $\forall \sigma_c \in \Sigma_{I_c \cup O_c}, \sigma_c \in \Sigma_c $ if and only if the following propositions hold.
+The \emph{behaviors} of a component $c$ are a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that $\forall \sigma_c \in \Sigma_{I_c \cup O_c}, \sigma_c \in \Sigma_c $ if and only if the following propositions hold.
 %A component $c$ is said to be \emph{consistent} if for all $\sigma_c \in \Sigma_c$ the following propositions hold.
 
 The \emph{assumptions} hold at \emph{dispatch}. That is,
@@ -97,22 +97,24 @@ Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
 Note that by definition the intersection of a component's inputs and outputs is empty. Thus, we forbid a component from connecting to itself.
 
 {\bf Schedule.}
-Let $C$ be a finite set of components, a schedule $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T]  \cap N\rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$, where \textsf{Dispatch} and \textsf{Complete}\ are two strings, satisfying:
+Let $C$ be a finite set of components, a \emph{schedule} $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T]  \cap N\rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$, where \textsf{Dispatch} and \textsf{Complete}\ are two strings, satisfying:
 
 \begin{enumerate}
 	\item $ \forall i \in \text{dom }\phi, c\in C, \phi(i) = (c, \textsf{Dispatch}) \implies \exists j\in \text{dom }\phi, j > i, \phi(j) =  (c, \textsf{Complete}) $,
 	\item $ \forall j \in \text{dom }\phi, c\in C, \phi(j) = (c, \textsf{Complete}) \implies \exists i\in \text{dom }\phi, i < j, \phi(i) =  (c, \textsf{Dispatch}) $,
-	\item $ \forall i, j \in \text{dom }\phi, i < j, c\in C,  \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c, \textsf{Dispatch}) \implies \exists k\in \text{dom }\phi, i < k < j, \phi(j) =  (c, \textsf{Complete}) $,
-	\item $ \forall i, j \in \text{dom }\phi, i < j, c, c'\in C, c \neq c', \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c', \textsf{Dispatch}) \wedge \forall n \in N, i < n <j, \phi(n) \neq (c, \textsf{Complete}) \implies c, c'$ are not connected.
-	\item $ \forall i, j, k \in \text{dom }\phi, i < j < k, c, c'\in C, c \neq c', \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c', \textsf{Dispatch}) \wedge \phi(k) = (c, \textsf{Complete}) \implies \exists n \in N, j < n < k, \phi(n) = (c', \textsf{Complete}) $.
+	\item $ \forall i, j \in \text{dom }\phi, i < j, c\in C,  \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c, \textsf{Dispatch}) \implies \exists k\in \text{dom }\phi, i < k < j, \phi(k) =  (c, \textsf{Complete}) $,
+	\item $ \forall i, j \in \text{dom }\phi, i < j, c\in C,  \phi(i) = (c, \textsf{Complete}) \wedge \phi(j) = (c, \textsf{Complete}) \implies \exists k\in \text{dom }\phi, i < k < j, \phi(k) =  (c, \textsf{Dispatch}) $,
+	\item $ \forall i, j \in \text{dom }\phi, i < j, c, c'\in C, c \neq c', \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c', \textsf{Dispatch}) \wedge \forall k \in \text{dom }\phi, i < k <j, \phi(k) \neq (c,
+ \textsf{Complete}) \implies c, c'$ are not connected,
+	\item $ \forall i, j, k \in \text{dom }\phi, i < j < k, c, c'\in C, c \neq c', \phi(i) = (c, \textsf{Dispatch}) \wedge \phi(j) = (c', \textsf{Dispatch}) \wedge \phi(k) = (c, \textsf{Complete}) \implies \exists n \in \text{dom }\phi, j < n < k, \phi(n) = (c', \textsf{Complete}) $.
 \end{enumerate}
 
-The first three conditions ensure the pair (\textsf{Dispatch}, \textsf{Complete}) associated with a component is \emph{well-ordered} in a schedule. 
-The fourth condition allows a component to be \emph{preempted} by another component if they two have no connection. The fifth condition ensures the scheduling events of two components are interleaved in a proper order.
-A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant there is either a \emph{dispatch} or a \emph{complete} . 
+The first four conditions ensure the pair (\textsf{Dispatch}, \textsf{Complete}) associated with a component is \emph{well-ordered} in a schedule. 
+The fifth condition allows a component to be \emph{preempted} by another component if they two have no connection. The sixth condition ensures the scheduling events of two components are interleaved in a proper order.
+A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant there is either a \emph{dispatch} or a \emph{complete}. 
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
 %In our framework, we only consider fair schedules.
-If a minimal schedule is not preemptive, we could simplify the notation and denote the schedule as a function that maps $[1, |C|] \cap N$ to $C$, as shown in the previous examples.
+If a schedule is minimal and non-preemptive, we could simplify the notation and denote the schedule as a function that maps $[1, |C|] \cap N$ to $C$, as shown in the previous examples.
 
 Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signal of each component $c \in C$ are defined as follows: $\forall i \in N$,
 \begin{equation*}
@@ -163,13 +165,13 @@ A \emph{system} $S$ is a tuple $(C, \phi, I_s, O_s, A_s, P_s, dispatch_s, comple
    	 	\end{cases}, \forall i \in N, i > 0$.
 \end{itemize}
 We have $I_s  \cup O_s = \cup_{\forall c \in C}(I_c \cup O_c)$.
-The \emph{behaviors} of a system $S$ is a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$, such that $\forall \sigma_s \in \Sigma_{I_s \cup O_s}$, 
+The \emph{behaviors} of a system $S$ are a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$, such that $\forall \sigma_s \in \Sigma_{I_s \cup O_s}$, 
 \begin{equation*}
 	\sigma_s\in \Sigma_s  \iff \forall c \in C, \exists \sigma_c \in \Sigma_c, \sigma_s|_{I_c \cup O_c} = \sigma_c.
 \end{equation*}
 Informally, a trace of a system's ports is a behavior of the system if and only if its projection onto any component's ports is a behavior of the component. 
 This implies a system behavior maps the connected ports to the same signal.
-We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). We use $\Delta_s$ to denote the set of all such intervals.
+We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). And we use $\Delta_s$ to denote the set of all such intervals.
 Given a system $S$ and a trace $\sigma_s \in \Sigma_{I_s \cup O_s}$, we define the following propositions.
 
 The system-level \emph{assumptions} hold at \emph{dispatch}. That is,
@@ -191,5 +193,5 @@ The system-level \emph{guarantees} hold at \emph{complete}. That is,
 \end{equation}
 
 Equation \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
-Informally, our verification problem is to check whether the system behaviors satisfy the system specification. 
+Our verification goal is to prove that the system behaviors satisfy the system specification. 
 Note that we do not define the system output freeze rule. This is because in our context, the system under consideration is always active. The rule would make sense in the assume-guarantee reasoning at a higher level in the hierarchy, where the system is viewed as a component and activated periodically.

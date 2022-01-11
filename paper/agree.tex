@@ -1,4 +1,4 @@
-The scheduling semantics can often be directly modeled in the AADL AGREE annex. At the component level, this requires introducing two Boolean variables \emph{dispatch} and \emph{complete}, augmenting the original contracts with \emph{dispatch} or \emph{complete}, and adding additional \emph{guarantees} to enforce the output freeze rule. We often omit the \emph{assumptions} of frozen inputs, as they are trivially satisfied by the schedule definition, the output freeze rule, and the system-level assumptions.
+The scheduling semantics can often be directly modeled in the AADL AGREE annex. At the component level, this requires introducing two Boolean variables \emph{dispatch} and \emph{complete}, augmenting the original assumption and \emph{guarantees} with \emph{dispatch} and \emph{complete}, respectively, and adding additional \emph{guarantees} to enforce the output freeze rule. We often omit the assumptions of frozen inputs, as they are trivially satisfied by the schedule definition, the output freeze rule, and the system-level assumptions.
 
 \begin{figure}[ht!]
 \centering
@@ -6,7 +6,7 @@ The scheduling semantics can often be directly modeled in the AADL AGREE annex. 
 \caption{Modeling of Scheduling Semantics in AGREE\label{wpmAGREE}}
 \end{figure}
 
-Figure \ref{wpmAGREE} shows a simplified AADL model originally developed in the CASE project. The first two \emph{guarantees} are added to freeze the outputs between completions. And the original contract (the \emph{assumption} and the third \emph{guarantee}) are augmented with \emph{dispatch} and \emph{complete}.
+Figure \ref{wpmAGREE} shows a simplified AADL model originally developed in the CASE project. The first two \emph{guarantees} are added to freeze the outputs between completions. And the original contract (the assumption and the third \emph{guarantee}) are augmented with \emph{dispatch} and \emph{complete}.
 In practice, we find that direct modeling is helpful to clarify the semantics with users. However, in general it could be a complex task, particularly if the contracts depend on past history. We rely on the Lustre backend model to handle the general case.
 
 At the system-level, we use a circular counter to model a cyclic schedule in AGREE. 
