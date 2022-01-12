@@ -71,12 +71,12 @@ A scheduled system, $\system = (\components, \schedule, \inputs, \outputs, \assu
             \implies \left(\complete^\schedule_s \wedge \guarantees_s\right)\right]
 \end{array}
 \]
-The first set of verification conditions, one for each component, checks compatibility between connected components.
+Here the system itself has a dispatch cycle in the schedule as discussed in the prior section.
+The first set of verification conditions, one condition in the set for each component, checks compatibility between connected components.
 Component outputs that are consumed by downstream components as inputs must have guarantees strong enough to satisfy input assumptions at dispatch.
 These must also respect the input freeze required by the consuming component.
 
 The second condition is for the system outputs.
-Here the system itself needs a dispatch cycle in the schedule to ensure the input hold through that cycle.
 Components producing system outputs must have guarantees strong enough to imply that the system guarantees hold at complete.
 Unlike components though, there is no output hold requirement for the system because outputs appear depending on when components producing those outputs complete.
 As before, if all the verification conditions hold, then a scheduled system is said to be correct.
