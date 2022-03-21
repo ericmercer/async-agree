@@ -10,7 +10,7 @@ We are aware that the standard Lustre language introduced similar temporal opera
 
 AGREE translates an AADL thread to a Lustre node in a \emph{constraint} style, in which the thread input and output ports are both mapped to the node input signals. Thus, the \emph{condact} expression does not automatically freeze the thread outputs. We add assertions to enforce the output freeze rule, and we use the thread \emph{complete} signal to clock the node. The \emph{complete} signal is triggered by the circular counter shown in Figure~\ref{schedule}. Figure~\ref{WPMlustre} shows an example of using \emph{condact} to model a scheduled AADL thread. 
 
-\begin{figure}[ht!]
+\begin{figure}[t!]
 \centering
 \includegraphics[width=120mm]{lustreAsync5.jpg}
 \caption{A Lustre Model of a Scheduled AADL Thread \label{WPMlustre}}

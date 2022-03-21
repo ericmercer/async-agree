@@ -1,4 +1,4 @@
-\begin{figure}[ht!]
+\begin{figure}[t!]
 \centering
 \includegraphics[width=80mm]{pre.jpg}
 \caption{A Simple Integrator AADL Model in AGREE\label{integratorFig}}
@@ -33,13 +33,13 @@ We only consider single-machine schedules. The scheduler ensures at most one com
 
 We assume the system-level inputs do not change values throughout a scheduling cycle. In practice, this means there may exist a queue that holds the system-level input messages, which are periodically sampled by the components, or the inputs may come from another system, which is inactive while the system under consideration is active.
 
-The input freeze rule may imply the assumptions could be examined at \emph{complete}, instead of \emph{dispatch}. Thus, we may not really need the \emph{dispatch} event. We keep it mainly for two reasons. First, the assumptions in general could depend on previous outputs. In our model, the outputs are updated at \emph{complete}. So the output values at \emph{dispatch} may be different from the values at the corresponding \emph{complete}. Therefore, it is important to distinguish between the two events to avoid ambiguity of the output values. Second, we find the pair (\emph{dispatch}, \emph{complete}) helps users better understand the counterexample trace, particularly with a preemptive schedule.
+The input freeze rule may imply the assumptions could be examined at \emph{complete}, instead of \emph{dispatch}. Thus, we may not really need the \emph{dispatch} event. We keep it mainly for two reasons. First, the assumptions in general could depend on previous outputs. In our model, the outputs are updated at \emph{complete}. So the output values at \emph{dispatch} may be different from the values at the corresponding \emph{complete}. Therefore, it is important to distinguish between the two events to avoid ambiguity of the output values. Second, keeping the pair (\emph{dispatch}, \emph{complete}) may help users better understand the counterexample trace, particularly with a preemptive schedule.
 
 %{\bf Model of Real-Time Schedule.}
 The original schedule is often specified in form of a sequence of time slots assigned to the components. 
 The schedule could come from an AADL real-time scheduling tool such as Cheddar \cite{cheddar}, or from a scheduler provided by an RTOS/Microkernel vendor, such as seL4 \cite{sel4}. 
 To properly model the schedule in AGREE, the component execution time has to be considered. Consider the example shown in Figure \ref{RTschedule}. There are two scheduled components $A$ and $B$. We refer to the original schedule and its model in AGREE as the real-time schedule and AGREE schedule, respectively.
-\begin{figure}[ht!]
+\begin{figure}[t!]
 \centering
 \includegraphics[width=130mm]{RTschedule.jpg}
 \caption{Models of Real-Time Schedule in AGREE\label{RTschedule}}

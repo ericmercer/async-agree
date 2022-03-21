@@ -1,6 +1,6 @@
 The scheduling semantics can often be directly modeled in the AADL AGREE annex. At the component level, this requires introducing two Boolean variables \emph{dispatch} and \emph{complete}, augmenting the original \emph{assumptions} and \emph{guarantees} with \emph{dispatch} and \emph{complete}, respectively, and adding additional \emph{guarantees} to enforce the output freeze rule. We often omit the assumptions of frozen inputs, as they are trivially satisfied by the schedule definition, the output freeze rule, and the system-level assumptions.
 
-\begin{figure}[ht!]
+\begin{figure}[t!]
 \centering
 \includegraphics[width=130mm]{wpmAGREE3.jpg}
 \caption{Modeling of Scheduling Semantics in AGREE\label{wpmAGREE}}
@@ -16,7 +16,7 @@ We set the limit to the period of the schedule.
 Based on the current count, the counter triggers a corresponding scheduling event.
 Figure \ref{schedule} shows an AGREE model of the schedule $(ABACD)$.
 
-\begin{figure}[ht!]
+\begin{figure}[t!]
 \centering
 \includegraphics[width=80mm]{schedule.jpg}
 \caption{Model of a Schedule in AGREE\label{schedule}}
