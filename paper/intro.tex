@@ -23,20 +23,12 @@ implementation.
 % Brief overview of AADL
 The Architecture Analysis and Design Language (AADL) was developed to capture the important 
 design concepts in distributed real-time embedded systems~\cite{FeilerModelBasedEngineering2012}. 
-%AADL is therefore well-suited for modeling avionics system architectures, and provides an excellent mechanism for capturing the important details of the system design. 
 AADL captures both the hardware and software architecture in a hierarchical format,  
-%It provides hardware component models including processors, buses, memories, and I/O devices, and software component models including threads, processes, and subprograms. 
-%Interfaces for these components and data flows between components can also be defined. 
-%The language offers a high degree of flexibility in terms of architecture and component detail. 
 offering a high degree of flexibility and supporting incremental development 
 in which an architecture is refined to add increasing levels of detail.
-%This supports incremental development, where the architecture is refined to increasing levels of detail and where components can be refined with additional details over time. 
-%AADL models can be built and managed using the Eclipse-based Open Source AADL Development Environment (OSATE) \cite{osate}. OSATE includes a number of tools for checking model characteristics, such as schedulability and data flows.  
-%
-% Need for compositional analysis - scalability, consistent with and supports development process, proof follows architecture
+
 In AADL, an architecture model includes component interfaces, connections, and execution characteristics, but not component implementations. It describes the interactions between components and their arrangement in the system, but the lowest level 
 components themselves are ``black boxes.'' Their implementations must be described separately using model-based behavioral specification languages or traditional programming languages, which may be included by reference in the architecture model.  
-%This separation of implementation and architecture is an important factor in achieving scalability for the analysis tools that we have developed.
 
 In previous work, we developed the Assume Guarantee Reasoning Environment (AGREE)~\cite{8625938}, a language and tool for compositional verification of AADL models.  The behavior of a model is described by {\em contracts} specified for each component.  A contract contains a set of {\em assumptions} about the component's inputs and a set of {\em guarantees} about the outputs.  The guarantees of a component must be true provided that the component's assumptions are true.  The goal of an AGREE analysis is to prove that each component's contract is entailed by the contracts of its subcomponents.  Guarantees on a leaf-level component must be verified to hold by its implementation.  
 
@@ -44,4 +36,4 @@ AGREE was originally developed to reason about systems that execute synchronousl
 
 In this paper, we extend the AGREE framework to enable the verification of \textit{scheduled} AADL models. We introduce virtual scheduling events, which tie AADL timing and scheduling semantics to AGREE contracts. This enhancement enables AGREE to take the software execution schedule into account in the analysis. Furthermore, it enables formal verification of a new class of embedded system architectures. 
 
-This paper is organized as follows. First we illustrate the motivation of our work using simple examples in Section~\ref{example}. We then provide an informal description of our interpretation of the scheduling semantics in Section~\ref{overview}, followed by formal definitions of the model in Section~\ref{async}. We present the modeling of the semantics in the AGREE AADL annex and Lustre backend in Section~\ref{agree} and Section~\ref{lustre}, respectively. We demonstrate usage of the proposed model in a case study in Section~\ref{case-study}. Related work is presented in Section~\ref{rw}.  We discuss our conclusion and future work in Section~\ref{conclusion}.  
+This paper is organized as follows. First we illustrate the motivation of our work using simple examples in Section~\ref{example}. We then provide an informal description of our interpretation of the scheduling semantics in Section~\ref{overview}, followed by formal definitions of the model in Section~\ref{async}. We present the modeling of the semantics in the AGREE AADL annex and Lustre backend in Section~\ref{agree} and Section~\ref{lustre}, respectively. We demonstrate usage of the model in a case study in Section~\ref{case-study}. Related work is presented in Section~\ref{rw}.  We discuss our conclusion and future work in Section~\ref{conclusion}.  

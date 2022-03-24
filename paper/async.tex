@@ -2,13 +2,10 @@
 A \emph{signal} $x$ is a function $x: N \rightarrow V$, where $N$ is the set of natural numbers including zero, and $V$ is a value set. 
 A signal is \emph{Boolean} if the value set is the Boolean domain.
 We use $x(n)$ to denote the value of signal $x$ at instant $n$. 
-%A \emph{trace} $\sigma_x$ of a signal $x$ is a possibly infinite sequence of values $(x(1), x(2),... )$. 
 
 \noindent{\bf Port.}
-%Let $Q ={q_1, ...,q_M}$ be a set of ports, where $q_i$ is the name of the i-th port. 
 Let $Q$ be a set of ports. 
-For each port $q \in Q$, a set $V_q$ denotes the values that may be assigned to port $q$. %$V_q$ is called the type of port $q$. 
-%A \emph{valuation} of $Q$ is an assignment of a value in $V_q$ to each port $q \in Q$.
+For each port $q \in Q$, a set $V_q$ denotes the values that may be assigned to port $q$. 
 A signal $x_q$ at port $q$ is a function $x_q: N \rightarrow V_q$.
 A \emph{trace} $\sigma_Q$ of $Q$ is an assignment of a signal $x_q$ to each port $q$ in $Q$.
 We use $\Sigma_Q$ to denote the set of all traces of $Q$.
@@ -26,7 +23,7 @@ Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} 
 \end{enumerate}
 
 The first condition requires that \emph{dispatch} and \emph{complete} are mutually exclusive. The second and third conditions state that \emph{dispatch} and \emph{complete} appear in pairs, and in each pair \emph{dispatch} appears before \emph{complete}. The fourth and fifth conditions ensure that \emph{dispatch} and \emph{complete} appear alternately. 
-From hereon we only consider a well-ordered pair (\emph{dispatch}, \emph{complete}).
+From here on we only consider a well-ordered pair (\emph{dispatch}, \emph{complete}).
 
 An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a set of integers $[n, m] \cap N, n,m \in N, n < m$, satisfying:
 
@@ -44,28 +41,16 @@ A (scheduled) \emph{component} $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, 
 \begin{itemize}
     	\item $I_c$ is a finite set of ports, called \emph{inputs},
     	\item $O_c$ is a finite set of ports disjoint from $I_c$, called \emph{outputs},
-%	\item $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, called behavior,
-%	\item $A_c$ and $P_c$ are prefix-closed subsets of $(I_c \cup O_c)^\omega$, called \emph{assumptions} and \emph{guarantees}, respectively,
-%	\item $A_c$ and $P_c$ are two Boolean functions $(I_c \cup O_c)^\omega \rightarrow B$, called \emph{assumptions} and \emph{guarantees}, respectively,	
 	\item $A_c$ and $P_c$ are two past-time LTL formulas on a trace $\sigma_c \in \Sigma_{I_c \cup O_c}$, called \emph{assumptions} and \emph{guarantees}, respectively,	
     	\item ($dispatch_c$, $complete_c$) is a pair of \emph{well-ordered} Boolean signals.
 \end{itemize}
-%A \emph{trace} $\sigma_c$ of a component $c$ is an assignment of a signal $x_q$ to each port $q$ in $I \cup O$.
 
-%Let $\mathcal{A}_c$ be a function $(I_c \cup O_c)^\omega \rightarrow B$, such that $\forall \Sigma \in A_c, \mathcal{A}_c(\Sigma) = 1$.
-%Let $\mathcal{P}_c$ be a function $(I_c \cup O_c)^\omega \rightarrow B$, such that $\forall \Sigma \in P_c, \mathcal{P}_c(\Sigma) = 1$.
+The \emph{behaviors} of a component $c$ are a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that $\forall \sigma_c \in \Sigma_{I_c \cup O_c}, \sigma_c \in \Sigma_c $ if and only if the following propositions hold:
 
-%A component is said to be \emph{consistent} if it satisfies the following rules.
-%A component satisfies the following rules.
-%Given a component $c$ and a trace $\sigma_c \in \Sigma_{I_c \cup O_c}$, we define the following propositions:
-
-The \emph{behaviors} of a component $c$ are a set $\Sigma_c \subseteq \Sigma_{I_c \cup O_c}$, such that $\forall \sigma_c \in \Sigma_{I_c \cup O_c}, \sigma_c \in \Sigma_c $ if and only if the following propositions hold.
-%A component $c$ is said to be \emph{consistent} if for all $\sigma_c \in \Sigma_c$ the following propositions hold.
-
+\bigskip
 The \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
 \label{eqn:assumption}
-%	dispatch_c(n) \implies A((I_c \cup O_c)^n), \forall n\in N.
 	dispatch_c(n) \implies (\sigma_c, n) \models A_c, \forall n\in N.
 \end{equation}
 
@@ -78,7 +63,6 @@ Inputs freeze between \emph{dispatch} and \emph{complete}. That is,
 The \emph{guarantees} hold at \emph{complete}. That is,
 \begin{equation} 
 \label{eqn:guarantee}
-%	complete_c(n) \implies P((I_c \cup O_c)^n), \forall n\in N.
 	complete_c(n) \implies (\sigma_c, n) \models P_c, \forall n\in N.
 \end{equation}
 
@@ -140,12 +124,7 @@ A set $C$ of components are said to be \emph{compatible} if no two components dr
 \begin{equation*}
 	\forall c_i,c_j \in C, c_i\neq c_j, O_{c_i} \cap O_{c_j} = \varnothing.
 \end{equation*}
-%A set $C$ of components are said to be \emph{connected} if a
-%\begin{equation*}
-%	\forall c_i \in C, \exists c_j \in C, c_i\neq c_j, O_{c_i} \cap I_{c_j} \neq \varnothing \vee O_{c_j} \cap I_{c_i} \neq \varnothing.
-%\end{equation*}
-%A set $C$ of compatible, connected, scheduled components is a \emph{system} $S = (I_s, O_s, A_s, P_s, \phi, dispatch_s, complete_s)$, where:
-%A set $C$ of compatible, connected, scheduled components is a \emph{system} $S = (I_s, O_s, A_s, P_s, dispatch_s, complete_s)$, where:
+
 A \emph{system} $S$ is a tuple $(C, \phi, I_s, O_s, A_s, P_s, dispatch_s, complete_s)$, where:
 \begin{itemize}
 	\item $C$ is a set of compatible, scheduled components,
@@ -192,7 +171,6 @@ The system-level \emph{guarantees} hold at \emph{complete}. That is,
 	complete_s(n) \implies (\sigma_s, n) \models P_s, \forall n\in N.
 \end{equation}
 
-%Equations \ref{eqn:sys_assumption}, \ref{eqn:sys_inputfreeze}, and \ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
 Equations \ref{eqn:sys_assumption}--\ref{eqn:sys_guarantee} represent the system specification of a set of scheduled components. 
 Our verification goal is to prove that the system behaviors satisfy the system specification. 
 Note that we do not define the system output freeze rule.
