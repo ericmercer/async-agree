@@ -1,16 +1,15 @@
 
 
 %For demonstration, we modeled a UAV system. The target application is waterway monitor. The waterway area consists of a set of fly-in zones and fly-out zones. The goal of the UAV is to fly from one end of the waterway to the other end in minimum distance, while staying inside the fly-in zones and outside the fly-out zones.
-The approach presented in this paper was applied to the BriefCASE toolchain~\cite{CASEAtScale}, which was developed on the DARPA CASE program to help system engineers design inherently cyber-resilient embedded systems.
-A UAV surveillance system was modeled as a part of the demonstration effort,
-whose mission was to fly from one end of a (meandering) waterway to the other while adhering to a set of keep-in and keep-out zones.
+The approach presented in this paper was applied to the BriefCASE toolchain~\cite{CASEAtScale}, which was developed on the DARPA CASE program to assist engineers in the design of inherently cyber-resilient embedded systems.
+As part of the demonstration effort, a UAV surveillance system architecture was modeled in AADL. 
+%
+Figure~\ref{SW} shows the architecture of the UAV mission computer software, which receives commands from a ground station to conduct surveillance along a geographical feature, such as a river.  The software generates a flight plan adhering to a set of keep-in and keep-out zones, which is then sent to the UAV flight controller. 
 
-Figure~\ref{SW} shows an overview of the software architecture.
-The initial design only included the UxAS~\cite{uxas} flight planning component, waypoint plan manager, UART driver, radio driver, and fly-zone database.
+The baseline design included the UxAS~\cite{uxas} flight planning component, waypoint plan manager, UART driver, radio driver, and fly-zone database.
 These components were associated with varying levels of trustworthiness.
-In particular, UxAS was treated as blackbox software and deemed as potentially security-compromised since it was an open-source component developed by a third party.
-BriefCASE includes cybersecurity analysis plugins that generated cyber-requirements corresponding to vulnerabilities in the design.  The BriefCASE cyber-resiliency tool was then used to address the requirements by transforming the model, thereby mitigating the corresponding vulnerability.  The transformations inserted eight high-assurance components into the model including attestation management, monitors, and filters.
-%: attestation gate, attestation manager, two monitors, and four filters.
+In particular, UxAS was treated as blackbox software and deemed potentially security-compromised since it was an open-source component developed by a third party.
+BriefCASE includes tools that analyze architecture models and generate requirements corresponding to vulnerabilities in the design.  The BriefCASE cyber-resiliency tool was then used to address the requirements by transforming the model, thereby mitigating the corresponding vulnerabilities.  The transformations inserted eight high-assurance components into the model including an attestation manager, attestation gate, two monitors, and four filters.
 AGREE behavioral specifications for these components were provided, describing their intended functionality.
 %manually entered by the user based on the cyber-security vulnerabilities being mitigated.
 
