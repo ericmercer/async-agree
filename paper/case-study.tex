@@ -38,6 +38,20 @@ The following system-level security properties were to be verified in the presen
 % 	\item The system only responds to trusted sources
 % 	\item The waypoints generated are \emph{geo-fenced}
 % \end{itemize}
-Our framework was able to prove these properties in less than 2 minutes on a PC with 2.6 GHz CPU and 32 GB RAM.
+The encoding of the well-formedness property and its assumptions is shown in Figure~\ref{wellformed}. 
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=90mm]{wellformed.jpg}
+\caption{Assumptions and Well-formedness Properties Modeled in AGREE \label{wellformed}}
+\end{figure}
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=110mm]{proof.png}
+\caption{Use Case Verification Results in AGREE \label{proof}}
+\end{figure}
+
+Our framework was able to prove these properties in less than 2 minutes on a PC with 2.6 GHz CPU and 32 GB RAM. The verification results is shown in Figure~\ref{proof}. 
 
 The case study is reflective of a development workflow in which we first verify that the component contracts hold under a synchronous dataflow model.  As the design is refined and an execution schedule for each component is specified, we want to show that the system properties continue to hold.  Our new framework enables such verification, providing assurance of intended behavior at runtime. 
