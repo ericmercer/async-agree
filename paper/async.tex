@@ -79,9 +79,9 @@ Equation \ref{eqn:assumption}, \ref{eqn:inputfreeze}, \ref{eqn:guarantee}, and \
 \bigskip
 \noindent{\bf Connection.}
 Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
-\begin{equation*}
+\begin{equation}
 	O_c \cap I_{c'} \neq \varnothing \vee O_{c'} \cap I_c \neq \varnothing.
-\end{equation*}
+\end{equation}
 Note that by definition the intersection of a component's inputs and outputs is empty. Thus, we forbid a component from connecting to itself.
 
 \bigskip
@@ -106,30 +106,30 @@ A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every 
 If a schedule is minimal and non-preemptive, we could simplify the notation and denote the schedule as a function that maps $[1, |C|] \cap N$ to $C$, as shown in the previous examples.
 
 Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complete} signals of each component $c \in C$ are defined as follows: $\forall i \in N$,
-\begin{equation*}
+\begin{equation}
 \label{eqn:dispatch}
     dispatch_c^\phi(i) =
     \begin{cases}
       1, & \text{if } \phi(i \mod T) = (c, \textsf{Dispatch}) \\
       0, & \text{otherwise}
     \end{cases},
-\end{equation*}
+\end{equation}
 
-\begin{equation*}
+\begin{equation}
 \label{eqn:complete}
     complete_c^\phi(i) =
     \begin{cases}
       1, & \text{if } \phi(i \mod T) = (c, \textsf{Complete}) \\
       0, & \text{otherwise}
     \end{cases}.
-\end{equation*}
+\end{equation}
 
 \bigskip
 \noindent{\bf System.}
 A set $C$ of components are said to be \emph{compatible} if no two components drive the same output. That is,
-\begin{equation*}
+\begin{equation}
 	\forall c_i,c_j \in C, c_i\neq c_j, O_{c_i} \cap O_{c_j} = \varnothing.
-\end{equation*}
+\end{equation}
 
 A \emph{system} $S$ is a tuple $(C, \phi, I_s, O_s, A_s, P_s, dispatch_s, complete_s)$, where:
 \begin{itemize}
@@ -151,9 +151,9 @@ A \emph{system} $S$ is a tuple $(C, \phi, I_s, O_s, A_s, P_s, dispatch_s, comple
 \end{itemize}
 We have $I_s  \cup O_s = \cup_{\forall c \in C}(I_c \cup O_c)$.
 The \emph{behaviors} of a system $S$ are a set $\Sigma_s \subseteq \Sigma_{I_s \cup O_s}$, such that $\forall \sigma_s \in \Sigma_{I_s \cup O_s}$, 
-\begin{equation*}
+\begin{equation}
 	\sigma_s\in \Sigma_s  \iff \forall c \in C, \exists \sigma_c \in \Sigma_c, \sigma_s|_{I_c \cup O_c} = \sigma_c.
-\end{equation*}
+\end{equation}
 Informally, a trace of a system's ports is a behavior of the system if and only if its projection onto any component's ports is a behavior of the component. 
 This implies a system behavior maps the connected ports to the same signal.
 We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). And we use $\Delta_s$ to denote the set of all such intervals.
