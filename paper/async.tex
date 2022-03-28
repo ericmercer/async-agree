@@ -3,6 +3,7 @@ A \emph{signal} $x$ is a function $x: N \rightarrow V$, where $N$ is the set of 
 A signal is \emph{Boolean} if the value set is the Boolean domain.
 We use $x(n)$ to denote the value of signal $x$ at instant $n$. 
 
+\bigskip
 \noindent{\bf Port.}
 Let $Q$ be a set of ports. 
 For each port $q \in Q$, a set $V_q$ denotes the values that may be assigned to port $q$. 
@@ -10,7 +11,8 @@ A signal $x_q$ at port $q$ is a function $x_q: N \rightarrow V_q$.
 A \emph{trace} $\sigma_Q$ of $Q$ is an assignment of a signal $x_q$ to each port $q$ in $Q$.
 We use $\Sigma_Q$ to denote the set of all traces of $Q$.
 Given a set $Q' \subseteq Q$, the \emph{projection} of a trace $\sigma_Q$ onto $Q'$ is the assignment of signal $x_q$ to each port $q$ in $Q'$, as defined in $\sigma_Q$. We denote the projection as $\sigma_Q|_{Q'}$.
- 
+
+\bigskip 
 \noindent{\bf Dispatch and Complete.}
 Two Boolean signals \emph{dispatch} and \emph{complete} are \emph{well-ordered} if 
 
@@ -35,6 +37,7 @@ An \emph{interval} $\delta$ of a pair (\emph{dispatch}, \emph{complete}) is a se
 
 We denote the set of all such intervals as $\Delta$.
 
+\bigskip
 \noindent{\bf Component.}
 A (scheduled) \emph{component} $c$ is a tuple $(I_c, O_c, A_c, P_c, dispatch_c, complete_c)$, where: 
 
@@ -73,6 +76,7 @@ Outputs freeze between \emph{completes}. That is,
 \end{equation}
 Equation \ref{eqn:assumption}, \ref{eqn:inputfreeze}, \ref{eqn:guarantee}, and \ref{eqn:outputfreeze} represent the specification of a scheduled component.
 
+\bigskip
 \noindent{\bf Connection.}
 Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
 \begin{equation*}
@@ -80,6 +84,7 @@ Two components $ c, c', c\neq c'$ are said to be \emph{connected} if
 \end{equation*}
 Note that by definition the intersection of a component's inputs and outputs is empty. Thus, we forbid a component from connecting to itself.
 
+\bigskip
 \noindent{\bf Schedule.}
 Let $C$ be a finite set of components, a \emph{schedule} $\phi$ of $C$ with \emph{length} $T\in N$ is a partial function $[1, T]  \cap N\rightarrow C\times \{\textsf{Dispatch}, \textsf{Complete}\}$, where \textsf{Dispatch} and \textsf{Complete}\ are two strings, satisfying:
 
@@ -119,6 +124,7 @@ Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complet
     \end{cases}.
 \end{equation*}
 
+\bigskip
 \noindent{\bf System.}
 A set $C$ of components are said to be \emph{compatible} if no two components drive the same output. That is,
 \begin{equation*}
@@ -151,8 +157,9 @@ The \emph{behaviors} of a system $S$ are a set $\Sigma_s \subseteq \Sigma_{I_s \
 Informally, a trace of a system's ports is a behavior of the system if and only if its projection onto any component's ports is a behavior of the component. 
 This implies a system behavior maps the connected ports to the same signal.
 We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). And we use $\Delta_s$ to denote the set of all such intervals.
-Given a system $S$ and a trace $\sigma_s \in \Sigma_{I_s \cup O_s}$, we define the following propositions.
+Given a system $S$ and a trace $\sigma_s \in \Sigma_{I_s \cup O_s}$, we define the following propositions:
 
+\bigskip
 The system-level \emph{assumptions} hold at \emph{dispatch}. That is,
 \begin{equation} 
 \label{eqn:sys_assumption}

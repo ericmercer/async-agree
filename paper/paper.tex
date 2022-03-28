@@ -14,6 +14,28 @@
 % to display URLs in blue roman font according to Springer's eBook style:
 % \renewcommand\UrlFont{\color{blue}\rmfamily}
 
+\lstdefinestyle{agree} 
+ {frame=none, 
+   basicstyle=\ttfamily, 
+   language=ML, 
+   aboveskip=3mm, 
+   belowskip=3mm, 
+   showstringspaces=false, 
+   columns=flexible, 
+   numbers=none, 
+   numberstyle=\tiny\color{gray}, 
+   commentstyle=\color{dkgreen}, 
+   stringstyle=\color{mauve}, 
+   breaklines=false, 
+   breakatwhitespace=true, 
+   tabsize=2, 
+   linewidth=2\linewidth, 
+   morecomment=[l]{--}, 
+   escapeinside={*}{*}, 
+   morekeywords={node, assume, eq, bool, guarantee, assume, true, false, pre, not, and, or, property, const, Historically, Since, Once, event, annex, Implementation, process, subcomponents} 
+} 
+
+
 \begin{document}
 %
 \title{Assume-Guarantee Reasoning with Scheduled Components
@@ -91,11 +113,13 @@
 \input{conclusion}
 
 \section*{ACKNOWLEDGMENT}
-
 This work was funded by DARPA contract HR00111890001. The
 views, opinions and/or findings expressed are those of the author
 and should not be interpreted as representing the official views or
 policies of the Department of Defense or the U.S. Government.
+
+We would like to thank John Hatcliff and Robby for discussions that helped us understanding the AADL semantics.
+We also want to thank David Hardin and anonymous reviewers for their comments that greatly improved the paper.
 
 %
 % ---- Bibliography ----
