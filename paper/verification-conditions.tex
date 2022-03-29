@@ -35,8 +35,8 @@ We define $\mathbb{I}_c$ to be the set of components providing input to some com
         & \forall c \in \components &  
             \globally(\historically(\assumes \wedge 
             \bigwedge_{c^\prime \in \mathbb{I}_c} P_{c^\prime}) 
-            \implies \assumes_c) \\
- \wedge &   & 
+            \implies \assumes_c)  \wedge \\
+ &   & 
             \globally(\historically(\assumes \wedge 
             \bigwedge_{c^\prime \in \mathbb{O}} \guarantees_{c^\prime}) 
             \implies \guarantees)
@@ -45,17 +45,17 @@ We define $\mathbb{I}_c$ to be the set of components providing input to some com
 The first condition checks the input assumptions on each component under the system assumptions and upstream component guarantees. The second checks the output guarantees of the system under the system assumptions and component guarantees providing the output.  If both conditions hold, then the system is said to be \emph{correct}, meaning that $\globally(\historically(\assumes) \implies \guarantees)$ holds.
 
 The verification conditions are extended to scheduled components by adding a notion of \textit{dispatch} and \textit{complete} to the verification conditions.
-We define a predicate $\same{X}$ that is true in the first moment, and after that, true is any moment if and only if the signals in the set $X$ are unchanged from the previous moment.
+We define a predicate $\same{X}$ that is true in the first moment, and after that, true at any moment if and only if the signals in the set $X$ are unchanged from the previous moment.
 We also define the predicate $\dpred_c$ to be true if the current moment is in a dispatch interval for the component $c$ according the schedule.
 
 The assumptions in a scheduled component must hold at dispatch, and the guarantees of the same component must hold at complete.
-A component also assumes its inputs are invariant through the dispatch interval and it guarantees the outputs are invariant between complete cycles.
+A component also assumes that its inputs are invariant through the dispatch interval and it guarantees that the outputs are invariant between complete cycles.
 These requirements are captured in the following predicates where $x$ is a component:
 \begin{eqnarray*}
   \dispred_x(\assumes_x) &=& \left[\left(\dispatch^\schedule_x \wedge \assumes_x\right) \vee \left(\dpred_x \wedge \same{\inputs_x}\right)\right] \\
   \compred_x(\guarantees_x) &=& \left[\left(\complete^\schedule_x \wedge \guarantees_x\right) \vee \left(\neg\complete^\schedule_x \wedge \same{\outputs_x}\right)\right] \\
 \end{eqnarray*}
-$\dispred_x(\assumes_x)$ relies on the scheduling interval, $\dpred_x$, for the input hold assumption.
+$\dispred_x(\assumes_x)$ relies on the scheduling interval, $\dpred_x$, for the input assumption to hold.
 The guarantee on the output hold is more direct relying only on the current value of $\complete^\schedule_x$.
 
 A scheduled system, $\system = (\components, \schedule, \inputs, \outputs, \assumes, \guarantees)$, is correct if and only if for all $\pi$ and for all $i \ge 0$ the following holds:
@@ -64,8 +64,8 @@ A scheduled system, $\system = (\components, \schedule, \inputs, \outputs, \assu
         & \forall c \in \components &  
             \globally\left[\historically\left(\dispred_S\left(\assumes\right) \wedge 
             \bigwedge_{c^\prime \in \mathbb{I}_c} \compred_{c^\prime}\left(P_{c^\prime}\right)\right) 
-            \implies \dispred_c\left(\assumes_c\right)\right] \\ \\
- \bigwedge &   & 
+            \implies \dispred_c\left(\assumes_c\right)\right] \bigwedge \\ \\
+  &   & 
             \globally\left[\historically\left(\dispred_S\left(\assumes\right) \wedge 
             \bigwedge_{c^\prime \in \mathbb{O}} \compred_{c^\prime}\left(\guarantees_{c^\prime}\right)\right)
             \implies \left(\complete^\schedule_s \wedge \guarantees_s\right)\right]
@@ -79,7 +79,7 @@ These must also respect the input freeze required by the consuming component.
 The second condition is for the system outputs.
 Components producing system outputs must have guarantees strong enough to imply that the system guarantees hold at complete.
 Unlike components though, there is no output hold requirement for the system because outputs appear depending on when components producing those outputs complete.
-As before, if all the verification conditions hold, then a scheduled system is said to be correct.
+As before, if all of the verification conditions hold, then a scheduled system is said to be correct.
 Correct means that for the schedule $\schedule\prime$, $\globally\left[\historically\left(\dispredp_S\left(\assumes\right)\right) 
 \implies \compredp_{\system}\left(\guarantees\right)\right]$ holds.
 Here the internal components of the system are completely abstracted away, and the system itself is just some scheduled component in $\schedule\prime$ belonging to a larger system.

@@ -1,4 +1,7 @@
-{\bf Signal.}
+In this section we formally define the proposed model.
+
+\bigskip
+\noindent{\bf Signal.}
 A \emph{signal} $x$ is a function $x: N \rightarrow V$, where $N$ is the set of natural numbers including zero, and $V$ is a value set. 
 A signal is \emph{Boolean} if the value set is the Boolean domain.
 We use $x(n)$ to denote the value of signal $x$ at instant $n$. 
@@ -99,7 +102,7 @@ Let $C$ be a finite set of components, a \emph{schedule} $\phi$ of $C$ with \emp
 \end{enumerate}
 
 The first four conditions ensure the pair (\textsf{Dispatch}, \textsf{Complete}) associated with a component is \emph{well-ordered} in a schedule. 
-The fifth condition allows a component to be \emph{preempted} by another component if the two have no connection. The sixth condition ensures the scheduling events of two components are interleaved in a proper order.
+The fifth condition allows a component to be \emph{preempted} by another component if the two have no connection. The sixth condition ensures that the scheduling events of two components are interleaved in a proper order.
 A schedule is \emph{minimal} if $\phi$ is a \emph{total} function. This means that at each instant there is either a \emph{dispatch} or a \emph{complete}. 
 A schedule is \emph{fair} if $\phi$ is \emph{surjective}. This means that every component is scheduled to execute at least once.
 %In our framework, we only consider fair schedules.
@@ -126,7 +129,7 @@ Given a schedule $\phi$ of components $C$, the \emph{dispatch} and \emph{complet
 
 \bigskip
 \noindent{\bf System.}
-A set $C$ of components are said to be \emph{compatible} if no two components drive the same output. That is,
+A set $C$ of components are said to be \emph{compatible} if no two components share the same output. That is,
 \begin{equation}
 	\forall c_i,c_j \in C, c_i\neq c_j, O_{c_i} \cap O_{c_j} = \varnothing.
 \end{equation}
@@ -155,7 +158,7 @@ The \emph{behaviors} of a system $S$ are a set $\Sigma_s \subseteq \Sigma_{I_s \
 	\sigma_s\in \Sigma_s  \iff \forall c \in C, \exists \sigma_c \in \Sigma_c, \sigma_s|_{I_c \cup O_c} = \sigma_c.
 \end{equation}
 Informally, a trace of a system's ports is a behavior of the system if and only if its projection onto any component's ports is a behavior of the component. 
-This implies a system behavior maps the connected ports to the same signal.
+This implies that a system behavior maps the connected ports to the same signal.
 We use $\delta_s$ to denote an \emph{interval} of the pair ($dispatch_s, complete_s$). And we use $\Delta_s$ to denote the set of all such intervals.
 Given a system $S$ and a trace $\sigma_s \in \Sigma_{I_s \cup O_s}$, we define the following propositions:
 

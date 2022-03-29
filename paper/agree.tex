@@ -2,12 +2,12 @@ The scheduling semantics can often be directly modeled in the AADL AGREE annex. 
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=130mm]{wpmAGREE3.jpg}
+\includegraphics[width=\columnwidth]{wpmAGREE3.jpg}
 \caption{Modeling of Scheduling Semantics in AGREE\label{wpmAGREE}}
 \end{figure}
 
 Figure \ref{wpmAGREE} shows a simplified AADL model originally developed on the DARPA CASE program~\cite{MODELS}. The first two \emph{guarantees} are added to freeze the outputs between completions. Also the original contract (the assumption and the third \emph{guarantee}) are augmented with \emph{dispatch} and \emph{complete}.
-In practice, we find that direct modeling is helpful to clarify the semantics with users. However, in general it could be a complex task, particularly if the contracts depend on past history. In the next session, we will discuss how the Lustre backend model is used to handle the general case.
+In practice, we find that direct modeling is helpful to clarify the semantics with users. However, in general it could be a complex task, particularly if the contracts depend on past history. In the next section, we will discuss how the Lustre backend model is used to handle the general case.
 
 At the system level, we use a circular counter to model a cyclic schedule in AGREE. 
 The counter updates at every instant. Once it reaches the limit, it resets to one at the next instant.
@@ -18,7 +18,7 @@ Figure \ref{schedule} shows an AGREE model of the schedule $(ABACD)$.
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width=\columnwidth]{schedule.jpg}
+\includegraphics[width=80mm]{schedule.jpg}
 \caption{Modeling Schedule with Circular Counter in AGREE\label{schedule}}
 \end{figure}
 
